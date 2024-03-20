@@ -1,0 +1,29 @@
+{
+  "name": "site-unseen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./routes/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JustPinero/site-unseen.git"
+  },
+  "author": "just",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JustPinero/site-unseen/issues"
+  },
+  "homepage": "https://github.com/JustPinero/site-unseen#readme",
+  "dependencies": {
+    "@google/maps": "^1.1.3",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.1",
+    "express-router": "^0.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mysql": "^2.18.1"
+  }
+}
