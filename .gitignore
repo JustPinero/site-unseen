@@ -1,3 +1,7 @@
+# IOS
+.DS_Store
+#Docker
+server/images
 # Logs
 logs
 *.log
