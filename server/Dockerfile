@@ -1,4 +1,4 @@
-FROM node:TAG
+FROM node:18.17.1
 
 RUN mkdir -p /app
 WORKDIR /app
