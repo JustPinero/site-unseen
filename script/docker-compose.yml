@@ -1,0 +1,14 @@
+services:
+  script:
+    build: ./
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: npm run start
+
+networks:
+  default:
+    name: site_unseen_network
+    external: true
