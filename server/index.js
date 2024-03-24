@@ -23,10 +23,10 @@ const socketIO = require('socket.io')(http, {
 
 const { Pool } = require('pg')
 const pool = new Pool({
-	user: 'admin',
-	host: 'postgres-db',
-	database: 'site-unseen',
-	password: 'root',
+	user: 'postgres',
+	host: '127.0.0.1', // LOCAL HOST - note: 127.0.0.1 true local host translated in your /etc/hosts (a file that exists on your system and does main name translation for you)
+	database: 'site_unseen',
+	password: 'PassWordle101!',
 	port: 5432,
 })
 
@@ -62,9 +62,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 require('./routes/signup.js')(app, pool, bcrypt, transporter);
-require('./routes/login_logout.js')(app, pool, bcrypt)
+require('./routes/login.js')(app, pool, bcrypt)
 require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
-require('./routes/profile.js')(app, pool, upload, fs, path, bcrypt)
 require('./routes/browsing.js')(app, pool, transporter, socketIO)
 
 const PORT = process.env.PORT || 3001

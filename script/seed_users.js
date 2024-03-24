@@ -21,13 +21,13 @@ const tag_names = ["work", "dog", "music", "travel", "outdoors", "books",
 	"health", "science", "history", "politics", "religion", "philosophy",
 	"psychology", "education", "family", "friends", "cats"]
 
-const pool = new Pool({
-	user: 'admin',
-	host: 'postgres-db',
-	database: 'site_unseen',
-	password: 'root',
-	port: 5432,
-})
+    const pool = new Pool({
+        user: 'postgres',
+        host: '127.0.0.1', // LOCAL HOST - note: 127.0.0.1 true local host translated in your /etc/hosts (a file that exists on your system and does main name translation for you)
+        database: 'site_unseen',
+        password: 'PassWordle101!',
+        port: 5432,
+    })
 
 const connectToDatabase = () => {
 	pool.connect((err, client, release) => {
@@ -37,7 +37,6 @@ const connectToDatabase = () => {
 			setTimeout(connectToDatabase, 5000)
 		} else {
 			console.log('Connected to database')
-			initTags()
 			initUsers()
 				.then(() => {
 					console.log("User creating finished, you can close this window")
@@ -46,24 +45,6 @@ const connectToDatabase = () => {
 	})
 }
 connectToDatabase()
-
-const initTags = async () => {
-	for (let i = 0; i < tag_names.length; i++) {
-		let sql = `SELECT * FROM tags WHERE tag_content = LOWER($1)`
-		let values = [tag_names[i]]
-		let res = await pool.query(sql, values)
-		if (res.rows.length === 0) {
-			sql = `INSERT INTO tags (tag_content) VALUES (LOWER($1))`
-			values = [tag_names[i]]
-			await pool.query(sql, values)
-		}
-		let tag = {
-			tag_content: tag_names[i],
-			tagged_user: []
-		}
-		tags.push(tag)
-	}
-}
 
 const createUser = async (gender) => {
 	let firstname, lastname
