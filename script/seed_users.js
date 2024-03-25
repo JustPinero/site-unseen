@@ -12,10 +12,27 @@ function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min) + min)
 }
 
+function randomLimitedSelection(numberOfSelections, choices){
+    let updatedChoices = choices;
+    let selection = [];
+    for(let i=0 ; i<numberOfSelections; i++){
+        console.log("UPDATED CHOICES:  ", updatedChoices);
+        if(updatedChoices.length){
+            selectedOption = choices.random();
+            updatedChoices = updatedChoices.filter((option)=> option!==selectedOption);
+            selection.push(selectedOption);
+        }
+
+    }
+    console.log("SELECTED INTERESTS")
+    return selection;
+}
+
 const users = []
-const gender_list = ["male", "female", "other"]
-const tags = []
-const tag_names = ["work", "dog", "music", "travel", "outdoors", "books",
+const genderOptions = ["male", "female", "non-binary"]
+const sexualPreferenceOptions = ["bisexual", "male", "female"]
+
+const softDefinerOptions = ["work", "dogs", "music", "travel", "outdoors", "books",
 	"adventure", "food", "hiking", "sports", "gaming", "movies", "tv", "art",
 	"nature", "animals", "cars", "tech", "fashion", "beauty", "fitness",
 	"health", "science", "history", "politics", "religion", "philosophy",
@@ -46,7 +63,8 @@ const connectToDatabase = () => {
 }
 connectToDatabase()
 
-const createUser = async (gender) => {
+const createUser = async () => {
+    let gender = genderOptions.random();
 	let firstname, lastname
 	if (gender === "man") {
 		firstname = faker.name.firstName('male')
@@ -77,11 +95,12 @@ const createUser = async (gender) => {
 
 const createUserInfo = async (id, gender) => {
 	let age = getRandomInt(18, 120)
-	let sexual_pref = ["bisexual", "male", "female"].random()
+	let sexual_pref = sexualPreferenceOptions.random()
 	let biography = faker.lorem.paragraph()
 	let coordinates = faker.address.nearbyGPSCoordinate([60.180929, 24.957521], 5000, true)
 	let city_data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates[0]},${coordinates[1]}&key=${process.env.GOOGLE_API}`)
 	let user_location
+    let interests = randomLimitedSelection(5 , softDefinerOptions)
 	let length = city_data.data.results.length
 	if (city_data.data.results.length > 0)
 		user_location = city_data.data.results[length - 1].formatted_address
@@ -89,8 +108,9 @@ const createUserInfo = async (id, gender) => {
 		user_location = "Unknown"
 	console.log('user_location', user_location)
 	let ip_location = `(${coordinates[0]}, ${coordinates[1]})`
-	let sql = `INSERT INTO user_info (user_id, gender, age, sexual_pref, biography, user_location, ip_location) VALUES ($1,$2,$3,$4,$5,$6,$7)`
-	let values = [id, gender, age, sexual_pref, biography, user_location, ip_location]
+	let sql = `INSERT INTO user_info (user_id, gender, age, sexual_pref, biography, user_location, ip_location, interests) VALUES ($1,$2,$3,$4,$5,$6,$7, $8)`
+    console.log("interests: ", interests)
+	let values = [id, gender, age, sexual_pref, biography, user_location, ip_location, interests]
 	await pool.query(sql, values)
 }
 
@@ -100,9 +120,9 @@ const createUserInfo = async (id, gender) => {
 const initUsers = async () => {
 	console.log("User creating started")
 
-	for (let i = 0; i < 500; i++) {
+	for (let i = 0; i < 50; i++) {
 		console.log("Creating user " + i)
-		let gender = gender_list.random()
+		let gender = genderOptions.random()
 		let id = await createUser(gender)
 		await createUserInfo(id, gender)
 	}

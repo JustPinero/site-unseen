@@ -1,0 +1,14 @@
+.usertile-container {
+    background-color: lightgray;
+    border-style: solid;
+    border-color: gray;
+    border-radius: 10px;
+    padding: 4px;
+    width: auto;
+    margin-bottom: 4px;
+}
+
+.usertile-text {
+    font-weight: bold;
+
+}

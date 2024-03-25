@@ -1,32 +1,37 @@
 import {useState, useEffect} from "react"
-import heartso from './assets/heartso.png';
 import './App.css';
 import fetchUsers from "./api";
+/* COMPONENTS */
+import HeartShapedBox from "./components/HeartShapedBox";
+import UserTile from "./components/UserTile";
 
 function App() {
   const [users, setUsers] = useState([]);
   const [matches, setMatches] = useState([]);
   useEffect(()=>{
-    console.log("broken")
-    fetch('localhost:3001/api/browsing/userlists')
-      .then((res) => {
-      return res.json();
-    })
-      .then((data) => {
-          console.log(data);
-          return data
-      });
-
+    fetch('http://localhost:3001/api/browsing/userlists')
+.then((res) => {
+  return res.json();
+})
+.then((data) => {
+    console.log("USER DATA:  ", data);
+    const {users} = data;
+    const {rows} = users;
+    const updatedUserData = rows
+    console.log("USER DATA FORMATTED:  ", updatedUserData)
+    setUsers(updatedUserData)
+});
   },[])
   return (
     <div className="App">
       <div className="matchmaker-container">
         <div className="userlist-container">
-          {users}
+          {users.map((user)=>{
+          return <UserTile userData={user} />
+          })
+          }
         </div>
-      <div>
-       <img src={heartso}/>
-      </div>
+        <HeartShapedBox/>
       <div className="matchlist-container">
 
       </div>

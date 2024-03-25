@@ -5,6 +5,18 @@
   align-items: center;
 }
 
+.matchmaker-container{
+  width: 100%;
+  display: flex;
+}
+
+.userlist-container{
+ display: flex;
+ flex-direction: column;
+  height: 400px;
+  overflow-y: scroll;
+  width: 20%;
+}
 
 
 @media (prefers-reduced-motion: no-preference) {

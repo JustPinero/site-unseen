@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS user_info (
 	user_id INT NOT NULL,
 	gender VARCHAR(255) NOT NULL,
 	age INT NOT NULL,
+	interests VARCHAR(255)[] NOT NULL,
 	sexual_pref VARCHAR(255) NOT NULL,
 	biography VARCHAR(65535) NOT NULL,
 	fame_rating INT NOT NULL DEFAULT 0,
@@ -115,4 +116,21 @@ CREATE TABLE IF NOT EXISTS notifications (
 	read enum_yesno DEFAULT 'NO',
 	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS gender_options (
+	gender_id SERIAL NOT NULL PRIMARY KEY,
+	gender_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sexuality_options (
+	sexual_pref_id SERIAL NOT NULL PRIMARY KEY,
+	sexual_pref_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS soft_definer_options (
+	soft_definer_id SERIAL NOT NULL PRIMARY KEY,
+	soft_definer_name VARCHAR(255) NOT NULL,
+	soft_definer_keywords VARCHAR(255)[]
 );
