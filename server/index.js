@@ -61,9 +61,9 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-require('./routes/signup.js')(app, pool, bcrypt, transporter);
-require('./routes/login.js')(app, pool, bcrypt)
-require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
+// require('./routes/signup.js')(app, pool, bcrypt, transporter);
+// require('./routes/login.js')(app, pool, bcrypt)
+// require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
 require('./routes/browsing.js')(app, pool, transporter, socketIO)
 
 const PORT = process.env.PORT || 3001
