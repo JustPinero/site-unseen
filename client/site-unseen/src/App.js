@@ -189,7 +189,7 @@ function App() {
       className="mb-3"
     >
       <Tab eventKey="dashboard" title="Dashboard">
-        <Dashboard user={users} pods={pods} availablePods={availablePods} />
+        <Dashboard users={users} availableUsers={availableUsers} pods={pods} availablePods={availablePods} />
       </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
         <Matchmaker users={availableUsers} pods={availablePods}  matches={matches} addMatch={matchAdditionHandler} removeMatch={matchRemovalHandler} updateMatch={matchUpdateHandler} updatePods={podsUpdateHandler} updateUsers={usersUpdateHandler} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler}/>

@@ -119,10 +119,22 @@ const createUserInfo = async (id, gender) => {
 const initUsers = async () => {
 	console.log("User creating started")
 
-	for (let i = 0; i < 50; i++) {
+	for (let i = 0; i < 140; i++) {
 		console.log("Creating user " + i)
 		let gender = genderOptions.random()
 		let id = await createUser(gender)
 		await createUserInfo(id, gender)
 	}
 }
+
+const generateDummyUserData = async (numberOfDummyUsers)=>{
+	console.log("User Generation started")
+	for (let i = 0; i < numberOfDummyUsers; i++) {
+		console.log("Creating user " + i)
+		let gender = genderOptions.random()
+		let id = await createUser(gender)
+		await createUserInfo(id, gender)
+	}
+}
+
+export {generateDummyUserData}
