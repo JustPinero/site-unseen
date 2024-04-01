@@ -1,0 +1,12 @@
+.matchmaker-tab {
+    width: 90vw;
+    height: auto;
+}
+
+.matches-container {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}

@@ -16,7 +16,6 @@ function randomLimitedSelection(numberOfSelections, choices){
     let updatedChoices = choices;
     let selection = [];
     for(let i=0 ; i<numberOfSelections; i++){
-        console.log("UPDATED CHOICES:  ", updatedChoices);
         if(updatedChoices.length){
             selectedOption = choices.random();
             updatedChoices = updatedChoices.filter((option)=> option!==selectedOption);
@@ -24,7 +23,6 @@ function randomLimitedSelection(numberOfSelections, choices){
         }
 
     }
-    console.log("SELECTED INTERESTS")
     return selection;
 }
 
@@ -113,6 +111,7 @@ const createUserInfo = async (id, gender) => {
 	let values = [id, gender, age, sexual_pref, biography, user_location, ip_location, interests]
 	await pool.query(sql, values)
 }
+
 
 
 

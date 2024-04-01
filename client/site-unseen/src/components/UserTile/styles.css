@@ -6,6 +6,12 @@
     padding: 4px;
     width: auto;
     margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.usertile-container:hover {
+    border-color: white;
+    border-width: 4px;
 }
 
 .usertile-text {

@@ -1,11 +1,12 @@
 import './styles.css';
 
 const UserTile = ({
-    userData
+    userData,
+    clickFunction
 })=>{
     const {username} = userData
     return (
-    <div className="usertile-container">
+    <div className="usertile-container" onClick={clickFunction}>
         <p className="usertile-text"> {username} </p>
     </div>
 )}
