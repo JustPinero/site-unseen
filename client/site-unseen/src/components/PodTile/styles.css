@@ -1,0 +1,27 @@
+.podtile-container {
+    background-color: white;
+    border-style: solid;
+    border-color: lightgray;
+    border-radius: 10px;
+    padding: 6px 0 0px;
+    width: 100px;
+    margin: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.occupied{
+    background-color: red;
+}
+
+.podoption-container:hover {
+    background-color: lightgrey;
+    color:white;
+}
+
+.podtile-text {
+    font-weight: bold;
+
+}

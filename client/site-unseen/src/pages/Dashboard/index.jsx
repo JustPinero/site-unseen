@@ -1,8 +1,7 @@
 /* CHARTS */
 import {PieChart, Pie, Cell, Legend, CartesianGrid, BarChart, XAxis, YAxis, Tooltip, Bar} from 'recharts'
-/* COMPONENTS */
-import MatchBox from "../../components/MatchBox";
-import UserTile from "../../components/UserTile";
+/*STYLES */
+import "./styles.css"
 
 const pieGenderColors = ["blue", "red", "green"]
 
@@ -69,12 +68,12 @@ const Dashboard = ({users, availableUsers, pods, availablePods})=> {
     ]
   return (
     <div className="dashboard-tab">   
-    <div>
       <div>
-        <div>
-          <h3>Gender Demographics</h3>
-          <div>
-          <PieChart width={600} height={600}>
+
+        <div className="charts-section">
+          <div className="chart-container">
+            <h5>Gender Percentages</h5>
+          <PieChart width={600} height={500}>
             <Pie data={genderPieChatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={150} label>
             <Legend />
             <Tooltip />
@@ -85,6 +84,7 @@ const Dashboard = ({users, availableUsers, pods, availablePods})=> {
           </PieChart>   
           </div>       
           <div>
+            <div className="chart-container">
           <BarChart width={730} height={350} data={sexualityBarChart}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
@@ -95,9 +95,9 @@ const Dashboard = ({users, availableUsers, pods, availablePods})=> {
             <Bar dataKey="Seeking Male" fill="#32cacd" />
             <Bar dataKey="Bisexual" fill="#82ca9d" />
           </BarChart>
+          </div>
           </div>         
         </div>
-    </div>
     </div>
     </div>
   );

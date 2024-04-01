@@ -195,7 +195,7 @@ function App() {
         <Matchmaker users={availableUsers} pods={availablePods}  matches={matches} addMatch={matchAdditionHandler} removeMatch={matchRemovalHandler} updateMatch={matchUpdateHandler} updatePods={podsUpdateHandler} updateUsers={usersUpdateHandler} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler}/>
       </Tab>
       <Tab eventKey="userlist" title="User List" >
-        <UserInfo />
+        <UserInfo users={users} pods={pods} matches={matches} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} />
       </Tab>
     </Tabs>
     </div>
