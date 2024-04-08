@@ -1,4 +1,4 @@
-const DUMMYUSERS =[
+[
     {
         "id": 1,
         "username": "Maxwell.Kihn",
@@ -7680,6 +7680,3 @@ const DUMMYUSERS =[
         "hasHadDatesWith": []
     }
 ]
-
-
-export default DUMMYUSERS;

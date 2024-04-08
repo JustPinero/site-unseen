@@ -13,7 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
 /* DUMMY DATA */
-import DUMMYUSERS from "./dummydata";
+import DUMMYUSERS from "./dummydata/users.json";
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -38,19 +38,7 @@ function App() {
   const [availablePods, setAvailablePods] = useState([]);
   const [matches, setMatches] = useState([]);
   useEffect(()=>{
-    fetch('http://localhost:3001/api/browsing/userlists')
-.then((res) => {
-  return res.json();
-})
-.then((data) => {
-    const {users} = data;
-    let rows
-    if(users.length){
-      rows = users.rows;
-    }else {
-      rows = DUMMYUSERS.json()
-    }
-    const updatedUserData = rows
+    const updatedUserData = DUMMYUSERS
     const POD_DUMMY_DATA = podDummyDataGenerator(70)
     const formattedUpdatedUserData = updatedUserData.map(userData =>{
       function generateClosestPods(){
@@ -67,7 +55,7 @@ function App() {
     })
     setUsers(formattedUpdatedUserData);
     setPods(POD_DUMMY_DATA);
-});
+// });
   },[])
 
   useEffect(()=>{
