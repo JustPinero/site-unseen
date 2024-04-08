@@ -12,6 +12,14 @@ import Tabs from 'react-bootstrap/Tabs';
 import Dashboard from "./pages/Dashboard";
 import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
+/* DUMMY DATA */
+import DUMMYUSERS from "./dummydata";
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 const podDummyDataGenerator = (numberOfPods)=>{
   let podData = [];
@@ -36,11 +44,25 @@ function App() {
 })
 .then((data) => {
     const {users} = data;
-    const {rows} = users;
+    let rows
+    if(users.length){
+      rows = users.rows;
+    }else {
+      rows = DUMMYUSERS.json()
+    }
     const updatedUserData = rows
     const POD_DUMMY_DATA = podDummyDataGenerator(70)
     const formattedUpdatedUserData = updatedUserData.map(userData =>{
-      const formattedUserData = {...userData, isInDate:false, dateCount:0, hasHadDatesWith:[]}
+      function generateClosestPods(){
+        let closestPodList = [];
+        for(let i =0; i<= 7 ; i++){
+          let newPodID = getRandomInt(0, 70 )
+          closestPodList.push(newPodID)
+        }
+        return closestPodList
+      }
+      const updatedPodList = generateClosestPods()
+      const formattedUserData = {...userData, isInDate:false, dateCount:0, hasHadDatesWith:[], closestPods: updatedPodList}
       return formattedUserData
     })
     setUsers(formattedUpdatedUserData);
