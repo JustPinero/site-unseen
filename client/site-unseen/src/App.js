@@ -43,7 +43,7 @@ function App() {
     const formattedUpdatedUserData = updatedUserData.map(userData =>{
       function generateClosestPods(){
         let closestPodList = [];
-        for(let i =0; i<= 7 ; i++){
+        for(let i =0; i<= 69 ; i++){
           let newPodID = getRandomInt(0, 70 )
           closestPodList.push(newPodID)
         }
@@ -130,6 +130,16 @@ function App() {
     });
     setMatches(updatedMatches)
   }
+/* USERS */
+  const addUser = (newUserData)=>{
+    const updatedUsers = [...users, newUserData]
+    setUsers(updatedUsers)
+  }
+
+  const addUsers = (newUsersData)=>{
+    const updatedUsers = [...users, ...newUsersData]
+    setUsers(updatedUsers)
+  }
 
   const usersUpdateHandler = (userID, userUpdate)=>{
     const updatedUsers = users.map(user=>{
@@ -140,7 +150,7 @@ function App() {
     })
     setUsers(updatedUsers)
   }
-
+/* PODS */
   const podsUpdateHandler = (id, podUpdate)=>{
     const updatedPods = pods.map(pod=>{
       if(pod.id===id){
@@ -205,7 +215,7 @@ function App() {
         <Matchmaker users={availableUsers} pods={availablePods}  matches={matches} addMatch={matchAdditionHandler} removeMatch={matchRemovalHandler} updateMatch={matchUpdateHandler} updatePods={podsUpdateHandler} updateUsers={usersUpdateHandler} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler}/>
       </Tab>
       <Tab eventKey="userlist" title="User List" >
-        <UserInfo users={users} pods={pods} matches={matches} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} />
+        <UserInfo users={users} pods={pods} matches={matches} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} addUser={addUser} addUsers={addUsers} />
       </Tab>
     </Tabs>
     </div>

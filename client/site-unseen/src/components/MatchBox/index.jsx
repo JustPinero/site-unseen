@@ -79,22 +79,7 @@ const MatchBox = ({matchData, updateMatch, removeMatch, users, pods, updatePods,
 /* LIFECYCLE */
     
     useEffect(()=>{
-        if(!match1 && match2){
-            const updatedUserMatches = users.filter((user)=>{
-            //USER OPTION
-            const userOptionSexualPreference = user.sexual_pref;   
-            const userOptionGender = user.gender; 
-            //SELECTED USER
-            const selectedUserSexualPreference = match2.occupantData.sexual_pref;
-            const selectedUserGender = match2.occupantData.gender;
-            //Compatiblity
-            const userOptionMatchesSelectedUserPreference = (selectedUserSexualPreference == userOptionGender) || selectedUserSexualPreference == "bisexual";
-            const selectedUserMatchesUserOptionPreference = (userOptionSexualPreference == selectedUserGender)|| userOptionSexualPreference == "bisexual";
-            const haveNotDated = match2.occupantData.hasHadDatesWith.indexOf(user.id)<0
-            return userOptionMatchesSelectedUserPreference && selectedUserMatchesUserOptionPreference && haveNotDated;
-            })
-            setSelectedUserMatches(updatedUserMatches)
-        }else if(match1 && !match2){
+ if(match1 && !match2){
             const updatedUserMatches = users.filter((user)=>{
             //USER OPTION
             const userOptionSexualPreference = user.sexual_pref;   
@@ -108,7 +93,12 @@ const MatchBox = ({matchData, updateMatch, removeMatch, users, pods, updatePods,
             const haveNotDated = match1.occupantData.hasHadDatesWith.indexOf(user.id)<0
             return userOptionMatchesSelectedUserPreference && selectedUserMatchesUserOptionPreference && haveNotDated;
                 })
-                setSelectedUserMatches(updatedUserMatches)
+                console.log(" MATCH:  ", updatedUserMatches[0])
+                let match2UserData = updatedUserMatches[0];
+                let match2ClosestPodNumber = match2UserData.closestPods[0]
+                let match2PodData = pods[match2ClosestPodNumber]
+                const updatedMatch2Data = {...match2PodData, isOccupied:true, occupantID:match2UserData.id, occupantData: match2UserData }
+                setMatch2(updatedMatch2Data)
         }else if(!match1 && !match2){
             setSelectedUserMatches([])
         }
@@ -167,10 +157,7 @@ const MatchBox = ({matchData, updateMatch, removeMatch, users, pods, updatePods,
             <div className = "heart-container">
                 <div className="heartcontent" >
                     <h5 className="matchlabel-text">MATCH {matchData.id}</h5>
-                        <div className="pod-row">
-                            <MatchHalf matchData={match1} userOptions={match2 ? selectedUserMatches : users} pods={pods} updateHalf={matchUser1UpdateHandler} clearHalf={clearMatchUser1Handler} updatePods={updatePods} updateUsers={updateUsers} isConfirmed={isConfirmed}/>
-                            <MatchHalf matchData={match2} userOptions={match1 ? selectedUserMatches : users} pods={pods} updateHalf={matchUser2UpdateHandler} clearHalf={clearMatchUser2Handler} updatePods={updatePods} updateUsers={updateUsers} isConfirmed={isConfirmed}/>
-                        </div>
+                            <MatchHalf match1Data={match1} match2Data={match2} userOptions={match2 ? selectedUserMatches : users} pods={pods} updateHalf={matchUser1UpdateHandler} clearHalf={clearMatchUser1Handler} updatePods={updatePods} updateUsers={updateUsers} isConfirmed={isConfirmed}/>
                         <div>
                         {
                             !isConfirmed ?

@@ -5,7 +5,7 @@ const MatchUserOption = ({
     userData,
     clickFunction
 })=>{
-    const { username, firstname, lastname, gender, sexual_pref,dateCount} = userData;
+    const { username, firstname, lastname, gender, sexual_pref, dateCount} = userData;
     console.log("GENDER:  ", gender)
     return (
     <div className={`matchuseroption-container ${userData.gender}`}  onClick={clickFunction}>

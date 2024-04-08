@@ -25,4 +25,18 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    color:white;
+}
+
+.matchnames {
+    display: flex;
+    flex-direction: row;
+    color:white;
+}
+
+.matchbutton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }

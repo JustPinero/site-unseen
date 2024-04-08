@@ -9,7 +9,7 @@ import MatchPodOption from './MatchPodOption';
 /* STYLES */
 import "./styles.css"
 
-const MatchHalf = ({matchData, userOptions, pods, updateHalf, clearHalf, updatePods, updateUsers, isConfirmed})=>{
+const MatchHalf = ({match1Data, match2Data, userOptions, pods, updateHalf, clearHalf, updatePods, updateUsers, isConfirmed})=>{
   /* LOCAL STATE */
   // MODAL
   const [show, setShow] = useState(false);
@@ -21,16 +21,26 @@ const MatchHalf = ({matchData, userOptions, pods, updateHalf, clearHalf, updateP
   useEffect(()=>{
     if(selectedUser){
       const updatedUserData = {...selectedUser, isInDate:true}
+      const closestPodNumber = selectedUser.closestPods[0]
+      const closestPod = pods[closestPodNumber]
+      console.log("closest pod:  ", closestPod, pods)
       updateUsers(updatedUserData.id, updatedUserData)
+      setSelectedPod(closestPod)
     }
-  }, [selectedPod])
+  }, [selectedUser])
 
   useEffect(()=>{
-    if(selectedPod){
+    if(selectedUser){
       const updatedPodData = {...selectedPod, isOccupied:true}
       updatePods(updatedPodData.id, updatedPodData)
     }
-  }, [selectedPod])
+  }, [selectedUser])
+
+  useEffect(()=>{
+    if(selectedPod && selectedUser){
+      saveUpdateHandler()
+    }
+  },[selectedPod])
 /* HANDLERS */
 // CLEAR HANDLERS
   const clearUser = ()=>{
@@ -57,9 +67,12 @@ const MatchHalf = ({matchData, userOptions, pods, updateHalf, clearHalf, updateP
   }
   return (
     <>
-      <Button disabled={isConfirmed} variant="light" onClick={handleShow}>
-        <div>{matchData ? `POD ${matchData.id}` :  "Select User"}</div>
-        <div>{matchData ? ` ${matchData.occupantData.username}` :  null}</div>
+      <Button disabled={isConfirmed} style={{borderStyle:"none"}} className="matchbutton" variant={match1Data ? "transparent" : "info"} onClick={handleShow}>
+        <div style={{color: "white"}}>{match1Data && match2Data ? `POD ${match1Data.id} POD ${match2Data.id}` : "Select User" }</div>
+        <div className="matchnames">
+          <div>{match1Data ? ` ${match1Data.occupantData.username}` :  null}</div>{(match1Data && match2Data)&& " + "}
+          <div>{match2Data ? ` ${match2Data.occupantData.username}` :  null}</div>
+        </div>
       </Button>
 
       <Modal show={show} onHide={handleClose}>
@@ -68,31 +81,6 @@ const MatchHalf = ({matchData, userOptions, pods, updateHalf, clearHalf, updateP
         </Modal.Header>
         <Modal.Body>
           {
-        (selectedUser && selectedPod) ?
-        <div>
-          <Button  onClick={clearPod}>BACK</Button>
-          <div className="matchselection-preview-container">
-            <h5>POD {selectedPod.id}</h5>
-            <h3>{selectedUser.firstname + " " + selectedUser.lastname }</h3>
-          </div>
-            
-        </div> :
-            selectedUser ? 
-            <div className="matchoptionsbody-container">
-              <Button onClick={clearUser}>BACK</Button>
-            <h1>Available Pods</h1>
-            <div className="matchpod-list">
-            {
-              pods ?
-              pods.map((podOption)=>{
-                if(!podOption.isOccupied){
-                  return <MatchPodOption key={podOption.id} podData={podOption} clickFunction={()=>setSelectedPod(podOption)} />
-                }
-              }): "No users are currently available"
-            }
-              </div>
-            </div>
-            :
           <div className="matchoptionsbody-container">
             <h1>Available Users</h1>
             <div className="matchuser-list">

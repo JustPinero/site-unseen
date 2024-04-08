@@ -8,7 +8,7 @@ import MatchPodOption from "../../components/MatchBox/MatchHalf/MatchPodOption";
 import UserGenerationTools from "../../components/UserGenerationTool";
 
 
-const UserInfo = ({users, pods, matches, updateUsers})=>{
+const UserInfo = ({users, pods, matches, updateUsers, addUser, addUsers})=>{
   return (
     <div className="userinfo-tab">
       <div className="userinfo-column">
@@ -24,7 +24,7 @@ const UserInfo = ({users, pods, matches, updateUsers})=>{
           <h5>Tools</h5>
         </div>
         <div className="userinfo-column-body">
-          <UserGenerationTools updateUsers={updateUsers}/>
+          <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers}/>
         </div>
       </div>
       <div className="userinfo-column">
@@ -36,28 +36,6 @@ const UserInfo = ({users, pods, matches, updateUsers})=>{
       </div>
       </div>
     </div>
-//     <div className="matchmaker-tab">
-//         <div className="matchmaker-container">
-// <div className="userlist-container">
-//   {users.map((user)=>{
-//   return <UserTile key={user.id} userData={user} clickFunction={()=>userSelectionHandler(user)} />
-//   })
-//   }
-// </div>
-// <div className="userlist-container">
-//   {selectedUser ?
-//     matches.length ?
-//     matches.map(match=>(
-//       <UserTile key={match.id} userData={match} clickFunction={()=>matchSelectionHandler(match)} />
-//     ))
-//     :
-//     <p>NO MATCHES FOUND</p>
-//     :
-//     null
-// }
-// </div>
-// </div>
-//     </div>
   );
 }
 
