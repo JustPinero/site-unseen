@@ -39,7 +39,7 @@ function randomLimitedSelection(numberOfSelections, choices){
 }
 
 
-const UserGenerationTools = ({updateUsers, addUsers, users})=>{
+const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUsers}})=>{
     const [userGenerationNumber, setUserGenerationNumber] = useState(1);
     const [showfilters, setShowFilters] = useState(false)
     const [generatedUserHasGender, setGeneratedUserHasGender] = useState(false)
@@ -126,6 +126,11 @@ const UserGenerationTools = ({updateUsers, addUsers, users})=>{
     }
     return (
         <div>
+            <div>
+                <Button onClick={clearUsers}>
+                    CLEAR USERS
+                </Button>
+            </div>
             <Form>
                 <Form.Label>Number of Users to Generate        
                 </Form.Label>

@@ -10,9 +10,15 @@ import Tabs from 'react-bootstrap/Tabs';
 import MatchBox from "../../components/MatchBox";
 
 
-const Matchmaker = ({users, pods, matches, addMatch, removeMatch, updateMatch, updatePods, updateUsers, completeDate, cancelMatch})=>{
+const Matchmaker = ({dateLength, users, pods, matches, addMatch, removeMatch, updateMatch, updatePods, updateUsers, completeDate, cancelMatch})=>{
+  const matchAll = ()=>{
+
+  }
   return (
     <div className="matchmaker-tab">
+        <Button onClick={addMatch}>
+            START MATCHING ROUND
+        </Button>
         <Button onClick={addMatch}>
             ADD NEW MATCH
         </Button>
@@ -20,7 +26,7 @@ const Matchmaker = ({users, pods, matches, addMatch, removeMatch, updateMatch, u
        {
         matches.length ?
         matches.map((match)=>{
-            return <MatchBox key={match.id} users={users} pods={pods} matchData={match} removeMatch={removeMatch} updateMatch={updateMatch} updatePods={updatePods} updateUsers={updateUsers} completeDate={completeDate} cancelMatch={cancelMatch}/>
+            return <MatchBox key={match.id} dateLength={dateLength} users={users} pods={pods} matchData={match} removeMatch={removeMatch} updateMatch={updateMatch} updatePods={updatePods} updateUsers={updateUsers} completeDate={completeDate} cancelMatch={cancelMatch}/>
         })
         : null
         }

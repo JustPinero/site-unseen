@@ -5,7 +5,6 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 /* CUSTOM COMPONENTS */
 import MatchUserOption from './MatchUserOption';
-import MatchPodOption from './MatchPodOption';
 /* STYLES */
 import "./styles.css"
 

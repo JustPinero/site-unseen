@@ -8,19 +8,20 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 const UserTile = ({
     userData,
-    clickFunction
+    tileClickFunction,
+    removeUser
 })=>{
     const [showMore, setShowMore] = useState(false)
-    const {username, firstname, lastname, sexual_pref, gender, biography, age, dateCount} = userData
+    const {id, username, firstname, lastname, sexual_pref, gender, biography, age, dateCount} = userData
     const toggleShowMoreHandler = ()=>{
         const updatedShowMoreStatus = !showMore;
         setShowMore(updatedShowMoreStatus)
     }
     return (
-    <div className="usertile-container" onClick={clickFunction}>
+    <div className="usertile-container" onClick={tileClickFunction}>
         <div className="usertile-header ">
         <FaEdit />
-        <FaTrashAlt color="red" />
+        <FaTrashAlt onClick={()=>removeUser(id)} color="red" />
         </div>
         <p className="usertile-text">Username:  {username} </p>
         <p className="usertile-text">Name:  {firstname + " "+lastname } </p>

@@ -4,19 +4,18 @@ import {useState, useEffect} from "react"
 import './styles.css';
 /* COMPONENTS */
 import UserTile from "../../components/UserTile";
-import MatchPodOption from "../../components/MatchBox/MatchHalf/MatchPodOption";
 import UserGenerationTools from "../../components/UserGenerationTool";
 
 
-const UserInfo = ({users, pods, matches, updateUsers, addUser, addUsers})=>{
+const UserInfo = ({users, pods, matches, updateUsers, addUser, addUsers, clearUsers, updateUser, removeUser})=>{
   return (
     <div className="userinfo-tab">
       <div className="userinfo-column">
         <div className="userinfo-column_header">
-          <h5>USERS</h5>
+          <h5>{users.length ? `${users.length} ACTIVE USERS` : " NO USERS"} </h5>
         </div>
         <div className="userinfo-column-body">
-        {users?.length && users.map(user=><UserTile key={user.id} userData={user}/>)}
+        {users?.length && users.map(user=><UserTile key={user.id} userData={user} removeUser={removeUser}/>)}
         </div>
       </div>
       <div className="userinfo-column">
@@ -24,16 +23,8 @@ const UserInfo = ({users, pods, matches, updateUsers, addUser, addUsers})=>{
           <h5>Tools</h5>
         </div>
         <div className="userinfo-column-body">
-          <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers}/>
+          <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers} clearUsers={clearUsers}/>
         </div>
-      </div>
-      <div className="userinfo-column">
-        <div className="userinfo-column_header">
-          <h5>PODS</h5>
-        </div>
-        <div className="userinfo-column-body userinfo-pod-map ">
-        {pods?.length && pods.map(pod=><MatchPodOption key={pod.id} podData={pod}/>)}
-      </div>
       </div>
     </div>
   );

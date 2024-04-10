@@ -9,7 +9,7 @@ import Button from "react-bootstrap/Button"
 /* CUSTOM COMPONENTS */
 import MatchHalf from './MatchHalf';
 
-const MatchBox = ({matchData, updateMatch, removeMatch, users, pods, updatePods, updateUsers, completeDate, cancelMatch})=>{
+const MatchBox = ({dateLength, matchData, updateMatch, removeMatch, users, pods, updatePods, updateUsers, completeDate, cancelMatch})=>{
     const [match1, setMatch1] = useState(null);
     const [match2, setMatch2] = useState(null);
 
@@ -59,7 +59,7 @@ const MatchBox = ({matchData, updateMatch, removeMatch, users, pods, updatePods,
     };
  
     const clearTimer = (e) => {
-        setTimer("00:00:10");
+        setTimer("00:00:15");
         if (Ref.current) clearInterval(Ref.current);
         const id = setInterval(() => {
             startTimer(e);
