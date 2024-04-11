@@ -8,6 +8,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 /* COMPONENTS */
 import MatchBox from "../../components/MatchBox";
+import MatchTable from "../../components/MatchTable"
 
 
 const Matchmaker = ({dateLength, users, pods, matches, addMatch, removeMatch, updateMatch, updatePods, updateUsers, completeDate, cancelMatch})=>{
@@ -16,21 +17,17 @@ const Matchmaker = ({dateLength, users, pods, matches, addMatch, removeMatch, up
   }
   return (
     <div className="matchmaker-tab">
+      <div classname="matchmaker=buttonbox">
         <Button onClick={addMatch}>
             START MATCHING ROUND
         </Button>
         <Button onClick={addMatch}>
             ADD NEW MATCH
         </Button>
-        <div className="matches-container">
-       {
-        matches.length ?
-        matches.map((match)=>{
-            return <MatchBox key={match.id} dateLength={dateLength} users={users} pods={pods} matchData={match} removeMatch={removeMatch} updateMatch={updateMatch} updatePods={updatePods} updateUsers={updateUsers} completeDate={completeDate} cancelMatch={cancelMatch}/>
-        })
-        : null
-        }
-    </div>
+      </div>
+      <div className="matches-container">
+          <MatchTable matches={matches} />
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import UserTile from "../../components/UserTile";
 import UserGenerationTools from "../../components/UserGenerationTool";
 
 
-const UserInfo = ({users, pods, matches, updateUsers, addUser, addUsers, clearUsers, updateUser, removeUser})=>{
+const UserInfo = ({users, pods, addPods, removePods, matches, updateUsers, addUser, addUsers, clearUsers, updateUser, removeUser})=>{
   return (
     <div className="userinfo-tab">
       <div className="userinfo-column">
@@ -23,7 +23,7 @@ const UserInfo = ({users, pods, matches, updateUsers, addUser, addUsers, clearUs
           <h5>Tools</h5>
         </div>
         <div className="userinfo-column-body">
-          <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers} clearUsers={clearUsers}/>
+          <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers} clearUsers={clearUsers} />
         </div>
       </div>
     </div>
