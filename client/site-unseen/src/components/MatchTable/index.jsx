@@ -5,7 +5,6 @@ import MatchTableRow from "./MatchTableRow"
 
 
 const MatchTable = ({matches, dateLength, dateCompletionHandler, deleteMatch})=>{
-    console.log("MATCH TABLE MATCHES:  ", matches)
     return(
     <Table striped bordered hover>
         <thead>

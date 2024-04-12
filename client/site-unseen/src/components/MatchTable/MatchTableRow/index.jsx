@@ -15,7 +15,6 @@ const statusKey= {
 }
 
 const MatchTableRow = ({matchData, dateLength, dateCompletionHandler, deleteMatch})=>{
-    console.log("MATCH DATA:  ", matchData)
     const {id, match1, match2, status} = matchData;
     const statusInfo = statusKey[status];
     const {text, styleId} = statusInfo;

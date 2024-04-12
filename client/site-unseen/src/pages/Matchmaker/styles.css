@@ -5,8 +5,15 @@
 
 .matches-container {
     width: 100%;
-    height: auto;
+    height: 500px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    overflow-y: scroll;
+}
+
+.matchuser-subheader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }

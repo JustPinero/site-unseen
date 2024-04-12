@@ -58,7 +58,6 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
     }
     const generatedUserGenderChangeHandler = (e)=>{
         const updatedGender = e.target.value;
-        console.log("UPDATED GENDER CHANGE:  ", updatedGender);
         setGeneratedUserGender(updatedGender)
     }
     const toggleGeneratedUserHasSexuality = ()=>{
@@ -67,17 +66,14 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
     }
     const generatedUserSexualityChangeHandler = (e)=>{
         const updatedSexuality = e.target.value;
-        console.log("UPDATED GENDER CHANGE:  ", updatedSexuality);
         setGeneratedUserSexuality(updatedSexuality)
     }
 
     const numberChangeHandler = (e)=>{
-        console.log(e.target.value)
         setUserGenerationNumber(e.target.value)
     }
     const generationRequestionSubmissionHandler = ()=>{
         const newUsers =[];
-        console.log("HELPER LENGTH", users.length)
         for (let i =0; i<= userGenerationNumber; i++ ){
             let newUserID= users.length + i;
             let newUserPassword = "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa" ;

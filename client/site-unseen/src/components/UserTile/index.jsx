@@ -12,7 +12,7 @@ const UserTile = ({
     removeUser
 })=>{
     const [showMore, setShowMore] = useState(false)
-    const {id, username, firstname, lastname, sexual_pref, gender, biography, age, dateCount} = userData
+    const {id, username, firstname, lastname, sexual_pref, gender, biography, age, dateCount, hasHadDatesWith} = userData
     const toggleShowMoreHandler = ()=>{
         const updatedShowMoreStatus = !showMore;
         setShowMore(updatedShowMoreStatus)
@@ -23,13 +23,21 @@ const UserTile = ({
         <FaEdit />
         <FaTrashAlt onClick={()=>removeUser(id)} color="red" />
         </div>
-        <p className="usertile-text">Username:  {username} </p>
-        <p className="usertile-text">Name:  {firstname + " "+lastname } </p>
-        <p className="usertile-text">Gender:  { gender } </p>
-        <p className="usertile-text">Age:  { age } </p>
+        <div>
+            <div>
+                <p className="usertile-text">Username:  {username} </p>
+                <p className="usertile-text">Name:  {firstname + " "+lastname } </p>
+                <p className="usertile-text">Gender:  { gender } </p>
+                <p className="usertile-text">Age:  { age } </p>
+            </div>
+            <div>
+                <p className="usertile-text">Has had {dateCount+" "}dates  </p>
+                <p className="usertile-text"> {hasHadDatesWith.length ? `Has Dated: ${hasHadDatesWith.map(previousMatch=>(<span key={previousMatch.id}>{previousMatch.firstname + " "+previousMatch.lastname}</span>))}`: "Has not had any dates yes"}
+                </p>
+            </div>
+        </div>
         {showMore &&
         <div className="usertile-hidden-content">
-              <p className="usertile-text">Has had  { dateCount } dates</p>
             <p className="usertile-text">BIO:  {biography} </p>
         </div>
         }

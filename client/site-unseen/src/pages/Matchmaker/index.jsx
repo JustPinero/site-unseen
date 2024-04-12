@@ -3,13 +3,17 @@ import {useState, useEffect} from "react"
 /* STYLES */
 import './styles.css';
 /* BOOTSTRAP COMPONENTS */
-import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal';
 /* COMPONENTS */
 import MatchTable from "../../components/MatchTable"
 import MatchToolBox from "./MatchToolBox";
+import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption";
 
 
-const Matchmaker = ({dateLength, availableUsers, usersInSession, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches})=>{
+const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSessionLists, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches, podCount})=>{
+    /* LOCAL STATE */
+  // MODAL
+  const [showModal, setShowModal] = useState(false);
       /* MATCHLIST */
   const [ currentMatches, setCurrentMatches] = useState([])
   /* WAITLIST */
@@ -101,8 +105,8 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, podsInSession, 
               updatedPodsInSession=[...updatedPodsInSession, userPodData]
                 let user2ClosestPods = currentMatch.closestPods;
                 matchPodData=availabilityCheckHandler(user2ClosestPods, updatedPodsInSession);
-                updatedPodsInSession=[...updatedPodsInSession, matchPodData]
                   if(userPodData!==null && matchPodData!==null ){
+                    updatedPodsInSession=[...updatedPodsInSession, matchPodData]
                     let formattedNewMatch = matchFormatter(currentUser, userPodData, currentMatch, matchPodData, "inProgress");
                     MatchUpdatePayload.push(formattedNewMatch)
                   }else{
@@ -112,25 +116,53 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, podsInSession, 
                     updatedWaitlist.push(updatedWaitListAddition2)
                   }
             }else{
+              updatedPodsInSession=updatedPodsInSession.filter(podID=>(podID!==userPodData))
               const updatedWaitListAddition = {...currentUser, status: "waitingOnPod" };
               updatedWaitlist.push(updatedWaitListAddition)
             }
         }else{
+          updatedUsersInSession=updatedUsersInSession.filter(userID=>(userID!==currentUser.id))
           const updatedWaitListAddition = {...currentUser, status: "waitingOnMatch" };
           updatedWaitlist.push(updatedWaitListAddition)
       }
     }
    }
+   console.log("updatedWaitlist", updatedWaitlist)
    matchesAdditionHandler(MatchUpdatePayload)
    waitListAdditionHandler(updatedWaitlist)
+   console.log("updatedUsersInSession:  ",updatedUsersInSession, "updatedPodsInSession:  ", updatedPodsInSession)
+   updateInSessionLists(updatedUsersInSession, updatedPodsInSession)
   }
-
+  let userOptions = availableUsers;
+  if(usersInSession.length){
+    userOptions = availableUsers.filter(userOption=>(usersInSession.indexOf(userOption.id)<0))
+  };
   return (
     <div className="matchmaker-tab">
-      <MatchToolBox matchMakingHandler={matchMakingHandler} addMatch={addMatch} waitList={waitList}/>
+      <MatchToolBox waitList={waitList} matchMakingHandler={matchMakingHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)} />
       <div className="matches-container">
           <MatchTable matches={currentMatches}  dateLength={dateLength} dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>
       </div>
+      <Modal show={showModal} onHide={()=>setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>ADD MATCH</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {
+          <div className="matchoptionsbody-container">
+            <div className="matchuser-subheader">
+              <p>Available Users: {waitList.length}</p><p>   Open Pods:  {podCount-podsInSession.length+1}</p>
+            </div>
+            <div className="matchuser-list">
+            {
+              waitList ?
+              waitList.map(availableUser=><MatchUserOption userData={availableUser}/>): "No users are currently available"
+            }
+            </div>
+          </div>
+        }
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

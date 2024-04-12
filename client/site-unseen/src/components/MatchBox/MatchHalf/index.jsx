@@ -22,7 +22,6 @@ const MatchHalf = ({match1Data, match2Data, userOptions, pods, updateHalf, clear
       const updatedUserData = {...selectedUser, isInDate:true}
       const closestPodNumber = selectedUser.closestPods[0]
       const closestPod = pods[closestPodNumber]
-      console.log("closest pod:  ", closestPod, pods)
       updateUsers(updatedUserData.id, updatedUserData)
       setSelectedPod(closestPod)
     }
