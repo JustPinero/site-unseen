@@ -1,4 +1,10 @@
 .infobox-container{
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+}
+
+.infobox-text{
+    font-size: 14px;
+    margin: 0;
 }

@@ -1,0 +1,29 @@
+.simsettings-duration-box{
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#datebuffer-form{
+    width: 50%;
+    font-size: 12px;
+    padding:2px
+}
+
+#dateduration-form{
+    width: 50%;
+    font-size: 12px;
+    padding:2px
+}
+#minimumdate-form{
+    width: 30%;
+    font-size: 12px;
+    padding:2px
+}
+
+.simsettings-form_label{
+    font-size: 12px;
+    margin: 0;
+
+}

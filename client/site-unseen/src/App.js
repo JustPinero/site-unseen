@@ -51,11 +51,14 @@ const podDummyDataGenerator = (numberOfPods)=>{
 
 const App = ()=> {
   /*--------LOCAL STATE---------- */
+
+  const [simIsRunning, setSimIsRunning] = useState(false)
   /* Session Time */
   const [sessionLength, setSessionLength]= useState(EVENTDURATION);
   /* DATES */
   const [bufferDuration, setBufferDuration]= useState(BUFFERDURATION);
   const [dateDuration, setDateDuration]= useState(DATEDURATION);
+  const [minumumDateAmount, setMinimumDateAmount] = useState(MINIMUMDATENUMBER)
   /* USERS */
   const [users, setUsers] = useState([]);
   const [matchQueue, setMatchQueue] = useState([]);
@@ -188,22 +191,50 @@ const App = ()=> {
   setBiSexualNonBinaryMatchList(updatedBiSexualNonBinaryMatchList);
   },[matchQueue])
 
+
+  useEffect(()=>{
+    
+
+  },[heteroSexualMaleMatchList,
+    homoSexualMaleMatchList,
+    biSexualMaleMatchList,
+    heteroSexualFemaleMatchList,
+    homoSexualFemaleMatchList,
+    biSexualFemaleMatchList,
+    nonBinarySeekingMalesMatchList,
+    nonBinarySeekingFemalesMatchList,
+    biSexualNonBinaryMatchList])
+
   useEffect(()=>{
     const updatedAvailablePods = pods.filter(pod=> pod.isOccupied === false);
     setAvailablePods(updatedAvailablePods);
   },[pods]);
-// /* ---------------LIFECYCLE-------------------------- */
-// /* --------------------HANDLERS------------- */
-// /* ----------USERS------------- */
+/* -----------
+
+  useEffect(()=>{
+    const updatedAvailablePods = pods.filter(pod=> pod.isOccupied === false);
+    setAvailablePods(updatedAvailablePods);
+  },[pods]);
+/* ---------------LIFECYCLE-------------------------- */
+/* --------------------HANDLERS------------- */
+/* ----------SIMULATION------------- */
+const simulationStartHandler = ()=>{
+  setSimIsRunning(true)
+}
+const simulationCancellationHandler = ()=>{
+  setSimIsRunning(false)
+}
+/* ----------SIMULATION------------- */
+/* ----------USERS------------- */
 
 const clearUsersHandler = ()=>{
   setUsers([]);
   setMatches([]);
 }
-// /* ----------USERS------------- */
+/* ----------USERS------------- */
 
-// /* ----------PODS------------- */
-// /* ----------MATCH------------- */
+/* ----------PODS------------- */
+/* ----------MATCH------------- */
 
 
   const matchCancellationHandler = (matchID)=>{
@@ -351,12 +382,25 @@ const updateInSessionLists = (busyUsers, usedPods)=>{
   const updatedPodsInSession = [...podsInSession, ...usedPods];
   setUsersInSession(updatedUsersInSession)
   setPodsInSession(updatedPodsInSession)
+};
+const bufferDurationChangeHandler = (e)=>{
+  let updatedBufferDuration = e.target.value
+  setBufferDuration()
+}
+const dateDurationChangeHandler = (e)=>{
+  let updatedDateDuration= e.target.value
+  setDateDuration(updatedDateDuration)
+}
+
+const minimumDateAmountChangeHandler = (e)=>{
+  let updatedMinimumDateAmount= e.target.value
+  setMinimumDateAmount(updatedMinimumDateAmount)
 }
 /* --------------------HANDLERS------------- */
   return (
     <div className="App">
       <div className="apphead-container">
-        <Header sessionLength={sessionLength} podCount={pods?.length} userCount={users?.length} matchCount={matchCount}/>
+        <Header minimumDateAmount={minumumDateAmount} minimumDateAmountChangeHandler={minimumDateAmountChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={pods?.length} userCount={users?.length} matchCount={matchCount}/>
         <EventWarning affectedUsers={usersWithTooFewDates}/>
       </div>
     <Tabs
@@ -369,6 +413,8 @@ const updateInSessionLists = (busyUsers, usedPods)=>{
       </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
         <Matchmaker
+          simIsRunning={simIsRunning}
+          simulationStartHandler={simulationStartHandler}
           dateLength={dateLength}
           matchQueue={matchQueue} podCount={pods?.length}
           addPods={podAdditionHandler}

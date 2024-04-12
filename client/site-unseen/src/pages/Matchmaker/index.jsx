@@ -10,7 +10,7 @@ import MatchToolBox from "./MatchToolBox";
 import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption";
 
 
-const Matchmaker = ({dateLength, matchQueue, usersInSession, updateInSessionLists, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches, podCount,
+const Matchmaker = ({simIsRunning, simulationStartHandler, dateLength, matchQueue, usersInSession, updateInSessionLists, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches, podCount,
   heteroSexualMaleMatchList,
   homoSexualMaleMatchList,
   biSexualMaleMatchList,
@@ -24,12 +24,12 @@ const Matchmaker = ({dateLength, matchQueue, usersInSession, updateInSessionList
     /* LOCAL STATE */
   // MODAL
   const [showModal, setShowModal] = useState(false);
+  /*  */
       /* MATCHLIST */
   const [ currentMatches, setCurrentMatches] = useState([])
   /* WAITLIST */
   const [waitList, setWaitList] = useState([]);
-  const [autoMatchActive, setAutoMatch] = useState(true);
-  const [matchMakingCount, setMatchMakingCount] = useState(0);
+  const [roundCount, setRoundCount] = useState(0);
   var TableMatches
   useEffect(()=>{
     const updatedMatchCount = currentMatches.length;
@@ -185,15 +185,15 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
   };
 
   const runSimulation = ()=>{
-
+    simulationStartHandler()
   }
   return (
     <div className="matchmaker-tab">
-      <MatchToolBox waitList={waitList} matchMakingHandler={matchMakingHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)} />
+        <MatchToolBox simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={waitList} matchMakingHandler={matchMakingHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)}  />
       <div className="matches-container">
           <MatchTable matches={currentMatches}  dateLength={dateLength} dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>
       </div>
-      <Modal show={showModal} onHide={()=>setShowModal(false)}>
+      {/* <Modal show={showModal} onHide={()=>setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>ADD MATCH</Modal.Title>
         </Modal.Header>
@@ -212,7 +212,7 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
           </div>
         }
         </Modal.Body>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }

@@ -5,21 +5,25 @@ import Button from 'react-bootstrap/Button'
 import WaitListTable from '../../../components/WaitListTable';
 
 
-const MatchToolBox = ({ waitList, matchMakingHandler, addMatch, addUserButtonClickHandler})=>{
-    console.log("TOOL BOX RENDERING WITH THIS DATA:  ", waitList)
+const MatchToolBox = ({ waitList, simIsRunning, runSimulation, addMatch, addUserButtonClickHandler})=>{
+
     return(
         <div className="matchtools-container">
             <div>
-                <Button style={{margin:"6px"}} onClick={matchMakingHandler}>
-                    START MATCHING ROUND
+                <Button disabled={simIsRunning} style={{margin:"6px"}} onClick={runSimulation}>
+                    {simIsRunning ? "SIMULATION IN PROGRESS" :  "START EVENT SIMULATION"}
                 </Button>
+                {
+                    simIsRunning ?
                 <Button onClick={addUserButtonClickHandler }>
-                    ADD NEW MATCH
+                    CANCEL SIMULATION
                 </Button>
+                : null
+                }
             </div>
-            <div className="waitlist-table-container">
+            {/* <div className="waitlist-table-container">
                 {waitList.length && <WaitListTable waitList={waitList}/>}
-            </div>
+            </div> */}
         </div>
     )
 }
