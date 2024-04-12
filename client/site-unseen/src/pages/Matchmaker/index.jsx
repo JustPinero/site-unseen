@@ -8,26 +8,43 @@ import Button from 'react-bootstrap/Button'
 import MatchTable from "../../components/MatchTable"
 
 
-const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, podsInSession, matches, addMatch, addMatches, removeMatch, updateMatch, updatePods, updateUsers, completeDate, cancelMatch})=>{
+const Matchmaker = ({dateLength, availableUsers, usersInSession, podsInSession, addMatch, IDGenerator})=>{
   const [ currentMatches, setCurrentMatches] = useState([])
   const [autoMatchActive, setAutoMatch] = useState(true);
   const [matchMakingCount, setMatchMakingCount] = useState(0);
   var TableMatches
 
 
+  const matchesAdditionHandler = (newMatchesList)=>{
+    const updatedMatches = newMatchesList.map((newMatchData, index)=>{
+    const {match1, match2, status} = newMatchData;
+    /* MATCHDATA */
+    const newMatchID = currentMatches.length ? IDGenerator(currentMatches, index) : index+1;
+    const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
+    return newMatch
+    })
+    const matchesUpdate = [...currentMatches, ...updatedMatches]
+    console.log(" INCOMING MATCHES UPDATE:  ", matchesUpdate)
+    setCurrentMatches(matchesUpdate)
+  }
+
   const availabilityCheckHandler = (options, restrictions)=>{
-    console.log("")
+    console.log("USERS DRIVING ME CRAZY:  ", options, restrictions)
     for(let i=0; i<options.length; i++){
       let currentOption = options[i];
-      if(currentOption.id!==undefined){
-        if(restrictions.indexOf(currentOption.id)<0){
+      console.log("USERS DRIVING ME CRAZY currentOption not undefined:  ", currentOption)
+      if(currentOption.id===undefined){
+        if(restrictions.indexOf(currentOption)<0){
+          console.log("USERS DRIVING ME CRAZY currentOption not RESTRICTED INDEX:  ", currentOption.id, restrictions.indexOf(currentOption.id)<0)
           return currentOption
         }
-      }
-      if(restrictions.indexOf(currentOption)<0){
+      }else if(restrictions.indexOf(currentOption.id)<0){
+        console.log("CURRENT OPTION HAS NO ID", currentOption, restrictions.indexOf(currentOption)<0)
         return currentOption
       }
     }
+
+    console.log(options, "MADE IT TO NULL")
     return null
   }
   const matchFormatter = (user, userPod, match, matchPod, status) =>{
@@ -56,11 +73,12 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, 
     let updatedOutliers = []
     for(let i=0 ; i< availableUsers.length; i++){
       let currentUser = availableUsers[i];
-      const currentUserInSession = updatedUsersInSession.indexOf(currentUser.id)>=0;
-      if(updatedUsersInSession.indexOf(currentUser.id)<0){
+      const currentUserNotInSession = updatedUsersInSession.indexOf(currentUser.id)<0;
+      if(currentUserNotInSession){
         updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
         let { potentialMatches } = currentUser;
         let currentMatch = availabilityCheckHandler(potentialMatches, updatedUsersInSession);
+        if(currentMatch!==null){
         updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
         let userPodData
         let matchPodData
@@ -77,9 +95,10 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, 
             }
         }
       }
+      }
    }
    console.log("CURRENTMATCHES", MatchUpdatePayload)
-   addMatches(MatchUpdatePayload)
+   matchesAdditionHandler(MatchUpdatePayload)
   }
 
   return (
@@ -93,7 +112,7 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, 
         </Button>
       </div>
       <div className="matches-container">
-          <MatchTable matches={matches}  dateLength={dateLength}/>
+          <MatchTable matches={currentMatches}  dateLength={dateLength}/>
       </div>
     </div>
   );

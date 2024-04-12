@@ -11,9 +11,11 @@ const MatchTable = ({matches, dateLength})=>{
         <thead>
             <tr>
                 <th>MATCH ID</th>
-                <th>USER 1</th>
+                <th>USER 1 ID</th>
+                <th>USER 1 NAME</th>
                 <th>POD 1</th>
-                <th>USER 2</th>
+                <th>USER 2 ID</th>
+                <th>USER 2 NAME</th>
                 <th>POD 2</th>
                 <th>STATUS</th>
                 <th>REMAINING TIME</th>

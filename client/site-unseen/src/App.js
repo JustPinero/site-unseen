@@ -32,16 +32,15 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function IDGenerator(dataList){
-  let newID = 0;
+function IDGenerator(dataList, offset){
+  let newID = 1;
   dataList.forEach((data)=>{
     const {id} = data
-    if(id)
     if(id>=newID){
       newID= id;
     }
   })
-  newID = newID+1 ;
+  newID = newID+offset;
   return newID
 }
 
@@ -239,54 +238,50 @@ const clearUsersHandler = ()=>{
 
 // /* ----------PODS------------- */
 // /* ----------MATCH------------- */
-  const matchAdditionHandler = (newMatchData)=>{
-    const {match1, match2} = newMatchData;
-    /* MATCHDATA */
-    const newMatchID = IDGenerator(matches);
-    const newMatch = {id:newMatchID, match1:match1, match2:match2};
-    let updatedMatches = [...matches, newMatch];
-    setMatches(updatedMatches)
-  }
+  // const matchAdditionHandler = (newMatchData)=>{
+  //   const {match1, match2} = newMatchData;
+  //   /* MATCHDATA */
+  //   const newMatchID = IDGenerator(matches);
+  //   const newMatch = {id:newMatchID, match1:match1, match2:match2};
+  //   let updatedMatches = [...matches, newMatch];
+  //   setMatches(updatedMatches)
+  // }
 
-  const matchesAdditionHandler = (newMatchesList)=>{
-    const updatedMatches = newMatchesList.map((newMatchData, index)=>{
-    const {match1, match2, status} = newMatchData;
-    /* MATCHDATA */
-    const newMatchID = matches.length ? IDGenerator(matches) : index;
-    const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
-    /* USER UPDATE*/
-    // const user1Update = match1.user;
-    // const user2Update = match2.user;
-    /* POD UPDATE 2 */
-    // const pod1Update = match1.pod;
-    // const pod2Update = match2.pod;
-    /* AVAILABILITY LIST UPDATES */
-    //USER
-    // const updatedAvailableUsers = availableUsers.filter(user=>((user.id!==user1Update.id) || (user.id!==user2Update.id)));
-    // const updatedUsersInSession = [...usersInSession, user1Update.id, user2Update.id];
-    //PODS
-    // const updatedAvailablePods = availablePods.filter(pod=>((pod.id!==pod1Update.id) || (pod.id!==pod2Update.id)));
-    // const updatedPodsInSession = [...podsInSession, pod1Update.id, pod2Update.id];
-    //UPDATES
-    //USERS
-    // usersUpdateHandler([user1Update, user2Update]);
-    // setAvailableUsers(updatedAvailableUsers);
-    // setUsersInSession(updatedUsersInSession);
-    //PODS
-    // podsUpdateHandler([pod1Update, pod2Update]);
-    // setAvailablePods(updatedAvailablePods);
-    // setPodsInSession(updatedPodsInSession);
-    return newMatch
-    })
-    const matchesUpdate = [...matches, ...updatedMatches]
-    console.log(" INCOMING MATCHES UPDATE:  ", matchesUpdate)
-    setMatches(matchesUpdate)
-  }
+  // const matchesAdditionHandler = (newMatchesList)=>{
+  //   const updatedMatches = newMatchesList.map((newMatchData, index)=>{
+  //   const {match1, match2, status} = newMatchData;
+  //   /* MATCHDATA */
+  //   const newMatchID = matches.length ? IDGenerator(matches, index) : index+1;
+  //   const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
+  //   /* USER UPDATE*/
+  //   // const user1Update = match1.user;
+  //   // const user2Update = match2.user;
+  //   /* POD UPDATE 2 */
+  //   // const pod1Update = match1.pod;
+  //   // const pod2Update = match2.pod;
+  //   /* AVAILABILITY LIST UPDATES */
+  //   //USER
+  //   // const updatedAvailableUsers = availableUsers.filter(user=>((user.id!==user1Update.id) || (user.id!==user2Update.id)));
+  //   // const updatedUsersInSession = [...usersInSession, user1Update.id, user2Update.id];
+  //   //PODS
+  //   // const updatedAvailablePods = availablePods.filter(pod=>((pod.id!==pod1Update.id) || (pod.id!==pod2Update.id)));
+  //   // const updatedPodsInSession = [...podsInSession, pod1Update.id, pod2Update.id];
+  //   //UPDATES
+  //   //USERS
+  //   // usersUpdateHandler([user1Update, user2Update]);
+  //   // setAvailableUsers(updatedAvailableUsers);
+  //   // setUsersInSession(updatedUsersInSession);
+  //   //PODS
+  //   // podsUpdateHandler([pod1Update, pod2Update]);
+  //   // setAvailablePods(updatedAvailablePods);
+  //   // setPodsInSession(updatedPodsInSession);
+  //   return newMatch
+  //   })
+  //   const matchesUpdate = [...matches, ...updatedMatches]
+  //   console.log(" INCOMING MATCHES UPDATE:  ", matchesUpdate)
+  //   setMatches(matchesUpdate)
+  // }
 
-  const matchRemovalHandler = (matchID)=>{
-    let updatedMatches = matches.filter((match)=>(match.id !== matchID))
-    setMatches(updatedMatches)
-  }
 
   const matchCancellationHandler = (matchID)=>{
     let updatedMatches = matches.filter((match)=>{
@@ -325,17 +320,6 @@ const clearUsersHandler = ()=>{
     setMatches(updatedMatches);
   }
 
-
-  const matchUpdateHandler = (matchID, matchUpdate)=>{
-    let updatedMatches = matches.map((match)=> {
-      if(match.id === matchID){
-        return matchUpdate;
-      }else{
-        return match;
-      }
-    });
-    setMatches(updatedMatches)
-  }
 // /* ----------MATCH------------- */
 // /* -------USERS---------- */
 //ADD USER
@@ -471,7 +455,7 @@ const podDeletionHandler = (podDeletionCount)=>{
         <Dashboard users={users} availableUsers={availableUsers} pods={pods} availablePods={availablePods} />
       </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
-        <Matchmaker dateLength={dateLength} availableUsers={availableUsers} usersInSession={usersInSession} availablePods={availablePods} podsInSession={podsInSession}  matches={matches} addMatches={matchAdditionHandler} addMatches={matchesAdditionHandler} removeMatch={matchRemovalHandler} updateMatch={matchUpdateHandler} updatePod={podUpdateHandler} updatePods={podsUpdateHandler} updateUser={userUpdateHandler} updateUsers={usersUpdateHandler} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler}/>
+        <Matchmaker dateLength={dateLength} availableUsers={availableUsers} usersInSession={usersInSession} podsInSession={podsInSession} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler} IDGenerator={IDGenerator}/>
       </Tab>
       <Tab eventKey="userlist" title="User List" >
         <UserInfo users={users} pods={pods} matches={matches} addPods={podAdditionHandler} removePods={podDeletionHandler} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} addUser={addUser} addUsers={addUsers} clearUsers={clearUsersHandler} removeUser={userRemovalHandler} updateUser={userUpdateHandler} />

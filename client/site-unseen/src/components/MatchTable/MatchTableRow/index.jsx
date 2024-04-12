@@ -85,8 +85,10 @@ const MatchTableRow = ({matchData, dateLength})=>{
     return(
         <tr className="match-row">
             <td id={styleId}>{id}</td>
+            <td id={styleId}>{match1.user.id}</td>
             <td id={styleId}>{match1.user.username}</td>
             <td id={styleId}>{match1.pod.id}</td>
+            <td id={styleId}>{match2.user.id}</td>
             <td id={styleId}>{match2.user.username}</td>
             <td id={styleId}>{match2.pod.id}</td>
             <td id={styleId}>{text}</td>
