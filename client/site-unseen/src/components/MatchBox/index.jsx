@@ -119,14 +119,12 @@ const MatchBox = ({dateLength, matchData, updateMatch, removeMatch, users, pods,
     useEffect(()=>{
         if(isConfirmed && match1 && match2){
             const updatedMatchData = {...matchData, pod1:match1 , pod2: match2};
-            console.log(" updatedMatchData :  ", updatedMatchData)
             updateMatch(updatedMatchData.id, updatedMatchData)
         }
     },[isConfirmed])
 
     useEffect(() => {
         if(timer==="00:00:00" && isConfirmed){
-                console.log("matchData:  ", matchData)
                 completeDate(matchData)
                 removeMatch(matchData.id)
         }

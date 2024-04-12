@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Alert from 'react-bootstrap/Alert';
-import Button from 'react-bootstrap/Button';
 
 function EventWarning({affectedUsers}) {
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
+  useEffect(()=>{
+    if(affectedUsers.length){
+      setShow(true);
+    }
+  }, [affectedUsers])
 
   if (show) {
     return (
@@ -16,7 +20,7 @@ function EventWarning({affectedUsers}) {
       </Alert>
     );
   }
-  return <Button onClick={() => setShow(true)}>Show Alert</Button>;
+  return null;
 }
 
 export default EventWarning;

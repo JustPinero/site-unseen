@@ -6,15 +6,21 @@ import './styles.css';
 const statusKey= {
     inProgress:{
         text: "Date In Progress",
-        styleId: "match-row-inprogress"
+        styleId: "date-inprogress"
+    },
+    waitingOnPod: {
+        text: "Waiting for Pod",
+        styleId: "match-row-waitingOnPod"
     }
 }
 
-const MatchTableRow = ({matchData, dateLength})=>{
+const MatchTableRow = ({matchData, dateLength, dateCompletionHandler, deleteMatch})=>{
     console.log("MATCH DATA:  ", matchData)
     const {id, match1, match2, status} = matchData;
     const statusInfo = statusKey[status];
-    const {text, styleId} = statusInfo
+    const {text, styleId} = statusInfo;
+    let dataColor = styleId;
+    let statusText = text;
     const Ref = useRef(null);
     // The state for our timer
     const [timer, setTimer] = useState("00:12:00");
@@ -71,27 +77,28 @@ const MatchTableRow = ({matchData, dateLength})=>{
         }
     }, []);
 
-    useEffect(() => {
+
         if(timer==="00:00:00"){
-                // console.log("matchData:  ", matchData)
-                // completeDate(matchData)
-                // removeMatch(matchData.id)
+            dataColor= "date-ending"
+            statusText= "Date Ending"
+            deleteMatch(id)
+            dateCompletionHandler(matchData)
         }
-    }, [timer]);
+
 
 
 
     console.log("MATCH TABLE ROW:  ", matchData)
     return(
         <tr className="match-row">
-            <td id={styleId}>{id}</td>
-            <td id={styleId}>{match1.user.id}</td>
-            <td id={styleId}>{match1.user.username}</td>
-            <td id={styleId}>{match1.pod.id}</td>
-            <td id={styleId}>{match2.user.id}</td>
-            <td id={styleId}>{match2.user.username}</td>
-            <td id={styleId}>{match2.pod.id}</td>
-            <td id={styleId}>{text}</td>
+            <td id={dataColor}>{id}</td>
+            <td id={dataColor}>{match1.user.id}</td>
+            <td id={dataColor}>{match1.user.username}</td>
+            <td id={dataColor}>{match1.pod.id}</td>
+            <td id={dataColor}>{match2.user.id}</td>
+            <td id={dataColor}>{match2.user.username}</td>
+            <td id={dataColor}>{match2.pod.id}</td>
+            <td id={dataColor}>{statusText}</td>
             <td>{timer}</td>
         </tr>
     )

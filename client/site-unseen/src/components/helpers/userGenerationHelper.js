@@ -39,10 +39,10 @@ function randomLimitedSelection(numberOfSelections, choices){
         let newUserVerified = "YES";
         let newUserLastConnection = "2024-03-25T13:25:39.853Z";
         let newUserGender = generatedUserHasGender ? generatedUserGender : genderOptions.random();
-        let newUserFirstName = newUserGender === "non-binary" ? faker.name.firstName() : faker.name.firstName(newUserGender);
-        let newUserLastName = newUserGender === "non-binary" ? faker.name.lastName() : faker.name.lastName(newUserGender);
-        let newUserEmail = faker.internet.email(newUserFirstName, newUserLastName)
-        let newUserName = faker.internet.userName(newUserFirstName, newUserLastName)
+        let newUserFirstName = newUserGender === "non-binary" ? faker.person.firstName() : faker.person.firstName(newUserGender);
+        let newUserLastName = newUserGender === "non-binary" ? faker.person.lastName() : faker.person.lastName(newUserGender);
+        let newUserEmail = faker.internet.email({newUserFirstName, newUserLastName})
+        let newUserName = faker.internet.userName({newUserFirstName, newUserLastName})
         let newUserAge = getRandomInt(18, 80);
         let newUserSexualPreference = generatedUserHasSexuality ? generatedUserSexuality : sexualPreferenceOptions.random();
         let newUserBiography = faker.lorem.paragraph();

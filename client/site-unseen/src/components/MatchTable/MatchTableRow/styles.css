@@ -1,3 +1,11 @@
-#match-row-inprogress{
+#date-inprogress{
     background-color: lightgreen;
+}
+
+#waitingOnPod{
+    background-color: gold;
+}
+
+#date-ending{
+    background-color: pink;
 }
