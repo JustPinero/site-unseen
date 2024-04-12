@@ -51,7 +51,7 @@ const podDummyDataGenerator = (numberOfPods)=>{
 
 const App = ()=> {
   /*--------LOCAL STATE---------- */
-
+  /* SIMULATION */
   const [simIsRunning, setSimIsRunning] = useState(false)
   /* Session Time */
   const [sessionLength, setSessionLength]= useState(EVENTDURATION);
@@ -404,7 +404,7 @@ const minimumDateAmountChangeHandler = (e)=>{
         <EventWarning affectedUsers={usersWithTooFewDates}/>
       </div>
     <Tabs
-      defaultActiveKey="profile"
+      defaultActiveKey="matchmaker"
       id="uncontrolled-tab-example"
       className="mb-3"
     >

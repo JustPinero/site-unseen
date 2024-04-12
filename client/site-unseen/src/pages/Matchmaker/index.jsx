@@ -10,7 +10,19 @@ import MatchToolBox from "./MatchToolBox";
 import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption";
 
 
-const Matchmaker = ({simIsRunning, simulationStartHandler, dateLength, matchQueue, usersInSession, updateInSessionLists, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches, podCount,
+const Matchmaker = ({
+  simIsRunning,
+  simulationStartHandler,
+  dateLength,
+  matchQueue,
+  usersInSession,
+  updateInSessionLists,
+  podsInSession,
+  addMatch,
+  IDGenerator,
+  dateCompletionHandler,
+  countMatches,
+  podCount,
   heteroSexualMaleMatchList,
   homoSexualMaleMatchList,
   biSexualMaleMatchList,

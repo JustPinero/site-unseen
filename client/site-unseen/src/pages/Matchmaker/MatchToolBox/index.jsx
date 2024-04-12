@@ -3,6 +3,7 @@ import './styles.css';
 /* BOOTSTRAP COMPONENTS */
 import Button from 'react-bootstrap/Button'
 import WaitListTable from '../../../components/WaitListTable';
+import SimulationDurationTracker from "../../../components/SimulationDurationTracker";
 
 
 const MatchToolBox = ({ waitList, simIsRunning, runSimulation, addMatch, addUserButtonClickHandler})=>{
@@ -20,6 +21,9 @@ const MatchToolBox = ({ waitList, simIsRunning, runSimulation, addMatch, addUser
                 </Button>
                 : null
                 }
+            </div>
+                <SimulationDurationTracker simIsRunning={simIsRunning} />
+            <div>
             </div>
             {/* <div className="waitlist-table-container">
                 {waitList.length && <WaitListTable waitList={waitList}/>}
