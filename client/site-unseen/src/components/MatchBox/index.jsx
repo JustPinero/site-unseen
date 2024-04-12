@@ -93,7 +93,6 @@ const MatchBox = ({dateLength, matchData, updateMatch, removeMatch, users, pods,
             const haveNotDated = match1.occupantData.hasHadDatesWith.indexOf(user.id)<0
             return userOptionMatchesSelectedUserPreference && selectedUserMatchesUserOptionPreference && haveNotDated;
                 })
-                console.log(" MATCH:  ", updatedUserMatches[0])
                 let match2UserData = updatedUserMatches[0];
                 let match2ClosestPodNumber = match2UserData.closestPods[0]
                 let match2PodData = pods[match2ClosestPodNumber]

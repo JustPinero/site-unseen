@@ -1,3 +1,5 @@
+/* HELPERS */
+import userGenerationHelper from "./components/helpers/userGenerationHelper.js"
 /* REACT */
 import {useState, useEffect} from "react"
 /* STYLES */
@@ -12,6 +14,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import Dashboard from "./pages/Dashboard";
 import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
+import EventWarning from "./components/Alerts/EventWarning";
 /* DUMMY DATA */
 import DUMMYUSERS from "./dummydata/users.json";
 /* DEFAULT VALUES */
@@ -20,7 +23,7 @@ const PODNUMBER = 84;
 const BUFFERDURATION = 60;
 const DATEDURATION = 660;
 const MINIMUMDATENUMBER = 6;
-/* HELPERS */
+
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -31,6 +34,7 @@ function IDGenerator(dataList){
   let newID = 0;
   dataList.forEach((data)=>{
     const {id} = data
+    if(id)
     if(id>=newID){
       newID= id;
     }
@@ -42,7 +46,7 @@ function IDGenerator(dataList){
 const podDummyDataGenerator = (numberOfPods)=>{
   let podData = [];
   for(let i=0; i<numberOfPods ;i++){
-    const pod = {id: i+1, isOccupied:false, occupantID:null, occupantData: null, remainingTime:null}
+    const pod = {id: i+1, isOccupied:false, occupantID:null, occupantData: null}
     podData.push(pod)
   }
   return podData
@@ -78,6 +82,54 @@ const App = ()=> {
   /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
   /* DATE DURATION */
   const dateLength = bufferDuration + dateDuration;
+//   const [prospectsKey, setProspectsKey] =useState({
+//     male:{
+//       male: [],
+//       female: [],
+//       bisexual: []
+//     },
+//     female:{
+//       male: [],
+//       female: [],
+//       bisexual: []
+//     },
+//     nonbinary: {
+//       male: [],
+//       female: [],
+//       bisexual: []
+//     }
+//   })
+//   /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
+//   /* ---------------LIFECYCLE-------------------------- */
+  useEffect(()=>{
+    let initialUsers = userGenerationHelper(USERNUMBER);
+    if(initialUsers){
+    initialUsers = initialUsers.map((user, index)=>({...user, id:users.length+index }))
+    const initialPods = podDummyDataGenerator(podCount);
+    const formattedUpdatedUserData = initialUsers.map(userData =>{
+      const {gender, sexual_pref} = userData
+      function generateClosestPods(){
+        let closestPodList = [];
+        for(let i =0; i<= 83 ; i++){
+          let newPodID = getRandomInt(0, 84 );
+          closestPodList.push(newPodID);
+        }
+        return closestPodList;
+      }
+      const updatedPodList = generateClosestPods();
+      let potentialMatches =  [];
+
+      const formattedUserData = {...userData, isInDate:false, dateCount:0, hasHadDatesWith:[], closestPods: updatedPodList, potentialMatches: potentialMatches, status: "available"};
+      return formattedUserData;
+    })
+    setUsers(formattedUpdatedUserData);
+    setPods(initialPods);
+  }
+  },[]);
+  const MatchingUsers =
+  useEffect(()=>{
+  let updatedAvailableUsers = users.filter(user=> user.isInDate === false);
+  let notEnoughDatesList =[];
   //GENDER
   //MALE
   const maleUsers = users?.filter(user=>user.gender==="male");
@@ -125,25 +177,11 @@ const App = ()=> {
       female: [...biSexualfemaleUsers, ...nonBinaryBisexualUsers],
       bisexual: [...biSexualMaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
     }
-  };
-  /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
-  /* ---------------LIFECYCLE-------------------------- */
-  useEffect(()=>{
-    const updatedUserData = DUMMYUSERS
-    const POD_DUMMY_DATA = podDummyDataGenerator(podCount)
-    let notEnoughDatesList =[];
-    const formattedUpdatedUserData = updatedUserData.map(userData =>{
-      const {gender, sexual_pref} = userData
-      function generateClosestPods(){
-        let closestPodList = [];
-        for(let i =0; i<= 83 ; i++){
-          let newPodID = getRandomInt(0, 84 );
-          closestPodList.push(newPodID);
-        }
-        return closestPodList;
-      }
-      const updatedPodList = generateClosestPods();
-      let potentialMatches =  []
+  }
+  console.log("PROSPECT KEY!:  ", prospectsKey)
+  updatedAvailableUsers = updatedAvailableUsers.map((userData)=>{
+    let potentialMatches =  [];
+    const {gender, sexual_pref} = userData;
       switch(gender){
         case "male":
           potentialMatches= prospectsKey.male[sexual_pref];
@@ -158,24 +196,28 @@ const App = ()=> {
           break;
       };
       let possibleDateCount = potentialMatches.length;
+      console.log("possibleDate:  ", potentialMatches)
       if(possibleDateCount<MINIMUMDATENUMBER){
         notEnoughDatesList.push(userData);
       }
-      const formattedUserData = {...userData, isInDate:false, dateCount:0, hasHadDatesWith:[], closestPods: updatedPodList, possibleDates: potentialMatches};
+      if(notEnoughDatesList.length){
+        setUsersWithTooFewDates(notEnoughDatesList)
+        setHasUnderThanMinimumPotentialDates(true)
+      }else{
+        setHasUnderThanMinimumPotentialDates(false)
+      }
+      potentialMatches = potentialMatches.filter(match=>match.id!==userData.id)
+      const formattedUserData = {...userData, isInDate:false, dateCount:0, hasHadDatesWith:[], potentialMatches: potentialMatches, status: "available"};
+      console.log("FORMATTED USER DATA WITH POTENTIAL MATCHES:  ", formattedUserData)
       return formattedUserData;
     })
-    if(notEnoughDatesList.length){
-      setUsersWithTooFewDates(notEnoughDatesList)
-      setHasUnderThanMinimumPotentialDates(true)
-    }else{
-      setHasUnderThanMinimumPotentialDates(false)
-    }
-    setUsers(formattedUpdatedUserData);
-    setPods(POD_DUMMY_DATA);
-  },[]);
-
-  useEffect(()=>{
-    const updatedAvailableUsers = users.filter(user=> user.isInDate === false);
+    // if(notEnoughDatesList.length){
+    //   setUsersWithTooFewDates(notEnoughDatesList)
+    //   setHasUnderThanMinimumPotentialDates(true)
+    // }else{
+    //   setHasUnderThanMinimumPotentialDates(false)
+    // }
+    console.log("UPDATED AVAILABLE USERS:  ", updatedAvailableUsers)
     setAvailableUsers(updatedAvailableUsers);
   },[users]);
 
@@ -183,73 +225,60 @@ const App = ()=> {
     const updatedAvailablePods = pods.filter(pod=> pod.isOccupied === false);
     setAvailablePods(updatedAvailablePods);
   },[pods]);
-/* ---------------LIFECYCLE-------------------------- */
-/* --------------------HANDLERS------------- */
-/* ----------USERS------------- */
-const userMatchHandler = (userGender, userPreference, userDateHistory)=>{
-  let matchOptions = [];
-  switch(userGender){
-    case "male":
-      if(userPreference==="male"){
-        matchOptions = [...homoSexualMaleUsers, ...biSexualMaleUsers];
-      }else if(userPreference==="female"){
-        matchOptions = [...heteroSexualfemaleUsers, ...biSexualfemaleUsers, ];
-      } else{
-        matchOptions = [...nonBinaryUsers, ...homoSexualMaleUsers, ...heteroSexualfemaleUsers];
-      }
-    case "female":
-      if(userPreference==="male"){
-        matchOptions = [...heteroSexualMaleUsers, ...biSexualMaleUsers];
-      }else if(userPreference==="female"){
-        matchOptions = [...homoSexualfemaleUsers, ...biSexualfemaleUsers, ];
-      } else{
-        matchOptions = [...nonBinaryUsers, ...homoSexualMaleUsers, ...heteroSexualfemaleUsers];
-      }
-    case "non-binary":
-      if(userPreference==="male"){
-        matchOptions = [...biSexualMaleUsers];
-      }else if(userPreference==="female"){
-        matchOptions = [...biSexualfemaleUsers, ];
-      } else{
-        matchOptions = [...nonBinaryUsers];
-      }
-  }
-  let filteredMatchOptions = matchOptions.filter((matchOption)=> (userDateHistory.indexOf(matchOption.id)<0));
-  console.log("FILTERED OPTIONS:  ", filteredMatchOptions)
-  return filteredMatchOptions;
-};
+// /* ---------------LIFECYCLE-------------------------- */
+// /* --------------------HANDLERS------------- */
+// /* ----------USERS------------- */
 
 const clearUsersHandler = ()=>{
   setUsers([]);
   setMatches([]);
 }
-/* ----------USERS------------- */
-/* ----------PODS------------- */
-const availablePodSearchHandler = (userData)=>{
-  const {closestPods} = userData;
-  for(let i=0; i<closestPods; i++){
-    let closestPod = closestPods[i];
-    if((podsInSession.length ===0) || (podsInSession.indexOf(closestPod)<0)){
-        return closestPod;
-    }
-  }
-}
-/* ----------PODS------------- */
-/* ----------MATCH------------- */
-  const matchAdditionHandler = (match1, match2)=>{
+// /* ----------USERS------------- */
+
+// /* ----------PODS------------- */
+// /* ----------MATCH------------- */
+  const matchAdditionHandler = (newMatchData)=>{
+    const {match1, match2} = newMatchData;
     /* MATCHDATA */
     const newMatchID = IDGenerator(matches);
     const newMatch = {id:newMatchID, match1:match1, match2:match2};
     let updatedMatches = [...matches, newMatch];
+    setMatches(updatedMatches)
+  }
+
+  const matchesAdditionHandler = (newMatchesList)=>{
+    const updatedMatches = newMatchesList.map((newMatchData, index)=>{
+    const {match1, match2} = newMatchData;
+    /* MATCHDATA */
+    const newMatchID = matches.length ? IDGenerator(matches) : index;
+    const newMatch = {id:newMatchID, match1:match1, match2:match2};
     /* USER UPDATE*/
     const user1Update = match1.user;
     const user2Update = match2.user;
-    usersUpdateHandler([user1Update, user2Update])
     /* POD UPDATE 2 */
-    const pod1Update = match1.Pod;
-    const pod2Update = match2.Pod;
-    podsUpdateHandler([pod1Update, pod1Update])
-    setMatches(updatedMatches)
+    const pod1Update = match1.pod;
+    const pod2Update = match2.pod;
+    /* AVAILABILITY LIST UPDATES */
+    //USER
+    const updatedAvailableUsers = availableUsers.filter(user=>((user.id!==user1Update.id) || (user.id!==user2Update.id)));
+    const updatedUsersInSession = [...usersInSession, user1Update.id, user2Update.id];
+    //PODS
+    const updatedAvailablePods = availablePods.filter(pod=>((pod.id!==pod1Update.id) || (pod.id!==pod2Update.id)));
+    const updatedPodsInSession = [...podsInSession, pod1Update.id, pod2Update.id];
+    //UPDATES
+    //USERS
+    usersUpdateHandler([user1Update, user2Update]);
+    setAvailableUsers(updatedAvailableUsers);
+    setUsersInSession(updatedUsersInSession);
+    //PODS
+    podsUpdateHandler([pod1Update, pod2Update]);
+    setAvailablePods(updatedAvailablePods);
+    setPodsInSession(updatedPodsInSession);
+    return newMatch
+    })
+    const matchesUpdate = [...matches, ...updatedMatches]
+    console.log(" INCOMING MATCHES UPDATE:  ", matchesUpdate)
+    setMatches(matchesUpdate)
   }
 
   const matchRemovalHandler = (matchID)=>{
@@ -305,8 +334,8 @@ const availablePodSearchHandler = (userData)=>{
     });
     setMatches(updatedMatches)
   }
-/* ----------MATCH------------- */
-/* -------USERS---------- */
+// /* ----------MATCH------------- */
+// /* -------USERS---------- */
 //ADD USER
   const addUser = (newUserData)=>{
     const updatedUsers = [...users, newUserData]
@@ -330,17 +359,19 @@ const userUpdateHandler = (userID, userUpdate)=>{
 // UPDATE USERS
   const usersUpdateHandler = (userUpdatelist)=>{
     let updatedUserUpdateList = userUpdatelist;
+    console.log(" updatedUserUpdateList:  ",  updatedUserUpdateList)
     const updatedUsers = users.map(user=>{
-      for(let i= 0; i<=updatedUserUpdateList.length; i++){
+      for(let i= 0; i<updatedUserUpdateList.length; i++){
         let updatedUserData = updatedUserUpdateList[i];
-        const {id, userData} = updatedUserData;
-        if(user.id===id){
+        console.log("updatedUserData:", updatedUserData)
+        console.log("user:", user)
+        if(user.id===updatedUserData.id){
           let updatedListHead = updatedUserUpdateList.slice(0, i);
           updatedListHead = updatedListHead.length ? updatedListHead: [];
           let updatedUserListTail = updatedUserUpdateList.slice(i+1);
           updatedUserListTail = updatedUserListTail.length ? updatedUserListTail: [];
           updatedUserUpdateList = [...updatedListHead, ...updatedUserListTail];
-          return userData;
+          return updatedUserData;
         }
       }
         return user;
@@ -352,8 +383,8 @@ const userRemovalHandler = (userID)=>{
   const updatedUsers = users.filter(user=>(user.id!==userID))
   setUsers(updatedUsers)
 };
-/* -----------USERS------------ */
-/* ----------PODS------------- */
+// /* -----------USERS------------ */
+// /* ----------PODS------------- */
 //ADD POD
 const podAdditionHandler = (podCount)=>{
   let updatedPods = [...pods]
@@ -377,8 +408,10 @@ const podUpdateHandler = (id, podUpdate)=>{
 const podsUpdateHandler = (podUpdatelist)=>{
   let updatedPodUpdateList = podUpdatelist;
   const updatedPods = pods.map(pod=>{
-    for(let i= 0; i<=updatedPodUpdateList.length; i++){
+    console.log("pod:  ", pod)
+    for(let i= 0; i<updatedPodUpdateList.length; i++){
       let updatedPodData = updatedPodUpdateList[i];
+      console.log("updatedPodData:  ", updatedPodData)
       const {id, podData} = updatedPodData;
       if(pod.id===id){
         let updatedListHead = updatedPodUpdateList.slice(0, i);
@@ -386,6 +419,7 @@ const podsUpdateHandler = (podUpdatelist)=>{
         let updatedPodListTail = updatedPodUpdateList.slice(i+1);
         updatedPodListTail = updatedPodListTail.length ? updatedPodListTail: [];
         updatedPodUpdateList = [...updatedListHead, ...updatedPodListTail];
+        console.log("podData:  ", podData)
         return podData;
       }
     }
@@ -398,8 +432,8 @@ const podDeletionHandler = (podDeletionCount)=>{
   let updatedPods = pods.slice(0, (pods.length-podDeletionCount))
   setPods(updatedPods)
 }
-/* ----------PODS------------- */
-/* -----------DATES------------ */
+// /* ----------PODS------------- */
+// /* -----------DATES------------ */
   const dateCompletionHandler = (match)=>{
     const {match1, match2} = match;
     //PODS UDPATE
@@ -423,6 +457,7 @@ const podDeletionHandler = (podDeletionCount)=>{
         <h1 className ="header-text">
           Site Unseen
         </h1>
+        <EventWarning affectedUsers={usersWithTooFewDates}/>
       </div>
     <Tabs
       defaultActiveKey="profile"
@@ -433,7 +468,7 @@ const podDeletionHandler = (podDeletionCount)=>{
         <Dashboard users={users} availableUsers={availableUsers} pods={pods} availablePods={availablePods} />
       </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
-        <Matchmaker dateLength={dateLength} users={availableUsers} pods={availablePods}  matches={matches} addMatch={matchAdditionHandler} removeMatch={matchRemovalHandler} updateMatch={matchUpdateHandler} updatePod={podUpdateHandler} updatePods={podsUpdateHandler} updateUser={userUpdateHandler} updateUsers={usersUpdateHandler} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler}/>
+        <Matchmaker dateLength={dateLength} availableUsers={availableUsers} usersInSession={usersInSession} availablePods={availablePods} podsInSession={podsInSession}  matches={matches} addMatches={matchAdditionHandler} addMatches={matchesAdditionHandler} removeMatch={matchRemovalHandler} updateMatch={matchUpdateHandler} updatePod={podUpdateHandler} updatePods={podsUpdateHandler} updateUser={userUpdateHandler} updateUsers={usersUpdateHandler} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler}/>
       </Tab>
       <Tab eventKey="userlist" title="User List" >
         <UserInfo users={users} pods={pods} matches={matches} addPods={podAdditionHandler} removePods={podDeletionHandler} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} addUser={addUser} addUsers={addUsers} clearUsers={clearUsersHandler} removeUser={userRemovalHandler} updateUser={userUpdateHandler} />
