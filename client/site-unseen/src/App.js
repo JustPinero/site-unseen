@@ -11,6 +11,7 @@ import fetchUsers from "./api";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 /* COMPONENTS */
+import Header from "./components/SessionTimer/index.jsx";
 import Dashboard from "./pages/Dashboard";
 import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
@@ -20,6 +21,7 @@ import DUMMYUSERS from "./dummydata/users.json";
 /* DEFAULT VALUES */
 const USERNUMBER = 280;
 const PODNUMBER = 84;
+const EVENTDURATION = 10800
 const BUFFERDURATION = 60;
 const DATEDURATION = 660;
 const MINIMUMDATENUMBER = 6;
@@ -57,7 +59,7 @@ const podDummyDataGenerator = (numberOfPods)=>{
 const App = ()=> {
   /*--------LOCAL STATE---------- */
   /* Session Time */
-  const [sessionLength, setSessionLength]= useState(1);
+  const [sessionLength, setSessionLength]= useState(EVENTDURATION);
   /* DATES */
   const [bufferDuration, setBufferDuration]= useState(BUFFERDURATION);
   const [dateDuration, setDateDuration]= useState(DATEDURATION);
@@ -104,7 +106,7 @@ const App = ()=> {
   useEffect(()=>{
     let initialUsers = userGenerationHelper(USERNUMBER);
     if(initialUsers){
-    initialUsers = initialUsers.map((user, index)=>({...user, id:users.length+index }))
+    initialUsers = initialUsers.map((user)=>({...user, id:users.length+user.id}))
     const initialPods = podDummyDataGenerator(podCount);
     const formattedUpdatedUserData = initialUsers.map(userData =>{
       const {gender, sexual_pref} = userData
@@ -260,20 +262,20 @@ const clearUsersHandler = ()=>{
     const pod2Update = match2.pod;
     /* AVAILABILITY LIST UPDATES */
     //USER
-    const updatedAvailableUsers = availableUsers.filter(user=>((user.id!==user1Update.id) || (user.id!==user2Update.id)));
-    const updatedUsersInSession = [...usersInSession, user1Update.id, user2Update.id];
+    // const updatedAvailableUsers = availableUsers.filter(user=>((user.id!==user1Update.id) || (user.id!==user2Update.id)));
+    // const updatedUsersInSession = [...usersInSession, user1Update.id, user2Update.id];
     //PODS
-    const updatedAvailablePods = availablePods.filter(pod=>((pod.id!==pod1Update.id) || (pod.id!==pod2Update.id)));
-    const updatedPodsInSession = [...podsInSession, pod1Update.id, pod2Update.id];
+    // const updatedAvailablePods = availablePods.filter(pod=>((pod.id!==pod1Update.id) || (pod.id!==pod2Update.id)));
+    // const updatedPodsInSession = [...podsInSession, pod1Update.id, pod2Update.id];
     //UPDATES
     //USERS
-    usersUpdateHandler([user1Update, user2Update]);
-    setAvailableUsers(updatedAvailableUsers);
-    setUsersInSession(updatedUsersInSession);
+    // usersUpdateHandler([user1Update, user2Update]);
+    // setAvailableUsers(updatedAvailableUsers);
+    // setUsersInSession(updatedUsersInSession);
     //PODS
-    podsUpdateHandler([pod1Update, pod2Update]);
-    setAvailablePods(updatedAvailablePods);
-    setPodsInSession(updatedPodsInSession);
+    // podsUpdateHandler([pod1Update, pod2Update]);
+    // setAvailablePods(updatedAvailablePods);
+    // setPodsInSession(updatedPodsInSession);
     return newMatch
     })
     const matchesUpdate = [...matches, ...updatedMatches]
@@ -454,6 +456,7 @@ const podDeletionHandler = (podDeletionCount)=>{
   return (
     <div className="App">
       <div>
+        <Header sessionLength={sessionLength}/>
         <h1 className ="header-text">
           Site Unseen
         </h1>

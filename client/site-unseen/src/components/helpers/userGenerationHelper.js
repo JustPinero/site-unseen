@@ -1,6 +1,6 @@
 const { faker } = require('@faker-js/faker')
 
-const userGenerationHelper = (userGenerationNumber, generatedUserHasGender, generatedUserGender, generatedUserHasSexuality, generatedUserSexuality, id )=>{
+const userGenerationHelper = (userGenerationNumber, generatedUserHasGender, generatedUserGender, generatedUserHasSexuality, generatedUserSexuality )=>{
     let generatedUserList =[];
     /* STATIC VALUES */
 const genderOptions = ["male", "female", "non-binary"]
@@ -34,7 +34,7 @@ function randomLimitedSelection(numberOfSelections, choices){
     return selection;
 }
     for (let i =0; i<= userGenerationNumber; i++ ){
-        let newUserID= id;
+        let newUserID= i;
         let newUserPassword = "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa" ;
         let newUserVerified = "YES";
         let newUserLastConnection = "2024-03-25T13:25:39.853Z";

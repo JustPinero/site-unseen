@@ -1,12 +1,14 @@
-import {useState, useEffect, useRef} from "react"
+/* REACT */
+import {useState, useEffect, useRef} from "react";
+/* STYLES */
+import './styles.css';
+/* BOOSTRAP COMPONENTS */
+import Button from "react-bootstrap/Button";
 
-const MatchTableRow = ({matchData, dateLength})=>{
-    console.log("MATCH DATA:  ", matchData)
-    const {id, match1, match2,} = matchData;
-
+const SessionTimer = ({sessionLength})=>{
     const Ref = useRef(null);
     // The state for our timer
-    const [timer, setTimer] = useState("00:00:00");
+    const [timer, setTimer] = useState("03:00:00");
     const getTimeRemaining = (e) => {
         const total =
             Date.parse(e) - Date.parse(new Date());
@@ -43,7 +45,7 @@ const MatchTableRow = ({matchData, dateLength})=>{
         }
     };
     const clearTimer = (e) => {
-        setTimer("00:00:00");
+
         if (Ref.current) clearInterval(Ref.current);
         const id = setInterval(() => {
             startTimer(e);
@@ -52,13 +54,14 @@ const MatchTableRow = ({matchData, dateLength})=>{
     };
     const getDeadTime = () => {
         let deadline = new Date();
-        deadline.setSeconds(deadline.getSeconds() + dateLength);
+        deadline.setSeconds(deadline.getSeconds() + sessionLength);
         return deadline;
     };
-    useEffect(() => {
-        clearTimer(getDeadTime());
-    }, []);
+    // useEffect(() => {
+    //     clearTimer(getDeadTime());
+    // }, []);
 
+    const countDownStartHandler = ()=>clearTimer(getDeadTime())
     useEffect(() => {
         if(timer==="00:00:00"){
                 // console.log("matchData:  ", matchData)
@@ -67,17 +70,15 @@ const MatchTableRow = ({matchData, dateLength})=>{
         }
     }, [timer]);
 
-    console.log("MATCH TABLE ROW:  ", matchData)
     return(
-        <tr>
-            <td>{id}</td>
-            <td>{match1.user.username}</td>
-            <td>{match1.pod.id}</td>
-            <td>{match2.user.username}</td>
-            <td>{match2.pod.id}</td>
-            {/* <td>{timer}</td> */}
-        </tr>
+        <div className="sessiontimer-container">
+            <h5>EVENT TIME REMAINING</h5>
+                {timer}
+                <Button onClick={countDownStartHandler}>
+                    Start Event
+                </Button>
+        </div>
     )
 }
 
-export default MatchTableRow;
+export default SessionTimer;
