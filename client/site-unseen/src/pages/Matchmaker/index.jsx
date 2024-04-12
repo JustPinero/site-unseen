@@ -10,7 +10,17 @@ import MatchToolBox from "./MatchToolBox";
 import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption";
 
 
-const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSessionLists, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches, podCount})=>{
+const Matchmaker = ({dateLength, matchQueue, usersInSession, updateInSessionLists, podsInSession, addMatch, IDGenerator, dateCompletionHandler, countMatches, podCount,
+  heteroSexualMaleMatchList,
+  homoSexualMaleMatchList,
+  biSexualMaleMatchList,
+  heteroSexualFemaleMatchList,
+  homoSexualFemaleMatchList,
+  biSexualFemaleMatchList,
+  nonBinarySeekingMalesMatchList,
+  nonBinarySeekingFemalesMatchList,
+  biSexualNonBinaryMatchList
+})=>{
     /* LOCAL STATE */
   // MODAL
   const [showModal, setShowModal] = useState(false);
@@ -65,6 +75,34 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSession
     }
     return null
   }
+
+const matchFinder = (userSeekingMatch, busyUserList)=>{
+  console.log("MATCHMAKER:  ", userSeekingMatch, busyUserList)
+  let prospectsKey =  {
+    male:{
+      male: homoSexualMaleMatchList,
+      female: heteroSexualMaleMatchList,
+      bisexual: biSexualMaleMatchList
+    },
+    female:{
+      male: heteroSexualFemaleMatchList,
+      female: homoSexualFemaleMatchList,
+      bisexual: biSexualFemaleMatchList
+    },
+    nonbinary: {
+      male: nonBinarySeekingMalesMatchList,
+      female: nonBinarySeekingFemalesMatchList,
+      bisexual: biSexualNonBinaryMatchList
+    }
+  }
+  const {gender, sexual_pref, hasHadDatesWith}=userSeekingMatch;
+  const prospects = prospectsKey[gender==="non-binary" ? "nonbinary": gender][sexual_pref];
+  const restrictions = [userSeekingMatch.id, ...busyUserList, ...hasHadDatesWith];
+  const newMatch =availabilityCheckHandler(prospects, restrictions);
+  console.log("MATCHMADE:  ", newMatch)
+  return newMatch;
+}
+
   const matchFormatter = (user, userPod, match, matchPod, status) =>{
     //USER DATA
     const updatedUserPotentialMatches = user.potentialMatches.filter(potentialMatch=>potentialMatch.id!==match.id);
@@ -90,15 +128,17 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSession
     let updatedPodsInSession = podsInSession;
     let updatedWaitlist = []
     console.log("MATCHING USERS")
-    for(let i=0 ; i< availableUsers.length; i++){
-      let currentUser = availableUsers[i];
+    for(let i=0 ; i< matchQueue.length; i++){
+      let currentUser = matchQueue[i];
       console.log("MATCHING USER:  ", currentUser)
       const currentUserNotInSession = updatedUsersInSession.indexOf(currentUser.id)<0;
       if(currentUserNotInSession){
         updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
-        let { potentialMatches } = currentUser;
+        let { potentialMatches, hasHadDatesWith } = currentUser;
         console.log("2nd time USER BEFORE MATCH CHECK:  ", currentUser)
-        let currentMatch = availabilityCheckHandler(potentialMatches, updatedUsersInSession);
+        let userMatchFilter
+        let currentMatch = matchFinder(currentUser,updatedUsersInSession)
+        // availabilityCheckHandler(potentialMatches, updatedUsersInSession);
         if(currentMatch!==null){
         updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
         let userPodData
@@ -139,10 +179,14 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSession
    console.log("updatedUsersInSession:  ",updatedUsersInSession, "updatedPodsInSession:  ", updatedPodsInSession)
    updateInSessionLists(updatedUsersInSession, updatedPodsInSession)
   }
-  let userOptions = availableUsers;
+  let userOptions = matchQueue;
   if(usersInSession.length){
-    userOptions = availableUsers.filter(userOption=>(usersInSession.indexOf(userOption.id)<0))
+    userOptions = matchQueue.filter(userOption=>(usersInSession.indexOf(userOption.id)<0))
   };
+
+  const runSimulation = ()=>{
+
+  }
   return (
     <div className="matchmaker-tab">
       <MatchToolBox waitList={waitList} matchMakingHandler={matchMakingHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)} />

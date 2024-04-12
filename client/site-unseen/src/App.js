@@ -58,7 +58,7 @@ const App = ()=> {
   const [dateDuration, setDateDuration]= useState(DATEDURATION);
   /* USERS */
   const [users, setUsers] = useState([]);
-  const [availableUsers, setAvailableUsers] = useState([]);
+  const [matchQueue, setMatchQueue] = useState([]);
   const [usersInSession, setUsersInSession] = useState([]);
   /* PODS */
   const [podCount, setPodCount] = useState(PODNUMBER)
@@ -68,6 +68,19 @@ const App = ()=> {
   /* MATCHES */
   const [matches, setMatches] =useState([])
   const [matchCount, setMatchCount] = useState([]);
+  /* MATCH GROUPS */
+  //MALE
+  const [heteroSexualMaleMatchList, setHeteroSexualMaleMatchList] = useState([]);
+  const [homoSexualMaleMatchList, setHomoSexualMaleMatchList] =  useState([]);
+  const [biSexualMaleMatchList, setBiSexualMaleMatchList] =  useState([])
+  //FEMALE
+  const [heteroSexualFemaleMatchList, setHeteroSexualFemaleMatchList] = useState([]);
+  const [homoSexualFemaleMatchList, setHomoSexualFemaleMatchList] =  useState([]);
+  const [biSexualFemaleMatchList, setBiSexualFemaleMatchList] =  useState([]);
+  //NON-BINARY
+  const [nonBinarySeekingMalesMatchList, setNonBinarySeekingMaleMatchList] = useState([]);
+  const [nonBinarySeekingFemalesMatchList, setNonBinarySeekingFemaleMatchList] = useState([]);
+  const [biSexualNonBinaryMatchList, setBiSexualNonBinaryMatchList] = useState([]);
    /* ALERTS */
    //PODS
    const [allPodsAreFull, setallPodsAreFull] = useState(false);
@@ -108,88 +121,72 @@ const App = ()=> {
   }
   },[]);
   useEffect(()=>{
-  let updatedAvailableUsers = users.filter(user=> user.isInDate === false);
-  let notEnoughDatesList =[];
+    let updatedmatchQueue = users.filter(user=> user.isInDate === false);
+
+    setMatchQueue(updatedmatchQueue);
+  },[users]);
+
+
+  useEffect(()=>{
   //GENDER
   //MALE
   const maleUsers = users?.filter(user=>user.gender==="male");
-  const maleUserCount = maleUsers.length;
   //SEXUAL PREFERENCES
   const heteroSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="female");
-  const heteroSexualMaleUserCount = heteroSexualMaleUsers.length;
   const homoSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="male");
-  const homoSexualMaleUserCount = homoSexualMaleUsers.length;
   const biSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="bisexual");
-  const biSexualMaleUserCount = biSexualMaleUsers.length;
   //FEMALE
   const femaleUsers = users?.filter(user=>user.gender==="female");
-  const femaleUserCount = femaleUsers.length;
   //SEXUAL PREFERENCES
   const heteroSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="male");
-  const heteroSexualFemaleUserCount = heteroSexualfemaleUsers.length;
   const homoSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="female");
-  const homoSexualFemaleUserCount = homoSexualfemaleUsers.length;
   const biSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="bisexual");
-  const biSexualFemaleUserCount = biSexualfemaleUsers.length;
   //NON-BINARY
   const nonBinaryUsers = users?.filter(user=>user.gender==="non-binary");
-  const nonBinaryUserCount = nonBinaryUsers.length;
+  //SEXUAL PREFERENCES
   const nonBinaryUsersSeekingMale = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="male");
-  const nonBinaryUsersSeekingMaleCount = nonBinaryUsersSeekingMale.length;
   const nonBinaryUsersSeekingFemale = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="female");
-  const nonBinaryUsersSeekingFemaleCount = nonBinaryUsersSeekingFemale.length;
   const nonBinaryBisexualUsers = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="bisexual");
-  const nonBinaryBisexualUsersCount = nonBinaryBisexualUsers.length;
-
-  let prospectsKey =  {
-    male:{
-      male: [...homoSexualMaleUsers, ...biSexualMaleUsers],
-      female: [...heteroSexualfemaleUsers, ...biSexualfemaleUsers],
-      bisexual: [...homoSexualMaleUsers, ...biSexualMaleUsers, ...heteroSexualfemaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
-    },
-    female:{
-      male: [...heteroSexualMaleUsers, ...biSexualMaleUsers],
-      female: [...homoSexualfemaleUsers, ...biSexualfemaleUsers],
-      bisexual: [...homoSexualfemaleUsers, ...biSexualfemaleUsers, ...heteroSexualMaleUsers, ...biSexualMaleUsers, ...nonBinaryBisexualUsers]
-    },
-    nonbinary: {
-      male: [...biSexualMaleUsers, ...nonBinaryBisexualUsers],
-      female: [...biSexualfemaleUsers, ...nonBinaryBisexualUsers],
-      bisexual: [...biSexualMaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
-    }
-  }
-  updatedAvailableUsers = updatedAvailableUsers.map((userData)=>{
-    let potentialMatches =  [];
-    const {gender, sexual_pref} = userData;
-      switch(gender){
-        case "male":
-          potentialMatches= prospectsKey.male[sexual_pref];
-          break;
-        case "female":
-          potentialMatches= prospectsKey.female[sexual_pref];
-          break;
-        case "non-binary":
-          potentialMatches= prospectsKey.nonbinary[sexual_pref];
-          break;
-        default:
-          break;
-      };
-      let possibleDateCount = potentialMatches.length;
-      if(possibleDateCount<MINIMUMDATENUMBER){
-        notEnoughDatesList.push(userData);
-      }
-      potentialMatches = potentialMatches.filter(match=>match.id!==userData.id)
-      const formattedUserData = {...userData, isInDate:false, dateCount:0, hasHadDatesWith:[], potentialMatches: potentialMatches, status: "available"};
-      return formattedUserData;
-    })
-    if(notEnoughDatesList.length){
-      setUsersWithTooFewDates(notEnoughDatesList)
-      setHasUnderThanMinimumPotentialDates(true)
-    }else{
-      setHasUnderThanMinimumPotentialDates(false)
-    }
-    setAvailableUsers(updatedAvailableUsers);
-  },[users]);
+  // let prospectsKey =  {
+  //   male:{
+  //     male: [...homoSexualMaleUsers, ...biSexualMaleUsers],
+  //     female: [...heteroSexualfemaleUsers, ...biSexualfemaleUsers],
+  //     bisexual: [...homoSexualMaleUsers, ...biSexualMaleUsers, ...heteroSexualfemaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
+  //   },
+  //   female:{
+  //     male: [...heteroSexualMaleUsers, ...biSexualMaleUsers],
+  //     female: [...homoSexualfemaleUsers, ...biSexualfemaleUsers],
+  //     bisexual: [...homoSexualfemaleUsers, ...biSexualfemaleUsers, ...heteroSexualMaleUsers, ...biSexualMaleUsers, ...nonBinaryBisexualUsers]
+  //   },
+  //   nonbinary: {
+  //     male: [...biSexualMaleUsers, ...nonBinaryBisexualUsers],
+  //     female: [...biSexualfemaleUsers, ...nonBinaryBisexualUsers],
+  //     bisexual: [...biSexualMaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
+  //   }
+  // }
+/* MATCH GROUPS */
+  //MALE
+  const updatedHeteroSexualMaleMatchList = [...heteroSexualfemaleUsers, ...biSexualfemaleUsers];
+  const updatedHomoSexualMaleMatchList = [...homoSexualMaleUsers, ...biSexualMaleUsers];
+  const updatedBiSexualMaleMatchList = [...homoSexualMaleUsers, ...biSexualMaleUsers, ...heteroSexualfemaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers, ...nonBinaryUsersSeekingMale]
+  setHeteroSexualMaleMatchList(updatedHeteroSexualMaleMatchList);
+  setHomoSexualMaleMatchList(updatedHomoSexualMaleMatchList);
+  setBiSexualMaleMatchList(updatedBiSexualMaleMatchList);
+  //FEMALE
+  const updatedHeteroSexualFemaleMatchList = [...heteroSexualMaleUsers, ...biSexualMaleUsers];
+  const updatedHomoSexualFemaleMatchList = [...homoSexualfemaleUsers, ...biSexualfemaleUsers];
+  const updatedBiSexualFemaleMatchList = [...homoSexualfemaleUsers, ...biSexualfemaleUsers, ...heteroSexualMaleUsers, ...biSexualMaleUsers, ...nonBinaryBisexualUsers, ...nonBinaryUsersSeekingFemale]
+  setHeteroSexualFemaleMatchList(updatedHeteroSexualFemaleMatchList);
+  setHomoSexualFemaleMatchList(updatedHomoSexualFemaleMatchList);
+  setBiSexualFemaleMatchList(updatedBiSexualFemaleMatchList);
+  //NON-BINARY
+  const updatedNonBinarySeekingMaleMatchList = [...biSexualMaleUsers, ...nonBinaryBisexualUsers];
+  const updatedNonBinarySeekingFemaleMatchList = [...biSexualfemaleUsers, ...nonBinaryBisexualUsers];
+  const updatedBiSexualNonBinaryMatchList = [...biSexualMaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
+  setNonBinarySeekingMaleMatchList(updatedNonBinarySeekingMaleMatchList);
+  setNonBinarySeekingFemaleMatchList(updatedNonBinarySeekingFemaleMatchList);
+  setBiSexualNonBinaryMatchList(updatedBiSexualNonBinaryMatchList);
+  },[matchQueue])
 
   useEffect(()=>{
     const updatedAvailablePods = pods.filter(pod=> pod.isOccupied === false);
@@ -343,8 +340,8 @@ const podDeletionHandler = (podDeletionCount)=>{
     //USERS UPDATE
     const user1 = match1.user;
     const user2 = match2.user;
-    const updatedUser1 = {...user1, isInDate:false, dateCount: user1.dateCount +1, hasHadDatesWith:[...user1.hasHadDatesWith, user2]}
-    const updatedUser2 = {...user2, isInDate:false, dateCount: user2.dateCount +1, hasHadDatesWith:[...user2.hasHadDatesWith, user1]}
+    const updatedUser1 = {...user1, isInDate:false, dateCount: user1.dateCount +1, hasHadDatesWith:[...user1.hasHadDatesWith, user2.id]}
+    const updatedUser2 = {...user2, isInDate:false, dateCount: user2.dateCount +1, hasHadDatesWith:[...user2.hasHadDatesWith, user1.id]}
     usersUpdateHandler([updatedUser1, updatedUser2])
     podsUpdateHandler([updatedPod1, updatedPod2])
   };
@@ -368,13 +365,33 @@ const updateInSessionLists = (busyUsers, usedPods)=>{
       className="mb-3"
     >
       <Tab eventKey="dashboard" title="Dashboard">
-        <Dashboard users={users} availableUsers={availableUsers} pods={pods} availablePods={availablePods} />
+        <Dashboard users={users} matchQueue={matchQueue} pods={pods} availablePods={availablePods} />
       </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
-        <Matchmaker dateLength={dateLength} availableUsers={availableUsers} podCount={pods?.length} addPods={podAdditionHandler} removePods={podDeletionHandler} usersInSession={usersInSession} updateInSessionLists={updateInSessionLists} podsInSession={podsInSession} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler} IDGenerator={IDGenerator} dateCompletionHandler={dateCompletionHandler} countMatches={matchCountChangeHandler}/>
+        <Matchmaker
+          dateLength={dateLength}
+          matchQueue={matchQueue} podCount={pods?.length}
+          addPods={podAdditionHandler}
+          removePods={podDeletionHandler}
+          usersInSession={usersInSession}
+          updateInSessionLists={updateInSessionLists}
+          podsInSession={podsInSession} completeDate={dateCompletionHandler}
+          cancelMatch={matchCancellationHandler}
+          IDGenerator={IDGenerator} dateCompletionHandler={dateCompletionHandler}
+          countMatches={matchCountChangeHandler}
+          heteroSexualMaleMatchList={heteroSexualMaleMatchList}
+          homoSexualMaleMatchList={homoSexualMaleMatchList}
+          biSexualMaleMatchList={biSexualMaleMatchList}
+          heteroSexualFemaleMatchList={heteroSexualFemaleMatchList}
+          homoSexualFemaleMatchList={homoSexualFemaleMatchList}
+          biSexualFemaleMatchList={biSexualFemaleMatchList}
+          nonBinarySeekingMalesMatchList={nonBinarySeekingMalesMatchList}
+          nonBinarySeekingFemalesMatchList={nonBinarySeekingFemalesMatchList}
+          biSexualNonBinaryMatchList={biSexualNonBinaryMatchList}
+        />
       </Tab>
       <Tab eventKey="userlist" title="User List" >
-        <UserInfo users={availableUsers} pods={pods} matches={matches} addPods={podAdditionHandler} removePods={podDeletionHandler} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} addUser={addUser} addUsers={addUsers} clearUsers={clearUsersHandler} removeUser={userRemovalHandler} updateUser={userUpdateHandler} />
+        <UserInfo users={matchQueue} pods={pods} matches={matches} addPods={podAdditionHandler} removePods={podDeletionHandler} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} addUser={addUser} addUsers={addUsers} clearUsers={clearUsersHandler} removeUser={userRemovalHandler} updateUser={userUpdateHandler} />
       </Tab>
     </Tabs>
     </div>
