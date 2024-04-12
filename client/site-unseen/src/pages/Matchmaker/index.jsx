@@ -30,7 +30,7 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, 
     }
     return null
   }
-  const matchFormatter = (user, userPod, match, matchPod) =>{
+  const matchFormatter = (user, userPod, match, matchPod, status) =>{
     //USER DATA
     const updatedUserPotentialMatches = user.potentialMatches.filter(potentialMatch=>potentialMatch.id!==match.id);
     const updatedUserDateList = [...user.hasHadDatesWith, match];
@@ -46,27 +46,22 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, 
     const formattedMatchPod = {id:matchPod, isOccupied: true, occupantData: match};
     const match2Data = {user:formattedMatchData , pod:formattedMatchPod };
     //NEW MATCH
-    const newMatch = {match1:match1Data, match2: match2Data};
+    const newMatch = {match1:match1Data, match2: match2Data, status:status};
     return newMatch;
   }
   const matchMakingHandler = ()=>{
     let MatchUpdatePayload = [];
     let updatedUsersInSession = usersInSession;
     let updatedPodsInSession = podsInSession;
+    let updatedOutliers = []
     for(let i=0 ; i< availableUsers.length; i++){
       let currentUser = availableUsers[i];
       const currentUserInSession = updatedUsersInSession.indexOf(currentUser.id)>=0;
-      console.log("CURRENTUSERINSESSION:  ", currentUserInSession)
-      console.log("CURRENTupdatedUsersInSession:  ", updatedUsersInSession)
       if(updatedUsersInSession.indexOf(currentUser.id)<0){
         updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
         let { potentialMatches } = currentUser;
         let currentMatch = availabilityCheckHandler(potentialMatches, updatedUsersInSession);
-        console.log("currentUser:  ", currentUser)
-        console.log("currentMatch:  ", currentMatch)
-        console.log("CURRENTupdatedUsersInSession1:  ", currentUser.id)
         updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
-        console.log("CURRENTupdatedUsersInSession2:  ", currentMatch.id)
         let userPodData
         let matchPodData
         let user1ClosestPods = currentUser.closestPods
@@ -77,14 +72,14 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, availablePods, 
                 matchPodData=availabilityCheckHandler(user2ClosestPods, updatedPodsInSession);
                 updatedPodsInSession=[...updatedPodsInSession, matchPodData]
                   if(userPodData && matchPodData ){
-                    let formattedNewMatch = matchFormatter(currentUser, userPodData, currentMatch, matchPodData);
+                    let formattedNewMatch = matchFormatter(currentUser, userPodData, currentMatch, matchPodData, "inProgress");
                     MatchUpdatePayload.push(formattedNewMatch)
+            }
         }
       }
-    }
-    }
-    console.log("CURRENTMATCHES", MatchUpdatePayload)
-    addMatches(MatchUpdatePayload)
+   }
+   console.log("CURRENTMATCHES", MatchUpdatePayload)
+   addMatches(MatchUpdatePayload)
   }
 
   return (

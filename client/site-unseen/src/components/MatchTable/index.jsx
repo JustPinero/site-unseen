@@ -15,7 +15,8 @@ const MatchTable = ({matches, dateLength})=>{
                 <th>POD 1</th>
                 <th>USER 2</th>
                 <th>POD 2</th>
-                <th>Remaining Time</th>
+                <th>STATUS</th>
+                <th>REMAINING TIME</th>
             </tr>
         </thead>
         <tbody>

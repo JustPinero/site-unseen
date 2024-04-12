@@ -250,16 +250,16 @@ const clearUsersHandler = ()=>{
 
   const matchesAdditionHandler = (newMatchesList)=>{
     const updatedMatches = newMatchesList.map((newMatchData, index)=>{
-    const {match1, match2} = newMatchData;
+    const {match1, match2, status} = newMatchData;
     /* MATCHDATA */
     const newMatchID = matches.length ? IDGenerator(matches) : index;
-    const newMatch = {id:newMatchID, match1:match1, match2:match2};
+    const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
     /* USER UPDATE*/
-    const user1Update = match1.user;
-    const user2Update = match2.user;
+    // const user1Update = match1.user;
+    // const user2Update = match2.user;
     /* POD UPDATE 2 */
-    const pod1Update = match1.pod;
-    const pod2Update = match2.pod;
+    // const pod1Update = match1.pod;
+    // const pod2Update = match2.pod;
     /* AVAILABILITY LIST UPDATES */
     //USER
     // const updatedAvailableUsers = availableUsers.filter(user=>((user.id!==user1Update.id) || (user.id!==user2Update.id)));

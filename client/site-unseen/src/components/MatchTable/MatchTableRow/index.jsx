@@ -1,12 +1,23 @@
+/* REACT */
 import {useState, useEffect, useRef} from "react"
+/* STYLES */
+import './styles.css';
+
+const statusKey= {
+    inProgress:{
+        text: "Date In Progress",
+        styleId: "match-row-inprogress"
+    }
+}
 
 const MatchTableRow = ({matchData, dateLength})=>{
     console.log("MATCH DATA:  ", matchData)
-    const {id, match1, match2,} = matchData;
-
+    const {id, match1, match2, status} = matchData;
+    const statusInfo = statusKey[status];
+    const {text, styleId} = statusInfo
     const Ref = useRef(null);
     // The state for our timer
-    const [timer, setTimer] = useState("00:00:00");
+    const [timer, setTimer] = useState("00:12:00");
     const getTimeRemaining = (e) => {
         const total =
             Date.parse(e) - Date.parse(new Date());
@@ -43,7 +54,6 @@ const MatchTableRow = ({matchData, dateLength})=>{
         }
     };
     const clearTimer = (e) => {
-        setTimer("00:00:00");
         if (Ref.current) clearInterval(Ref.current);
         const id = setInterval(() => {
             startTimer(e);
@@ -56,7 +66,9 @@ const MatchTableRow = ({matchData, dateLength})=>{
         return deadline;
     };
     useEffect(() => {
+        if(status==="inProgress"){
         clearTimer(getDeadTime());
+        }
     }, []);
 
     useEffect(() => {
@@ -67,15 +79,18 @@ const MatchTableRow = ({matchData, dateLength})=>{
         }
     }, [timer]);
 
+
+
     console.log("MATCH TABLE ROW:  ", matchData)
     return(
-        <tr>
-            <td>{id}</td>
-            <td>{match1.user.username}</td>
-            <td>{match1.pod.id}</td>
-            <td>{match2.user.username}</td>
-            <td>{match2.pod.id}</td>
-            {/* <td>{timer}</td> */}
+        <tr className="match-row">
+            <td id={styleId}>{id}</td>
+            <td id={styleId}>{match1.user.username}</td>
+            <td id={styleId}>{match1.pod.id}</td>
+            <td id={styleId}>{match2.user.username}</td>
+            <td id={styleId}>{match2.pod.id}</td>
+            <td id={styleId}>{text}</td>
+            <td>{timer}</td>
         </tr>
     )
 }
