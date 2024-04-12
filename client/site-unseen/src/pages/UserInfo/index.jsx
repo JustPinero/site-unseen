@@ -5,6 +5,7 @@ import './styles.css';
 /* COMPONENTS */
 import UserTile from "../../components/UserTile";
 import UserGenerationTools from "../../components/UserGenerationTool";
+import PodManagementTools from "../../components/PodManagmentTool"
 
 
 const UserInfo = ({users, pods, addPods, removePods, matches, updateUsers, addUser, addUsers, clearUsers, updateUser, removeUser})=>{
@@ -24,6 +25,7 @@ const UserInfo = ({users, pods, addPods, removePods, matches, updateUsers, addUs
         </div>
         <div className="userinfo-column-body">
           <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers} clearUsers={clearUsers} />
+          <PodManagementTools pods={pods} addPods={addPods} removePods={removePods} />
         </div>
       </div>
     </div>

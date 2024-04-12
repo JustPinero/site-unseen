@@ -1,0 +1,19 @@
+.usergen-buttonbox {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin:10px;
+}
+
+.usergen-filterbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 4px;
+}
+
+.usergen-switch {
+    width: 50%;
+    height: 100px;
+    padding: 4px
+}

@@ -1,5 +1,7 @@
 /* REACT */
 import {useState} from "react";
+/* STYLES */
+import './styles.css';
 /* BOOTSTRAP */
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -123,11 +125,7 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
     }
     return (
         <div>
-            <div>
-                <Button onClick={clearUsers}>
-                    CLEAR USERS
-                </Button>
-            </div>
+            <h3>User Generation</h3>
             <Form>
                 <Form.Label>Number of Users to Generate        
                 </Form.Label>
@@ -149,48 +147,54 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
                 onChange={toggleShowFilters}
             />
             {showfilters &&
-            <div>
-                <Form.Label>
-                    Gender
-                </Form.Label>
-                <Form.Check
-                    type="switch"
-                    id="generated-user-gender"
-                    value={generatedUserHasGender}
-                    onChange={toggleGeneratedUserHasGender}
-                />
-                {generatedUserHasGender &&
-                    <Form.Select aria-label="SelectGender" value={generatedUserGender} onChange={generatedUserGenderChangeHandler}>
-                    <option value="">Select Generated User Gender</option>
-                    <option value="non-binary">Non-Binary</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    </Form.Select>
-}
-
-            <Form.Label>
-                Sexuality
-            </Form.Label>
-            <Form.Check
-                type="switch"
-                id="generated-user-sexuality"
-                value={generatedUserHasSexuality}
-                onChange={toggleGeneratedUserHasSexuality}
-            />
-                {generatedUserHasSexuality &&
-                    <Form.Select aria-label="SelectGender" value={generatedUserSexuality} onChange={generatedUserSexualityChangeHandler}>
-                    <option value="">Select Generated User Sexual Preference</option>
-                    <option value="bisexual">Bisexual</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </Form.Select>
-            }
+            <div className="usergen-filterbox">
+                <div className="usergen-switch">
+                    <Form.Label>
+                        Gender
+                    </Form.Label>
+                    <Form.Check
+                        type="switch"
+                        id="generated-user-gender"
+                        value={generatedUserHasGender}
+                        onChange={toggleGeneratedUserHasGender}
+                    />
+                    {generatedUserHasGender &&
+                        <Form.Select aria-label="SelectGender" value={generatedUserGender} onChange={generatedUserGenderChangeHandler}>
+                        <option value="">Select Generated User Gender</option>
+                        <option value="non-binary">Non-Binary</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        </Form.Select>
+}               </div>
+                <div className="usergen-switch">
+                    <Form.Label>
+                        Sexuality
+                    </Form.Label>
+                    <Form.Check
+                        type="switch"
+                        id="generated-user-sexuality"
+                        value={generatedUserHasSexuality}
+                        onChange={toggleGeneratedUserHasSexuality}
+                    />
+                        {generatedUserHasSexuality &&
+                            <Form.Select aria-label="SelectGender" value={generatedUserSexuality} onChange={generatedUserSexualityChangeHandler}>
+                            <option value="">Select Generated User Sexual Preference</option>
+                            <option value="bisexual">Bisexual</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </Form.Select>
+                    }
+                </div>
             </div>
             }
-
+            <div className="usergen-buttonbox">
                 <Button onClick={generationRequestionSubmissionHandler}>
                     Generate Users
                 </Button>
+                <Button onClick={clearUsers}>
+                    CLEAR USERS
+                </Button>
+            </div>
             </Form>
         </div>
     )

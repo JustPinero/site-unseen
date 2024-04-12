@@ -302,7 +302,8 @@ const userRemovalHandler = (userID)=>{
 const podAdditionHandler = (podCount)=>{
   let updatedPods = [...pods]
   for(let i= pods.length ; i < (pods.length + podCount) ; i++){
-    const pod = {id: i+1, isOccupied:false, occupantID:null, occupantData: null, remainingTime:null};
+    const newPodID = IDGenerator(updatedPods, i)
+    const pod = {id: newPodID, isOccupied:false, occupantID:null, occupantData: null, remainingTime:null};
     updatedPods.push(pod)
   }
   setPods(updatedPods)
@@ -371,7 +372,7 @@ const updateInSessionLists = (busyUsers, usedPods)=>{
         <Dashboard users={users} availableUsers={availableUsers} pods={pods} availablePods={availablePods} />
       </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
-        <Matchmaker dateLength={dateLength} availableUsers={availableUsers} podCount={pods?.length} usersInSession={usersInSession} updateInSessionLists={updateInSessionLists} podsInSession={podsInSession} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler} IDGenerator={IDGenerator} dateCompletionHandler={dateCompletionHandler} countMatches={matchCountChangeHandler}/>
+        <Matchmaker dateLength={dateLength} availableUsers={availableUsers} podCount={pods?.length} addPods={podAdditionHandler} removePods={podDeletionHandler} usersInSession={usersInSession} updateInSessionLists={updateInSessionLists} podsInSession={podsInSession} completeDate={dateCompletionHandler} cancelMatch={matchCancellationHandler} IDGenerator={IDGenerator} dateCompletionHandler={dateCompletionHandler} countMatches={matchCountChangeHandler}/>
       </Tab>
       <Tab eventKey="userlist" title="User List" >
         <UserInfo users={availableUsers} pods={pods} matches={matches} addPods={podAdditionHandler} removePods={podDeletionHandler} updateUsers={(updatedUsers)=>{setUsers(updatedUsers)}} addUser={addUser} addUsers={addUsers} clearUsers={clearUsersHandler} removeUser={userRemovalHandler} updateUser={userUpdateHandler} />
