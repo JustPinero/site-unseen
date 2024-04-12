@@ -24,7 +24,7 @@ const UserInfo = ({users, pods, addPods, removePods, matches, updateUsers, addUs
           <h5>Tools</h5>
         </div>
         <div className="userinfo-column-body">
-          <UserGenerationTools users={users} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers} clearUsers={clearUsers} />
+          <UserGenerationTools users={users} pods={pods} updateUsers={updateUsers} addUser={addUser} addUsers={addUsers} clearUsers={clearUsers} />
           <PodManagementTools pods={pods} addPods={addPods} removePods={removePods} />
         </div>
       </div>

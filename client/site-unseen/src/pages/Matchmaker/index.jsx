@@ -52,6 +52,7 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSession
 
 
   const availabilityCheckHandler = (options, restrictions)=>{
+    console.log("I BROKE IT:  ", options, restrictions)
     for(let i=0; i<options.length; i++){
       let currentOption = options[i];
       if(currentOption.id===undefined){
@@ -88,22 +89,27 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSession
     let updatedUsersInSession = usersInSession;
     let updatedPodsInSession = podsInSession;
     let updatedWaitlist = []
+    console.log("MATCHING USERS")
     for(let i=0 ; i< availableUsers.length; i++){
       let currentUser = availableUsers[i];
+      console.log("MATCHING USER:  ", currentUser)
       const currentUserNotInSession = updatedUsersInSession.indexOf(currentUser.id)<0;
       if(currentUserNotInSession){
         updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
         let { potentialMatches } = currentUser;
+        console.log("2nd time USER BEFORE MATCH CHECK:  ", currentUser)
         let currentMatch = availabilityCheckHandler(potentialMatches, updatedUsersInSession);
         if(currentMatch!==null){
         updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
         let userPodData
         let matchPodData
         let user1ClosestPods = currentUser.closestPods
+        console.log("3rd time USER BEFORE CLOSEST POD CHECK:  ", currentUser)
             userPodData = availabilityCheckHandler(user1ClosestPods, updatedPodsInSession);
             if(userPodData!==null){
               updatedPodsInSession=[...updatedPodsInSession, userPodData]
                 let user2ClosestPods = currentMatch.closestPods;
+                console.log("4rtj time MATCH BEFORE CLOSEST POD CHECK:  ", currentMatch)
                 matchPodData=availabilityCheckHandler(user2ClosestPods, updatedPodsInSession);
                   if(userPodData!==null && matchPodData!==null ){
                     updatedPodsInSession=[...updatedPodsInSession, matchPodData]
@@ -128,8 +134,8 @@ const Matchmaker = ({dateLength, availableUsers, usersInSession, updateInSession
     }
    }
    console.log("updatedWaitlist", updatedWaitlist)
-   matchesAdditionHandler(MatchUpdatePayload)
    waitListAdditionHandler(updatedWaitlist)
+      matchesAdditionHandler(MatchUpdatePayload)
    console.log("updatedUsersInSession:  ",updatedUsersInSession, "updatedPodsInSession:  ", updatedPodsInSession)
    updateInSessionLists(updatedUsersInSession, updatedPodsInSession)
   }

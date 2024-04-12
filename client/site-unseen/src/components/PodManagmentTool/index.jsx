@@ -16,16 +16,25 @@ const PodManagmentTools = ({pods, addPods, removePods, })=>{
 
 
     const PodAdditionChangeHandler = (e)=>{
-        const update = e.target.value
-        setPodAdditionCount(update);
+        const update = parseInt(e.target.value);
+        if(update<=0){
+            setPodAdditionCount(0);
+        }else{
+            setPodAdditionCount(update);
+        }
     }
     const PodAdditionSubmissionHandler = ()=>{
-        addPods(1)
+        addPods(podAdditionCount)
     }
     const PodRemovalChangeHandler = (e)=>{
-        const update = e.target.value
-        if(update>0 || update<= pods.length){
-            setPodRemovalCount(update);
+        const update = parseInt(e.target.value);
+        if(update<=0){
+            setPodRemovalCount(0);
+        }else
+        if( update> pods.length){
+            setPodRemovalCount(pods.length);
+        }else {
+        setPodRemovalCount(update);
         }
     }
     const PodRemovalSubmissionHandler = ()=>{
@@ -60,9 +69,9 @@ const PodManagmentTools = ({pods, addPods, removePods, })=>{
                             placeholder="Pod Removal Count"
                             aria-label="Remove Pods"
                             aria-describedby="basic-addon2"
-                            type="number"
                             value={podRemovalCount}
                             onChange={PodRemovalChangeHandler}
+                            type="number"
                             />
                             <Button onClick={PodRemovalSubmissionHandler} variant="outline-secondary" id="button-addon2">
                                 Remove Pods

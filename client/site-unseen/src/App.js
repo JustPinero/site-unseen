@@ -43,13 +43,11 @@ function IDGenerator(dataList, offset){
 const podDummyDataGenerator = (numberOfPods)=>{
   let podData = [];
   for(let i=0; i<numberOfPods ;i++){
-    const pod = {id: i+1, isOccupied:false, occupantID:null, occupantData: null}
+    const pod = {id: i, isOccupied:false, occupantID:null, occupantData: null}
     podData.push(pod)
   }
   return podData
 }
-
-
 
 const App = ()=> {
   /*--------LOCAL STATE---------- */
@@ -76,6 +74,7 @@ const App = ()=> {
    //DATES
   const [hasUnderThanMinimumPotentialDates, setHasUnderThanMinimumPotentialDates] = useState(false);
   const [usersWithTooFewDates, setUsersWithTooFewDates] = useState([]);
+  
   /* ----------LOCAL STATE------------- */
   /* ---------------STATE DEPENDANT VARIABLES FORMATTED DATA AND METRICS-------------------------- */
   /* DATE DURATION */
@@ -108,7 +107,6 @@ const App = ()=> {
     setPods(initialPods);
   }
   },[]);
-  const MatchingUsers =
   useEffect(()=>{
   let updatedAvailableUsers = users.filter(user=> user.isInDate === false);
   let notEnoughDatesList =[];
@@ -306,6 +304,7 @@ const podAdditionHandler = (podCount)=>{
     const pod = {id: newPodID, isOccupied:false, occupantID:null, occupantData: null, remainingTime:null};
     updatedPods.push(pod)
   }
+  console.log("PODS BEING ADDED:  ", updatedPods )
   setPods(updatedPods)
 }
 //UPDATE POD

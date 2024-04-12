@@ -27,6 +27,18 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min)
 }
 
+function IDGenerator(dataList, offset){
+    let newID = 1;
+    dataList.forEach((data)=>{
+      const {id} = data
+      if(id>=newID){
+        newID= id;
+      }
+    })
+    newID = newID+offset;
+    return newID
+  }
+
 function randomLimitedSelection(numberOfSelections, choices){
     let updatedChoices = choices;
     let selection = [];
@@ -52,11 +64,20 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
     const toggleShowFilters = ()=>{
         let updatedShowFilters = !showfilters;
         setShowFilters(updatedShowFilters)
+        if(updatedShowFilters ===false){
+            setGeneratedUserHasSexuality(false)
+            setGeneratedUserHasGender(false);
+            setGeneratedUserSexuality("")
+            setGeneratedUserGender("")
+        }
     }
 
     const toggleGeneratedUserHasGender = ()=>{
         let updatedHasGender = !generatedUserHasGender;
         setGeneratedUserHasGender(updatedHasGender)
+        if(updatedHasGender ===false){
+            setGeneratedUserGender("")
+        }
     }
     const generatedUserGenderChangeHandler = (e)=>{
         const updatedGender = e.target.value;
@@ -65,6 +86,9 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
     const toggleGeneratedUserHasSexuality = ()=>{
         let updatedHasSexuality = !generatedUserHasSexuality;
         setGeneratedUserHasSexuality(updatedHasSexuality)
+        if(updatedHasSexuality ===false){
+            setGeneratedUserSexuality("")
+        }
     }
     const generatedUserSexualityChangeHandler = (e)=>{
         const updatedSexuality = e.target.value;
@@ -76,8 +100,8 @@ const UserGenerationTools = ({updateUsers, addUsers, users, clearUsers={clearUse
     }
     const generationRequestionSubmissionHandler = ()=>{
         const newUsers =[];
-        for (let i =0; i<= userGenerationNumber; i++ ){
-            let newUserID= users.length + i;
+        for (let i =0; i< userGenerationNumber; i++ ){
+            let newUserID= IDGenerator(users, i);
             let newUserPassword = "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa" ;
             let newUserVerified = "YES";
             let newUserLastConnection = "2024-03-25T13:25:39.853Z";
