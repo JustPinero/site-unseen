@@ -7,7 +7,6 @@ const pieGenderColors = ["blue", "red", "green"]
 
 
 const Dashboard = ({users, availableUsers, pods, availablePods})=> {
-  console.log("USERS:  ", users)
 
   if(!users?.length){
     return <div>LOADING</div>

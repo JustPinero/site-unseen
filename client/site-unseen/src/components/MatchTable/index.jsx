@@ -26,7 +26,9 @@ const MatchTable = ({matches,  dateCompletionHandler,
             </tr>
         </thead>
         <tbody>
-            {matches?.map((match)=><MatchTableRow key={match.id} dateDuration={dateDuration} bufferDuration={bufferDuration} matchData={match}  dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>)}
+            {matches?.map((match)=>{
+                return match.id && <MatchTableRow key={match.id} dateDuration={dateDuration} bufferDuration={bufferDuration} matchData={match}  dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>}
+            )}
         </tbody>
     </Table>
     )

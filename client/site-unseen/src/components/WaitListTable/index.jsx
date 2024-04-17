@@ -4,7 +4,6 @@ import Table from 'react-bootstrap/Table';
 import WaitlistTableRow from "./WaitListTableRow";
 
 const WaitListTable = ({waitList})=>{
-    console.log("WAIT LIST TABLE RENDERING WITH THIS DATA:  ", waitList)
     return(
     <Table striped bordered hover>
         <thead>

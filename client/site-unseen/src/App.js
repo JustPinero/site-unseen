@@ -92,6 +92,7 @@ const App = ()=> {
    //PODS
    const [allPodsAreFull, setallPodsAreFull] = useState(false);
    //DATES
+  const [completedDateQueue, setCompletedDateQueue] = useState([]);
   const [hasUnderThanMinimumPotentialDates, setHasUnderThanMinimumPotentialDates] = useState(false);
   const [usersWithTooFewDates, setUsersWithTooFewDates] = useState([]);
   
@@ -138,29 +139,21 @@ const App = ()=> {
         const dateCountB = candidateB.dateCount
         return dateCountA - dateCountB ;
       })
-      console.log("UPDATED MATCH QUEUE ORDERED:  ",updatedmatchQueue )
-      setMatchQueue(updatedmatchQueue);
-    }
-  },[users]);
-    /* --------USERS-------- */
-
-/* --------MATCH QUEUE-------- */
-  useEffect(()=>{
-  //GENDER
+        //GENDER
   //MALE
-  const maleUsers = matchQueue?.filter(user=>user.gender==="male");
+  const maleUsers = users?.filter(user=>user.gender==="male");
   //SEXUAL PREFERENCES
   const heteroSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="female");
   const homoSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="male");
   const biSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="bisexual");
   //FEMALE
-  const femaleUsers = matchQueue?.filter(user=>user.gender==="female");
+  const femaleUsers = users?.filter(user=>user.gender==="female");
   //SEXUAL PREFERENCES
   const heteroSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="male");
   const homoSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="female");
   const biSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="bisexual");
   //NON-BINARY
-  const nonBinaryUsers = matchQueue?.filter(user=>user.gender==="non-binary");
+  const nonBinaryUsers = users?.filter(user=>user.gender==="non-binary");
   //SEXUAL PREFERENCES
   const nonBinaryUsersSeekingMale = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="male");
   const nonBinaryUsersSeekingFemale = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="female");
@@ -191,21 +184,12 @@ const App = ()=> {
     setSimIsRunning(false)
     setSimIsComplete(true)
   }
-  },[matchQueue])
+      setMatchQueue(updatedmatchQueue);
+    }
+  },[users]);
+    /* --------USERS-------- */
 
-
-  useEffect(()=>{
-    
-
-  },[heteroSexualMaleMatchList,
-    homoSexualMaleMatchList,
-    biSexualMaleMatchList,
-    heteroSexualFemaleMatchList,
-    homoSexualFemaleMatchList,
-    biSexualFemaleMatchList,
-    nonBinarySeekingMalesMatchList,
-    nonBinarySeekingFemalesMatchList,
-    biSexualNonBinaryMatchList])
+/* --------MATCH QUEUE-------- */
 
   useEffect(()=>{
     const updatedAvailablePods = pods.filter(pod=> pod.isOccupied === false);
@@ -213,10 +197,6 @@ const App = ()=> {
   },[pods]);
 /* -----------
 
-  useEffect(()=>{
-    const updatedAvailablePods = pods.filter(pod=> pod.isOccupied === false);
-    setAvailablePods(updatedAvailablePods);
-  },[pods]);
 /* ---------------LIFECYCLE-------------------------- */
 /* --------------------HANDLERS------------- */
 /* ----------SIMULATION------------- */
@@ -334,7 +314,6 @@ const podAdditionHandler = (podCount)=>{
     const pod = {id: newPodID, isOccupied:false, occupantID:null, occupantData: null, remainingTime:null};
     updatedPods.push(pod)
   }
-  console.log("PODS BEING ADDED:  ", updatedPods )
   setPods(updatedPods)
 }
 //UPDATE POD
@@ -378,6 +357,34 @@ const podDeletionHandler = (podDeletionCount)=>{
     usersUpdateHandler([updatedUser1, updatedUser2])
     podsUpdateHandler([updatedPod1, updatedPod2])
   };
+  const datesCompletionHandler = (matches)=>{
+    let updatedUsers = [];
+    let updatedPods =[];
+    if(matches.length){
+    matches.map(matchData=>{
+    const {match1, match2} = matchData;
+    //PODS UDPATE
+    const pod1 = match1.pod
+    const pod2 = match2.pod
+    const updatedPod1 = {...pod1, isOccupied:false, occupantID:null, occupantData: null}
+    const updatedPod2 = {...pod2, isOccupied:false, occupantID:null, occupantData: null}
+    //USERS UPDATE
+    const user1 = match1.user;
+    const user2 = match2.user;
+    const updatedUser1 = {...user1, isInDate:false, dateCount: user1.dateCount +1, hasHadDatesWith:[...user1.hasHadDatesWith, user2.id]}
+    const updatedUser2 = {...user2, isInDate:false, dateCount: user2.dateCount +1, hasHadDatesWith:[...user2.hasHadDatesWith, user1.id]}
+    updatedUsers = [...updatedUsers, updatedUser1, updatedUser2];
+    console.log("UPATED USERS:  ", updatedUsers)
+    updatedPods = [...updatedPods, updatedPod1, updatedPod2]
+    })
+    usersUpdateHandler(updatedUsers)
+    podsUpdateHandler(updatedPods)
+  }
+  };
+  const addToDateCompletionQueue = (date)=>{
+    const updatedCompletedDateQueue = [...completedDateQueue, date]
+    setCompletedDateQueue(updatedCompletedDateQueue)
+  }
 /* -----------DATES------------ */
 const updateInSessionLists = (busyUsers, usedPods)=>{
   const updatedUsersInSession = [...usersInSession, ...busyUsers];
@@ -403,24 +410,28 @@ const minimumDateAmountChangeHandler = (e)=>{
 /* -----------DATES------------ */
 /* -----------MATCHES------------ */
 const matchAdditionHandler = (newMatchData)=>{
-  console.log("MATCH HANDLER STARTING CURRENT MATCHES:  ", currentMatches)
   const {match1, match2, status} = newMatchData;
   /* MATCHDATA */
   const newMatchID = currentMatches.length+1;
   const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
   const matchesUpdate = [...currentMatches, newMatch]
-  console.log("MATCH HANDLER INCOMING MATCHES UPDATE:  ", matchesUpdate)
   setCurrentMatches(matchesUpdate)
 }
-const matchesAdditionHandler = (newMatchData)=>{
-  console.log("MATCH HANDLER STARTING CURRENT MATCHES:  ", currentMatches)
+const matchesAdditionHandler = (newMatchesData)=>{
+  const updatedMatches = newMatchesData.map((newMatchData, index)=>{
   const {match1, match2, status} = newMatchData;
   /* MATCHDATA */
-  const newMatchID = currentMatches.length+1;
+  const newMatchID = index
   const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
-  const matchesUpdate = [...currentMatches, newMatch]
-  console.log("MATCH HANDLER INCOMING MATCHES UPDATE:  ", matchesUpdate)
-  setCurrentMatches(matchesUpdate)
+  return newMatch
+  })
+  setCurrentMatches(updatedMatches)
+}
+
+const deleteMatch = (matchID)=>{
+  let updatedMatches = currentMatches.filter((removedMatch)=>{
+    return (matchID!==removedMatch.id)});
+    setCurrentMatches(updatedMatches)
 }
 /* -----------MATCHES------------ */
 /* --------------------HANDLERS------------- */
@@ -464,7 +475,12 @@ const matchesAdditionHandler = (newMatchData)=>{
           nonBinarySeekingFemalesMatchList={nonBinarySeekingFemalesMatchList}
           biSexualNonBinaryMatchList={biSexualNonBinaryMatchList}
           currentMatches={currentMatches}
-          addMatch={matchesAdditionHandler}
+          addMatch={matchAdditionHandler}
+          addMatches={matchesAdditionHandler}
+          deleteMatch={deleteMatch}
+          completedDateQueue={completedDateQueue}
+          datesCompletionHandler={datesCompletionHandler}
+          addToDateCompletionQueue={addToDateCompletionQueue}
         />
       </Tab>
       <Tab eventKey="userlist" title="User List" >

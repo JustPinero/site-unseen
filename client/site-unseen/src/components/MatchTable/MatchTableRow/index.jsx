@@ -72,7 +72,7 @@ const MatchTableRow = ({matchData,dateDuration,bufferDuration, dateCompletionHan
     };
     const getDeadTime = () => {
         let deadline = new Date();
-        deadline.setSeconds(deadline.getSeconds() + bufferDuration+dateDuration);
+        deadline.setSeconds(deadline.getSeconds() + 5);
         return deadline;
     };
     useEffect(() => {
@@ -82,17 +82,12 @@ const MatchTableRow = ({matchData,dateDuration,bufferDuration, dateCompletionHan
     }, []);
 
 
-        if(timer==="00:00:00"){
-            dataColor= "date-ending"
-            statusText= "Date Ending"
-            deleteMatch(id)
-            dateCompletionHandler(matchData)
-        }
-
-
-
-
-    // console.log("MATCH TABLE ROW:  ", matchData)
+    if(timer==="00:00:00"){
+        dataColor= "date-ending"
+        statusText= "Date Ending"
+        dateCompletionHandler(matchData)
+        deleteMatch(id)
+    };
     return(
         <tr className="match-row">
             <td id={dataColor}>{id}</td>
