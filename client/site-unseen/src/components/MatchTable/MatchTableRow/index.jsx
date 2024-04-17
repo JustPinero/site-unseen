@@ -19,7 +19,7 @@ const statusKey= {
 }
 
 const MatchTableRow = ({matchData,dateDuration,bufferDuration, dateCompletionHandler, deleteMatch})=>{
-    console.log("MATCH DATA:  ", matchData)
+    // console.log("MATCH DATA:  ", matchData)
     const {id, match1, match2, status} = matchData;
     const statusInfo = statusKey[status];
     const {text, styleId} = statusInfo;
@@ -92,15 +92,17 @@ const MatchTableRow = ({matchData,dateDuration,bufferDuration, dateCompletionHan
 
 
 
-    console.log("MATCH TABLE ROW:  ", matchData)
+    // console.log("MATCH TABLE ROW:  ", matchData)
     return(
         <tr className="match-row">
             <td id={dataColor}>{id}</td>
             <td id={dataColor}>{match1.user.id}</td>
             <td id={dataColor}>{match1.user.username}</td>
+            <td id={dataColor}>{match1.user.dateCount}</td>
             <td id={dataColor}>{match1.pod.id}</td>
             <td id={dataColor}>{match2.user.id}</td>
             <td id={dataColor}>{match2.user.username}</td>
+            <td id={dataColor}>{match2.user.dateCount}</td>
             <td id={dataColor}>{match2.pod.id}</td>
             <td id={dataColor}>{statusText}</td>
             <td>{timer}</td>

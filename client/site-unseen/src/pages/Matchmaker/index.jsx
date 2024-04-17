@@ -34,47 +34,65 @@ const Matchmaker = ({
   nonBinarySeekingFemalesMatchList,
   biSexualNonBinaryMatchList
 })=>{
+  console.log("matchQueue:  ", matchQueue)
   /* LOCAL STATE */
   //
-  const [availableUsers, setAvailableUsers] = useState([])
-  // MODAL
-  const [showModal, setShowModal] = useState(false);
-  /*  */
+  const [matchCandidate, setMatchCandidate] = useState(null)
       /* MATCHLIST */
   const [ currentMatches, setCurrentMatches] = useState([])
   /* WAITLIST */
-  const [waitList, setWaitList] = useState([]);
-  const [roundCount, setRoundCount] = useState(0);
+  // const [waitList, setWaitList] = useState([]);
+  // const [roundCount, setRoundCount] = useState(0);
 
-  let updatedUsersInSession = usersInSession
-  let updatedPodsInSession = podsInSession
+  // let updatedUsersInSession = usersInSession
+  // let updatedPodsInSession = podsInSession
 
   useEffect(()=>{
-    const updatedMatchCount = currentMatches.length;
-    countMatches(updatedMatchCount)
+    console.log("updated match queue detected:  ", matchQueue)
+    if(matchQueue.length){
+    for(let i=0; i<matchQueue.length; i++){
+      const newCandidateData = matchQueue[i]
+      console.log("updated CURRENT MATCHES LENGTH", currentMatches.length)
+      if(newCandidateData && currentMatches.length<=(podCount/2)) {
+        console.log("updated MATCH CANDIDATE:  ", matchQueue[i])
+        matchCandidateAdditionHandler(newCandidateData)
+      } else {
+        break;
+      }
+    }
+  }
   },[matchQueue]);
 
   useEffect(()=>{
-    const updatedMatchCount = currentMatches.length;
-    countMatches(updatedMatchCount)
-  },[currentMatches]);
-  
+    console.log("matchCandidate:  ", matchCandidate)
+    if(matchCandidate!==null){
+      if(usersInSession.indexOf(matchCandidate.id)<0){
+        matchMakingHandler(matchCandidate)
+      }
+    }
+  },[matchCandidate]);
 
-  const waitListAdditionHandler = (newWaitListAdditions)=>{
-    const waitlistUpdates = [...waitList, ...newWaitListAdditions]
-    setWaitList(waitlistUpdates)
+
+  // useEffect(()=>{
+  //   console.log("current matches recieved a change:  ", currentMatches)
+  //   const updatedMatchCount = currentMatches.length;
+  //   countMatches(updatedMatchCount)
+  // },[currentMatches]);
+  
+  const matchCandidateAdditionHandler = (newCandidate)=>{
+    console.log("matchCandidateAdditionHandler:  ", newCandidate)
+    let updatedMatchCandidate = newCandidate;
+    setMatchCandidate(updatedMatchCandidate);
   }
 
-  const matchesAdditionHandler = (newMatchesList)=>{
-    const updatedMatches = newMatchesList.map((newMatchData, index)=>{
+  const matchesAdditionHandler = (newMatchData)=>{
+    console.log("MATCH HANDLER STARTING CURRENT MATCHES:  ", currentMatches)
     const {match1, match2, status} = newMatchData;
     /* MATCHDATA */
-    const newMatchID = currentMatches.length ? IDGenerator(currentMatches, index) : index+1;
+    const newMatchID = currentMatches.length+1;
     const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
-    return newMatch
-    })
-    const matchesUpdate = [...currentMatches, ...updatedMatches]
-    console.log(" INCOMING MATCHES UPDATE:  ", matchesUpdate)
+    const matchesUpdate = [...currentMatches, newMatch]
+    console.log("MATCH HANDLER INCOMING MATCHES UPDATE:  ", matchesUpdate)
     setCurrentMatches(matchesUpdate)
   }
 
@@ -145,59 +163,38 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
     const newMatch = {match1:match1Data, match2: match2Data, status:status};
     return newMatch;
   }
-  const matchMakingRoundHandler = ()=>{
-    let MatchUpdatePayload = [];
+  const matchMakingHandler = (currentUser)=>{
+    console.log("MATCHMAKER RUNNING!  ")
     let updatedUsersInSession = usersInSession;
     let updatedPodsInSession = podsInSession;
-    let updatedWaitlist = []
-    console.log("MATCHING USERS")
-    for(let i=0 ; i< matchQueue.length; i++){
-      let currentUser = matchQueue[i];
-      console.log("MATCHING USER:  ", currentUser)
-      const currentUserNotInSession = updatedUsersInSession.indexOf(currentUser.id)<0;
-      if(currentUserNotInSession){
-        updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
-        console.log("2nd time USER BEFORE MATCH CHECK:  ", currentUser)
-        let currentMatch = matchFinder(currentUser,updatedUsersInSession)
-        if(currentMatch!==null){
-        updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
-        let userPodData
-        let matchPodData
-        let user1ClosestPods = currentUser.closestPods
-        console.log("3rd time USER BEFORE CLOSEST POD CHECK:  ", currentUser)
-            userPodData = availabilityCheckHandler(user1ClosestPods, updatedPodsInSession);
-            if(userPodData!==null){
-              updatedPodsInSession=[...updatedPodsInSession, userPodData]
-                let user2ClosestPods = currentMatch.closestPods;
-                console.log("4rtj time MATCH BEFORE CLOSEST POD CHECK:  ", currentMatch)
-                matchPodData=availabilityCheckHandler(user2ClosestPods, updatedPodsInSession);
-                  if(userPodData!==null && matchPodData!==null ){
-                    updatedPodsInSession=[...updatedPodsInSession, matchPodData]
-                    let formattedNewMatch = matchFormatter(currentUser, userPodData, currentMatch, matchPodData, "inProgress");
-                    MatchUpdatePayload.push(formattedNewMatch)
-                  }else{
-                    const updatedWaitListAddition1 = {...currentUser, status: "waitingOnPod" };
-                    updatedWaitlist.push(updatedWaitListAddition1)
-                    const updatedWaitListAddition2 = {...currentUser, status: "waitingOnPod" };
-                    updatedWaitlist.push(updatedWaitListAddition2)
-                  }
-            }else{
-              updatedPodsInSession=updatedPodsInSession.filter(podID=>(podID!==userPodData))
-              const updatedWaitListAddition = {...currentUser, status: "waitingOnPod" };
-              updatedWaitlist.push(updatedWaitListAddition)
-            }
-        }else{
-          updatedUsersInSession=updatedUsersInSession.filter(userID=>(userID!==currentUser.id))
-          const updatedWaitListAddition = {...currentUser, status: "waitingOnMatch" };
-          updatedWaitlist.push(updatedWaitListAddition)
+    console.log("MATCHING USER:  ", currentUser)
+    const currentUserNotInSession = updatedUsersInSession.indexOf(currentUser.id)<0;
+    if(currentUserNotInSession){
+      updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
+      console.log("2nd time USER BEFORE MATCH CHECK:  ", currentUser)
+      let currentMatch = matchFinder(currentUser,updatedUsersInSession)
+      if(currentMatch!==null){
+      updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
+      let userPodData
+      let matchPodData
+      let user1ClosestPods = currentUser.closestPods
+      console.log("3rd time USER BEFORE CLOSEST POD CHECK:  ", currentUser)
+          userPodData = availabilityCheckHandler(user1ClosestPods, updatedPodsInSession);
+          if(userPodData!==null){
+            updatedPodsInSession=[...updatedPodsInSession, userPodData]
+              let user2ClosestPods = currentMatch.closestPods;
+              console.log("4rtj time MATCH BEFORE CLOSEST POD CHECK:  ", currentMatch)
+              matchPodData=availabilityCheckHandler(user2ClosestPods, updatedPodsInSession);
+                if(userPodData!==null && matchPodData!==null ){
+                  updatedPodsInSession=[...updatedPodsInSession, matchPodData]
+                  let formattedNewMatch = matchFormatter(currentUser, userPodData, currentMatch, matchPodData, "inProgress");
+                  matchesAdditionHandler(formattedNewMatch)
+                }
+          }
       }
     }
-   }
-   console.log("updatedWaitlist", updatedWaitlist)
-   waitListAdditionHandler(updatedWaitlist)
-      matchesAdditionHandler(MatchUpdatePayload)
-   console.log("updatedUsersInSession:  ",updatedUsersInSession, "updatedPodsInSession:  ", updatedPodsInSession)
-   updateInSessionLists(updatedUsersInSession, updatedPodsInSession)
+    console.log("updatedUsersInSession:  ",updatedUsersInSession, "updatedPodsInSession:  ", updatedPodsInSession)
+    updateInSessionLists(updatedUsersInSession, updatedPodsInSession)
   }
   let userOptions = matchQueue;
   if(usersInSession.length){
@@ -211,34 +208,14 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
     //   setRoundCount(updatedRoundCount+1)
     //   matchMakingRoundHandler()
     // }
-    matchMakingRoundHandler()
+    // matchMakingRoundHandler()
   }
   return (
     <div className="matchmaker-tab">
-        <MatchToolBox roundCount={roundCount} simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={waitList} matchMakingHandler={matchMakingRoundHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)}  />
+        {/* <MatchToolBox roundCount={roundCount} simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={waitList} matchMakingHandler={()=>{}} addMatch={addMatch}   /> */}
       <div className="matches-container">
           <MatchTable matches={currentMatches} dateDuration={dateDuration} bufferDuration={bufferDuration} dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>
       </div>
-      {/* <Modal show={showModal} onHide={()=>setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>ADD MATCH</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {
-          <div className="matchoptionsbody-container">
-            <div className="matchuser-subheader">
-              <p>Available Users: {waitList.length}</p><p>   Open Pods:  {podCount-podsInSession.length+1}</p>
-            </div>
-            <div className="matchuser-list">
-            {
-              waitList ?
-              waitList.map(availableUser=><MatchUserOption userData={availableUser}/>): "No users are currently available"
-            }
-            </div>
-          </div>
-        }
-        </Modal.Body>
-      </Modal> */}
     </div>
   );
 }

@@ -18,10 +18,11 @@ import EventWarning from "./components/Alerts/EventWarning";
 const USERNUMBER = 280;
 const PODNUMBER = 84;
 const EVENTDURATION = 10800
-const BUFFERDURATION = 60;
-const DATEDURATION = 660;
+const BUFFERDURATION = 10;
+const DATEDURATION = 10;
 const MINIMUMDATENUMBER = 6;
 
+/* ---------HELPERS--------- */
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -48,6 +49,7 @@ const podDummyDataGenerator = (numberOfPods)=>{
   }
   return podData
 }
+/* ---------HELPERS--------- */
 
 const App = ()=> {
   /*--------LOCAL STATE---------- */
@@ -70,6 +72,7 @@ const App = ()=> {
   const [availablePods, setAvailablePods] = useState([]);
   const [podsInSession, setPodsInSession] = useState([]);
   /* MATCHES */
+  const [currentMatches, setCurrentMatches] = useState([]);
   const [matches, setMatches] =useState([])
   const [matchCount, setMatchCount] = useState([]);
   /* MATCH GROUPS */
@@ -98,6 +101,7 @@ const App = ()=> {
 
 //   /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
 //   /* ---------------LIFECYCLE-------------------------- */
+/* --------INIT-------- */
   useEffect(()=>{
     let initialUsers = userGenerationHelper(USERNUMBER);
     if(initialUsers){
@@ -123,13 +127,24 @@ const App = ()=> {
     setPods(initialPods);
   }
   },[]);
+  /* --------INIT-------- */
+  /* --------USERS-------- */
   /* MATCH QUEUE FORMATTING */
   useEffect(()=>{
-    let updatedmatchQueue = users.filter(user=> ((user.dateCount <  minumumDateAmount)|| (user.status ===  "noMoreProspects") ));
-    setMatchQueue(updatedmatchQueue);
+    if(users.length){
+      let updatedmatchQueue = users.filter(user=> ((user.dateCount <  minumumDateAmount)|| (user.status ===  "noMoreProspects") ));
+      updatedmatchQueue = updatedmatchQueue.sort((candidateA, candidateB)=>{
+        const dateCountA = candidateA.dateCount
+        const dateCountB = candidateB.dateCount
+        return dateCountA - dateCountB ;
+      })
+      console.log("UPDATED MATCH QUEUE ORDERED:  ",updatedmatchQueue )
+      setMatchQueue(updatedmatchQueue);
+    }
   },[users]);
+    /* --------USERS-------- */
 
-
+/* --------MATCH QUEUE-------- */
   useEffect(()=>{
   //GENDER
   //MALE
@@ -385,6 +400,29 @@ const minimumDateAmountChangeHandler = (e)=>{
   let updatedMinimumDateAmount= e.target.value
   setMinimumDateAmount(updatedMinimumDateAmount)
 }
+/* -----------DATES------------ */
+/* -----------MATCHES------------ */
+const matchAdditionHandler = (newMatchData)=>{
+  console.log("MATCH HANDLER STARTING CURRENT MATCHES:  ", currentMatches)
+  const {match1, match2, status} = newMatchData;
+  /* MATCHDATA */
+  const newMatchID = currentMatches.length+1;
+  const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
+  const matchesUpdate = [...currentMatches, newMatch]
+  console.log("MATCH HANDLER INCOMING MATCHES UPDATE:  ", matchesUpdate)
+  setCurrentMatches(matchesUpdate)
+}
+const matchesAdditionHandler = (newMatchData)=>{
+  console.log("MATCH HANDLER STARTING CURRENT MATCHES:  ", currentMatches)
+  const {match1, match2, status} = newMatchData;
+  /* MATCHDATA */
+  const newMatchID = currentMatches.length+1;
+  const newMatch = {id:newMatchID, match1:match1, match2:match2, status:status};
+  const matchesUpdate = [...currentMatches, newMatch]
+  console.log("MATCH HANDLER INCOMING MATCHES UPDATE:  ", matchesUpdate)
+  setCurrentMatches(matchesUpdate)
+}
+/* -----------MATCHES------------ */
 /* --------------------HANDLERS------------- */
   return (
     <div className="App">
@@ -425,6 +463,8 @@ const minimumDateAmountChangeHandler = (e)=>{
           nonBinarySeekingMalesMatchList={nonBinarySeekingMalesMatchList}
           nonBinarySeekingFemalesMatchList={nonBinarySeekingFemalesMatchList}
           biSexualNonBinaryMatchList={biSexualNonBinaryMatchList}
+          currentMatches={currentMatches}
+          addMatch={matchesAdditionHandler}
         />
       </Tab>
       <Tab eventKey="userlist" title="User List" >
