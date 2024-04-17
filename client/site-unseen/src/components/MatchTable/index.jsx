@@ -4,7 +4,10 @@ import Table from 'react-bootstrap/Table';
 import MatchTableRow from "./MatchTableRow"
 
 
-const MatchTable = ({matches, dateLength, dateCompletionHandler, deleteMatch})=>{
+const MatchTable = ({matches,  dateCompletionHandler,
+    dateDuration,
+    bufferDuration,
+    deleteMatch})=>{
     return(
     <Table striped bordered hover>
         <thead>
@@ -21,7 +24,7 @@ const MatchTable = ({matches, dateLength, dateCompletionHandler, deleteMatch})=>
             </tr>
         </thead>
         <tbody>
-            {matches?.map((match)=><MatchTableRow key={match.id} matchData={match} dateLength={dateLength} dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>)}
+            {matches?.map((match)=><MatchTableRow key={match.id} dateDuration={dateDuration} bufferDuration={bufferDuration} matchData={match}  dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>)}
         </tbody>
     </Table>
     )

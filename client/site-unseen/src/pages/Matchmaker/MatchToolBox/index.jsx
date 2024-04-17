@@ -6,7 +6,7 @@ import WaitListTable from '../../../components/WaitListTable';
 import SimulationDurationTracker from "../../../components/SimulationDurationTracker";
 
 
-const MatchToolBox = ({ waitList, simIsRunning, runSimulation, addMatch, addUserButtonClickHandler})=>{
+const MatchToolBox = ({ roundCount, waitList, simIsRunning, runSimulation, addMatch, addUserButtonClickHandler})=>{
 
     return(
         <div className="matchtools-container">
@@ -22,6 +22,7 @@ const MatchToolBox = ({ waitList, simIsRunning, runSimulation, addMatch, addUser
                 : null
                 }
             </div>
+                <p>{roundCount} ROUNDS</p>
                 <SimulationDurationTracker simIsRunning={simIsRunning} />
             <div>
             </div>

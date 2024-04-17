@@ -11,10 +11,15 @@ const statusKey= {
     waitingOnPod: {
         text: "Waiting for Pod",
         styleId: "match-row-waitingOnPod"
-    }
+    },
+    available: {
+        text: "available",
+        styleId: "available"
+    },
 }
 
-const MatchTableRow = ({matchData, dateLength, dateCompletionHandler, deleteMatch})=>{
+const MatchTableRow = ({matchData,dateDuration,bufferDuration, dateCompletionHandler, deleteMatch})=>{
+    console.log("MATCH DATA:  ", matchData)
     const {id, match1, match2, status} = matchData;
     const statusInfo = statusKey[status];
     const {text, styleId} = statusInfo;
@@ -22,7 +27,7 @@ const MatchTableRow = ({matchData, dateLength, dateCompletionHandler, deleteMatc
     let statusText = text;
     const Ref = useRef(null);
     // The state for our timer
-    const [timer, setTimer] = useState("00:12:00");
+    const [timer, setTimer] = useState("00:00:10");
     const getTimeRemaining = (e) => {
         const total =
             Date.parse(e) - Date.parse(new Date());
@@ -67,7 +72,7 @@ const MatchTableRow = ({matchData, dateLength, dateCompletionHandler, deleteMatc
     };
     const getDeadTime = () => {
         let deadline = new Date();
-        deadline.setSeconds(deadline.getSeconds() + dateLength);
+        deadline.setSeconds(deadline.getSeconds() + bufferDuration+dateDuration);
         return deadline;
     };
     useEffect(() => {

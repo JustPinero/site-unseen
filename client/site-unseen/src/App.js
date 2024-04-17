@@ -53,6 +53,7 @@ const App = ()=> {
   /*--------LOCAL STATE---------- */
   /* SIMULATION */
   const [simIsRunning, setSimIsRunning] = useState(false)
+  const [simIsComplete, setSimIsComplete] = useState(false)
   /* Session Time */
   const [sessionLength, setSessionLength]= useState(EVENTDURATION);
   /* DATES */
@@ -94,7 +95,6 @@ const App = ()=> {
   /* ----------LOCAL STATE------------- */
   /* ---------------STATE DEPENDANT VARIABLES FORMATTED DATA AND METRICS-------------------------- */
   /* DATE DURATION */
-  const dateLength = bufferDuration + dateDuration;
 
 //   /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
 //   /* ---------------LIFECYCLE-------------------------- */
@@ -123,9 +123,9 @@ const App = ()=> {
     setPods(initialPods);
   }
   },[]);
+  /* MATCH QUEUE FORMATTING */
   useEffect(()=>{
-    let updatedmatchQueue = users.filter(user=> user.isInDate === false);
-
+    let updatedmatchQueue = users.filter(user=> ((user.dateCount <  minumumDateAmount)|| (user.status ===  "noMoreProspects") ));
     setMatchQueue(updatedmatchQueue);
   },[users]);
 
@@ -133,40 +133,23 @@ const App = ()=> {
   useEffect(()=>{
   //GENDER
   //MALE
-  const maleUsers = users?.filter(user=>user.gender==="male");
+  const maleUsers = matchQueue?.filter(user=>user.gender==="male");
   //SEXUAL PREFERENCES
   const heteroSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="female");
   const homoSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="male");
   const biSexualMaleUsers = maleUsers.filter(maleUser=>maleUser.sexual_pref=="bisexual");
   //FEMALE
-  const femaleUsers = users?.filter(user=>user.gender==="female");
+  const femaleUsers = matchQueue?.filter(user=>user.gender==="female");
   //SEXUAL PREFERENCES
   const heteroSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="male");
   const homoSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="female");
   const biSexualfemaleUsers = femaleUsers.filter(femaleUser=>femaleUser.sexual_pref=="bisexual");
   //NON-BINARY
-  const nonBinaryUsers = users?.filter(user=>user.gender==="non-binary");
+  const nonBinaryUsers = matchQueue?.filter(user=>user.gender==="non-binary");
   //SEXUAL PREFERENCES
   const nonBinaryUsersSeekingMale = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="male");
   const nonBinaryUsersSeekingFemale = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="female");
   const nonBinaryBisexualUsers = nonBinaryUsers.filter(nonBinaryUser=>nonBinaryUser.sexual_pref=="bisexual");
-  // let prospectsKey =  {
-  //   male:{
-  //     male: [...homoSexualMaleUsers, ...biSexualMaleUsers],
-  //     female: [...heteroSexualfemaleUsers, ...biSexualfemaleUsers],
-  //     bisexual: [...homoSexualMaleUsers, ...biSexualMaleUsers, ...heteroSexualfemaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
-  //   },
-  //   female:{
-  //     male: [...heteroSexualMaleUsers, ...biSexualMaleUsers],
-  //     female: [...homoSexualfemaleUsers, ...biSexualfemaleUsers],
-  //     bisexual: [...homoSexualfemaleUsers, ...biSexualfemaleUsers, ...heteroSexualMaleUsers, ...biSexualMaleUsers, ...nonBinaryBisexualUsers]
-  //   },
-  //   nonbinary: {
-  //     male: [...biSexualMaleUsers, ...nonBinaryBisexualUsers],
-  //     female: [...biSexualfemaleUsers, ...nonBinaryBisexualUsers],
-  //     bisexual: [...biSexualMaleUsers, ...biSexualfemaleUsers, ...nonBinaryBisexualUsers]
-  //   }
-  // }
 /* MATCH GROUPS */
   //MALE
   const updatedHeteroSexualMaleMatchList = [...heteroSexualfemaleUsers, ...biSexualfemaleUsers];
@@ -189,6 +172,10 @@ const App = ()=> {
   setNonBinarySeekingMaleMatchList(updatedNonBinarySeekingMaleMatchList);
   setNonBinarySeekingFemaleMatchList(updatedNonBinarySeekingFemaleMatchList);
   setBiSexualNonBinaryMatchList(updatedBiSexualNonBinaryMatchList);
+  if(!matchQueue.length && simIsRunning){
+    setSimIsRunning(false)
+    setSimIsComplete(true)
+  }
   },[matchQueue])
 
 
@@ -385,10 +372,12 @@ const updateInSessionLists = (busyUsers, usedPods)=>{
 };
 const bufferDurationChangeHandler = (e)=>{
   let updatedBufferDuration = e.target.value
-  setBufferDuration()
+  updatedBufferDuration=parseInt(updatedBufferDuration)
+  setBufferDuration(updatedBufferDuration)
 }
 const dateDurationChangeHandler = (e)=>{
   let updatedDateDuration= e.target.value
+  updatedDateDuration=parseInt(updatedDateDuration)
   setDateDuration(updatedDateDuration)
 }
 
@@ -415,8 +404,10 @@ const minimumDateAmountChangeHandler = (e)=>{
         <Matchmaker
           simIsRunning={simIsRunning}
           simulationStartHandler={simulationStartHandler}
-          dateLength={dateLength}
-          matchQueue={matchQueue} podCount={pods?.length}
+          dateDuration={dateDuration}
+          bufferDuration={bufferDuration}
+          matchQueue={matchQueue}
+          podCount={pods?.length}
           addPods={podAdditionHandler}
           removePods={podDeletionHandler}
           usersInSession={usersInSession}

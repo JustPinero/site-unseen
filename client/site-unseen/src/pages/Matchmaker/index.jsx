@@ -13,7 +13,8 @@ import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption
 const Matchmaker = ({
   simIsRunning,
   simulationStartHandler,
-  dateLength,
+  dateDuration,
+  bufferDuration,
   matchQueue,
   usersInSession,
   updateInSessionLists,
@@ -33,7 +34,9 @@ const Matchmaker = ({
   nonBinarySeekingFemalesMatchList,
   biSexualNonBinaryMatchList
 })=>{
-    /* LOCAL STATE */
+  /* LOCAL STATE */
+  //
+  const [availableUsers, setAvailableUsers] = useState([])
   // MODAL
   const [showModal, setShowModal] = useState(false);
   /*  */
@@ -42,11 +45,20 @@ const Matchmaker = ({
   /* WAITLIST */
   const [waitList, setWaitList] = useState([]);
   const [roundCount, setRoundCount] = useState(0);
-  var TableMatches
+
+  let updatedUsersInSession = usersInSession
+  let updatedPodsInSession = podsInSession
+
+  useEffect(()=>{
+    const updatedMatchCount = currentMatches.length;
+    countMatches(updatedMatchCount)
+  },[matchQueue]);
+
   useEffect(()=>{
     const updatedMatchCount = currentMatches.length;
     countMatches(updatedMatchCount)
   },[currentMatches]);
+  
 
   const waitListAdditionHandler = (newWaitListAdditions)=>{
     const waitlistUpdates = [...waitList, ...newWaitListAdditions]
@@ -71,7 +83,6 @@ const Matchmaker = ({
       return (matchID!==removedMatch.id)});
     setCurrentMatches(updatedMatches)
   }
-
 
   const availabilityCheckHandler = (options, restrictions)=>{
     console.log("I BROKE IT:  ", options, restrictions)
@@ -134,7 +145,7 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
     const newMatch = {match1:match1Data, match2: match2Data, status:status};
     return newMatch;
   }
-  const matchMakingHandler = ()=>{
+  const matchMakingRoundHandler = ()=>{
     let MatchUpdatePayload = [];
     let updatedUsersInSession = usersInSession;
     let updatedPodsInSession = podsInSession;
@@ -146,11 +157,8 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
       const currentUserNotInSession = updatedUsersInSession.indexOf(currentUser.id)<0;
       if(currentUserNotInSession){
         updatedUsersInSession = [...updatedUsersInSession, currentUser.id];
-        let { potentialMatches, hasHadDatesWith } = currentUser;
         console.log("2nd time USER BEFORE MATCH CHECK:  ", currentUser)
-        let userMatchFilter
         let currentMatch = matchFinder(currentUser,updatedUsersInSession)
-        // availabilityCheckHandler(potentialMatches, updatedUsersInSession);
         if(currentMatch!==null){
         updatedUsersInSession = [...updatedUsersInSession, currentMatch.id];
         let userPodData
@@ -197,13 +205,19 @@ const matchFinder = (userSeekingMatch, busyUserList)=>{
   };
 
   const runSimulation = ()=>{
-    simulationStartHandler()
+    // simulationStartHandler()
+    // let updatedRoundCount = 0
+    // while(matchQueue.length ){
+    //   setRoundCount(updatedRoundCount+1)
+    //   matchMakingRoundHandler()
+    // }
+    matchMakingRoundHandler()
   }
   return (
     <div className="matchmaker-tab">
-        <MatchToolBox simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={waitList} matchMakingHandler={matchMakingHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)}  />
+        <MatchToolBox roundCount={roundCount} simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={waitList} matchMakingHandler={matchMakingRoundHandler} addMatch={addMatch} addUserButtonClickHandler={()=>setShowModal(true)}  />
       <div className="matches-container">
-          <MatchTable matches={currentMatches}  dateLength={dateLength} dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>
+          <MatchTable matches={currentMatches} dateDuration={dateDuration} bufferDuration={bufferDuration} dateCompletionHandler={dateCompletionHandler} deleteMatch={deleteMatch}/>
       </div>
       {/* <Modal show={showModal} onHide={()=>setShowModal(false)}>
         <Modal.Header closeButton>
