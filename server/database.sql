@@ -7,27 +7,11 @@ CREATE TABLE IF NOT EXISTS users (
 	lastname VARCHAR(255) NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
-	last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
--- CREATE TABLE IF NOT EXISTS password_reset (
--- 	running_id SERIAL NOT NULL PRIMARY KEY,
--- 	user_id INT NOT NULL,
--- 	reset_code VARCHAR(255) NOT NULL,
--- 	expire_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
--- 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
--- );
-
-CREATE TABLE IF NOT EXISTS user_info (
-	running_id SERIAL NOT NULL PRIMARY KEY,
-	user_id INT NOT NULL,
 	gender VARCHAR(255) NOT NULL,
 	age INT NOT NULL,
 	interests VARCHAR(255)[] NOT NULL,
 	sexual_pref VARCHAR(255) NOT NULL,
 	biography VARCHAR(65535) NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 
