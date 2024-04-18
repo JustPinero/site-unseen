@@ -133,17 +133,23 @@ const App = ()=> {
   /* MATCH QUEUE FORMATTING */
   useEffect(()=>{
     console.log("A USER CHANGED!!:  ", users)
-  let updatedMatchQueue = users.filter(user=> ((user.dateCount <  minumumDateAmount)|| (user.status !==  "noMoreProspects") ));
+   let updatedMatchQueue = users.sort((candidateA, candidateB)=>{
+      const dateCountA = candidateA.dateCount
+      const dateCountB = candidateB.dateCount
+      return dateCountA - dateCountB ;
+    })
+   updatedMatchQueue = updatedMatchQueue.filter((user)=>{
+    if(user.dateCount >=  minumumDateAmount){
+      console.log("I AM BEING FILTERED:  ", user)
+    }
+    return ((user.dateCount <  minumumDateAmount)|| (user.status !==  "noMoreProspects") )
+  });
   if(!updatedMatchQueue.length && simIsRunning){
     setSimIsRunning(false)
     setSimIsComplete(true)
   }
   console.log("filtered Data:  ", updatedMatchQueue)
-  updatedMatchQueue = updatedMatchQueue.sort((candidateA, candidateB)=>{
-    const dateCountA = candidateA.dateCount
-    const dateCountB = candidateB.dateCount
-    return dateCountA - dateCountB ;
-  })
+
   //GENDER
   //MALE
   const maleUsers = updatedMatchQueue?.filter(user=>user.gender==="male");
