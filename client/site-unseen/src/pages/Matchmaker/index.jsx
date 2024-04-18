@@ -8,8 +8,10 @@ import Modal from "react-bootstrap/Modal";
 import MatchTable from "../../components/MatchTable";
 import MatchToolBox from "./MatchToolBox";
 import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption";
+import SimulationResults from "./SimulationResults"
 
 const Matchmaker = ({
+  simIsComplete,
   simIsRunning,
   simulationStartHandler,
   dateDuration,
@@ -37,12 +39,13 @@ const Matchmaker = ({
   deleteMatch,
   completedDateQueue,
   addToDateCompletionQueue,
+  roundCount,
+  addRound
 }) => {
   /* LOCAL STATE */
   /* MATCHLIST */
   // const [ currentMatches, setCurrentMatches] = useState([])
   const [matchCount, setMatchCount] = useState(0);
-  let updatedMatches = currentMatches;
   let updatedUsersInSession = usersInSession;
   let updatedPodsInSession = podsInSession;
   let pauseMatchMaking = false
@@ -59,16 +62,20 @@ const Matchmaker = ({
 
   /* -------MATCH QUEUE------- */
   useEffect(() => {
-
+    let updatedCurrentMatches = currentMatches;
     if (matchQueue.length && !pauseMatchMaking) {
-      if(matchCount <= podCount / 2){
+        addRound();
+      if(updatedCurrentMatches.length <= podCount / 2){
       for (let i = 0; i < matchQueue.length; i++) {
+        if((updatedCurrentMatches.length > podCount / 2)|| pauseMatchMaking){
+          break
+        }
         const newCandidateData = matchQueue[i];
         if (newCandidateData) {
           const newMatch = matchMakingHandler(newCandidateData);
           if(newMatch!==undefined){
-            updatedMatches = [...updatedMatches, newMatch];
-            addMatches(updatedMatches)
+            updatedCurrentMatches = [...updatedCurrentMatches, newMatch];
+            addMatch(newMatch)
           }
         } else {
           break;
@@ -76,7 +83,7 @@ const Matchmaker = ({
       }
     }
     }
-  }, [matchQueue]);
+  }, [matchQueue, completedDateQueue]);
 
 /*------ MATCHES----- */
 
@@ -139,11 +146,13 @@ const dateCompletedFunction = (date)=>{
   };
 
   const matchFormatter = (user, userPod, match, matchPod, status) => {
+    console.log("MATCH FORMATTER USER:  ", user)
+    console.log("MATCH FORMATTER MATCH:  ", user)
     const updatedUserDateList = [...user.hasHadDatesWith, match];
+    const updatedUserDateCount = updatedUserDateList.length
     const formattedUserData = {
       ...user,
       status: "date in progress",
-      hasHadDatesWith: updatedUserDateList,
     };
     //USER POD DATA
     const formattedUserPod = {
@@ -153,11 +162,11 @@ const dateCompletedFunction = (date)=>{
     };
     const match1Data = { user: formattedUserData, pod: formattedUserPod };
     //MATCH DATA
-    const updatedMatchDateList = [...match.hasHadDatesWith, user];
+
     const formattedMatchData = {
       ...match,
-      status: " ",
-      hasHadDatesWith: updatedMatchDateList,
+      status: "date in progress",
+
     };
     //MATCH POD DATA
     const formattedMatchPod = {
@@ -168,6 +177,7 @@ const dateCompletedFunction = (date)=>{
     const match2Data = { user: formattedMatchData, pod: formattedMatchPod };
     //NEW MATCH
     const newMatch = { match1: match1Data, match2: match2Data, status: status };
+    console.log("MATCH FORMATTER RESULT:  ", newMatch)
     return newMatch;
   };
 /*------ HELPERS----- */
@@ -178,6 +188,12 @@ const dateCompletedFunction = (date)=>{
   }
   const removeFromUserInSessionList = (userID)=>{
     updatedUsersInSession = updatedUsersInSession.filter(inSessionID=> userID!==inSessionID)
+  }
+  const addToPodInSessionList = (podID)=>{
+    updatedPodsInSession = [...updatedPodsInSession, podID];
+  }
+  const removeFromPodInSessionList = (podID)=>{
+    updatedPodsInSession = updatedPodsInSession.filter(inSessionID=> podID!==inSessionID)
   }
   const matchMakingHandler = (currentUser) => {
 
@@ -197,15 +213,16 @@ const dateCompletedFunction = (date)=>{
           updatedPodsInSession,
         );
         if (userPodData !== null) {
-          updatedPodsInSession = [...updatedPodsInSession, userPodData];
+          addToPodInSessionList(userPodData.id)
           let user2ClosestPods = currentMatch.closestPods;
           matchPodData = availabilityCheckHandler(
             user2ClosestPods,
             updatedPodsInSession,
           );
           if (userPodData !== null && matchPodData !== null) {
-            setMatchCount(matchCount + 1);
-            updatedPodsInSession = [...updatedPodsInSession, matchPodData];
+            const updatedMatchCount = matchCount + 1
+            setMatchCount(updatedMatchCount);
+            addToPodInSessionList(matchPodData.id)
             let formattedNewMatch = matchFormatter(
               currentUser,
               userPodData,
@@ -213,11 +230,12 @@ const dateCompletedFunction = (date)=>{
               matchPodData,
               "inProgress",
             );
-            updatedUsersInSession =[...updatedUsersInSession, updatedUsersInSession, updatedPodsInSession];
             return formattedNewMatch;
           } else{
             removeFromUserInSessionList(currentUser.id)
             removeFromUserInSessionList(currentMatch.id)
+            removeFromPodInSessionList(userPodData.id)
+            removeFromPodInSessionList(matchPodData.id)
           }
         }else{
           removeFromUserInSessionList(currentUser.id)
@@ -233,6 +251,10 @@ const dateCompletedFunction = (date)=>{
     <div className="matchmaker-tab">
       {/* <MatchToolBox roundCount={roundCount} simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={waitList} matchMakingHandler={()=>{}} addMatch={addMatch}   /> */}
       <div className="matches-container">
+        {roundCount}
+        {
+        simIsComplete ?
+        <SimulationResults/>:
         <MatchTable
           matches={currentMatches}
           dateDuration={dateDuration}
@@ -240,6 +262,7 @@ const dateCompletedFunction = (date)=>{
           dateCompletionHandler={dateCompletedFunction}
           deleteMatch={matchRemovalHandler}
         />
+        }
       </div>
     </div>
   );
