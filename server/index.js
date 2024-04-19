@@ -12,33 +12,18 @@ app.use(express.json());
 //create a user
 app.post("/users", async(req,res)=>{
 	try {
-		console.log(req.body)
-		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body
+
+		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
 		const newUser = await pool.query(
-		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`
+		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`,
 		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography]
 	);
 	console.log(newUser)
-	res.json(newUser)
+	return res.json(newUser)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
 })
-
-
-// CREATE TABLE IF NOT EXISTS users (
-// 	id SERIAL NOT NULL PRIMARY KEY,
-// 	username VARCHAR(255) NOT NULL,
-// 	firstname VARCHAR(255) NOT NULL,
-// 	lastname VARCHAR(255) NOT NULL,
-// 	email VARCHAR(255) NOT NULL,
-// 	password VARCHAR(255) NOT NULL
-// 	gender VARCHAR(255) NOT NULL,
-// 	age INT NOT NULL,
-// 	interests VARCHAR(255)[] NOT NULL,
-// 	sexual_pref VARCHAR(255) NOT NULL,
-// 	biography VARCHAR(65535) NOT NULL,
-// );
 
 //get a user
 
@@ -51,7 +36,7 @@ app.post("/users", async(req,res)=>{
 
 require('dotenv').config() // to use .env variables
 const PORT = process.env.PORT
-app.listen(5001, ()=>{
+app.listen(PORT, ()=>{
 	console.log(`THE SERVER HAS STARTED!  BIG O!  SHOW TIME! listening on ${PORT}`)
 })
 // app.use(express.json()) // needed to attach JSON data to POST body property
