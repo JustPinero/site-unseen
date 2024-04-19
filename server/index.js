@@ -15,7 +15,7 @@ app.post("/users", async(req,res)=>{
 
 		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
 		const newUser = await pool.query(
-		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`,
+		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography]
 	);
 	console.log(newUser)
@@ -26,13 +26,61 @@ app.post("/users", async(req,res)=>{
 })
 
 //get a user
+app.get("/users/:id", async(req,res)=>{
+	try {
+		const {id} = req.params
+		const user = await pool.query(
+		`SELECT * FROM users WHERE id = $1`,[id]
+	);
+	console.log(user)
+	return res.json(user)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+})
 
 //get all users
-
+app.get("/users", async(req,res)=>{
+	try {
+		const allUsers = await pool.query(
+		`SELECT * FROM users`
+	);
+	console.log(allUsers)
+	return res.json(allUsers)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+})
 //update a user
+app.put("/users/:id", async(req,res)=>{
+	try {
+		const {id} = req.params
+		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
+
+		const updateUser = await pool.query(
+		`UPDATE users SET username=$1, firstname=$2, lastname=$3, email=$4, password=$5, gender=$6, age=$7, interests=$8, sexual_pref=$9, biography=$10  WHERE id=$11`,		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, id]
+	);
+	console.log(updateUser)
+	return res.json(updateUser)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+})
+
 
 //delete a user
-
+app.delete("/users/:id", async(req,res)=>{
+	try {
+		const {id} = req.params
+		const deleteUser = await pool.query(
+		`DELETE FROM users WHERE id = $1`,[id]
+	);
+	console.log(deleteUser)
+	return res.json(deleteUser)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+})
 
 require('dotenv').config() // to use .env variables
 const PORT = process.env.PORT
