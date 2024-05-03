@@ -1,167 +1,189 @@
-// const { faker } = require('@faker-js/faker')
-// const { Pool } = require('pg')
-// const axios = require('axios')
-// module.exports = function (app, bcrypt, transporter) {
+var express = require('express');
+var router = express.Router();
+const db = require("../db");
+const { faker } = require('@faker-js/faker');
 
-// Array.prototype.random = function () {
-// 	return this[Math.floor((Math.random() * this.length))];
-// }
+/* GET all users  */
+router.get('/', async(req,res)=>{
+	try {
+		const allUsers = await db.query(
+		`SELECT * FROM users`
+	);
+	console.log(allUsers.rows)
+	res.json(allUsers.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
-// function getRandomInt(min, max) {
-// 	min = Math.ceil(min)
-// 	max = Math.floor(max)
-// 	return Math.floor(Math.random() * (max - min) + min)
-// }
+/* GET all users by gender */
+router.get('/gender/:gender', async(req,res)=>{
+	try {
+    const {gender} = req.params;
+		const allUsersByGender = await db.query(
+		`SELECT * FROM users WHERE gender = $1`,[gender]
+	);
+	console.log(allUsersByGender.rows)
+	res.json(allUsersByGender)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
-// function randomLimitedSelection(numberOfSelections, choices){
-//     let updatedChoices = choices;
-//     let selection = [];
-//     for(let i=0 ; i<numberOfSelections; i++){
-//         if(updatedChoices.length){
-//             selectedOption = choices.random();
-//             updatedChoices = updatedChoices.filter((option)=> option!==selectedOption);
-//             selection.push(selectedOption);
-//         }
-
-//     }
-//     return selection;
-// }
-
-// const users = []
-// const genderOptions = ["male", "female", "non-binary"]
-// const sexualPreferenceOptions = ["bisexual", "male", "female"]
-
-// const softDefinerOptions = ["work", "dogs", "music", "travel", "outdoors", "books",
-// 	"adventure", "food", "hiking", "sports", "gaming", "movies", "tv", "art",
-// 	"nature", "animals", "cars", "tech", "fashion", "beauty", "fitness",
-// 	"health", "science", "history", "politics", "religion", "philosophy",
-// 	"psychology", "education", "family", "friends", "cats"]
-
-//     const pool = new Pool({
-//         user: 'postgres',
-//         host: '127.0.0.1', // LOCAL HOST - note: 127.0.0.1 true local host translated in your /etc/hosts (a file that exists on your system and does main name translation for you)
-//         database: 'site_unseen',
-//         password: 'PassWordle101!',
-//         port: 5432,
-//     })
-
-// const connectToDatabase = () => {
-// 	pool.connect((err, client, release) => {
-// 		if (err) {
-// 			console.log('Error acquiring client', err.stack)
-// 			console.log('Retrying in 5 seconds...')
-// 			setTimeout(connectToDatabase, 5000)
-// 		} else {
-// 			console.log('Connected to database')
-// 			initUsers()
-// 				.then(() => {
-// 					console.log("User creating finished, you can close this window")
-// 				})
-// 		}
-// 	})
-// }
-// connectToDatabase()
-
-// const createUser = async () => {
-//     let gender = genderOptions.random();
-// 	let firstname, lastname
-// 	if (gender === "man") {
-// 		firstname = faker.name.firstName('male')
-// 		lastname = faker.name.lastName('male')
-// 	} else if (gender === "female") {
-// 		firstname = faker.name.firstName('female')
-// 		lastname = faker.name.firstName("female")
-// 	} else {
-// 		firstname = faker.name.firstName()
-// 		lastname = faker.name.lastName()
-// 	}
-// 	let username = faker.internet.userName(firstname, lastname)
-// 	let email = faker.internet.email(firstname, lastname)
-// 	let user = {
-// 		username,
-// 		firstname,
-// 		lastname,
-// 		email,
-// 		password: "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa",
-// 		verified: "YES"
-// 	}
-// 	users.push(user)
-// 	let sql = `INSERT INTO users (username, firstname, lastname, email, password, verified) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`
-// 	let values = [user.username, user.firstname, user.lastname, user.email, user.password, user.verified]
-// 	let res = await pool.query(sql, values)
-// 	return (res.rows[0].id)
-// }
-
-// const createUserInfo = async (id, gender) => {
-// 	let age = getRandomInt(18, 120)
-// 	let sexual_pref = sexualPreferenceOptions.random()
-// 	let biography = faker.lorem.paragraph()
-// 	let coordinates = faker.address.nearbyGPSCoordinate([60.180929, 24.957521], 5000, true)
-// 	let city_data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates[0]},${coordinates[1]}&key=${process.env.GOOGLE_API}`)
-// 	let user_location
-//     let interests = randomLimitedSelection(5 , softDefinerOptions)
-// 	let length = city_data.data.results.length
-// 	if (city_data.data.results.length > 0)
-// 		user_location = city_data.data.results[length - 1].formatted_address
-// 	else
-// 		user_location = "Unknown"
-// 	console.log('user_location', user_location)
-// 	let ip_location = `(${coordinates[0]}, ${coordinates[1]})`
-// 	let sql = `INSERT INTO user_info (user_id, gender, age, sexual_pref, biography, user_location, ip_location, interests) VALUES ($1,$2,$3,$4,$5,$6,$7, $8)`
-//     console.log("interests: ", interests)
-// 	let values = [id, gender, age, sexual_pref, biography, user_location, ip_location, interests]
-// 	await pool.query(sql, values)
-// }
+/* GET user by id */
+router.get('/:id', async(req,res)=>{
+	try {
+    const {id} = req.params
+		const user = await db.query(
+		`SELECT * FROM users where id=$1`,[id]
+	);
+	console.log(user.rows)
+	res.json(user.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
 
+/* GET ALL users who still need dates */
+router.get('/dates/:datecount', async(req,res)=>{
+	try {
+    const {datecount} = req.params
+		const sortedUsers = await db.query(
+      `
+      SELECT users.*, COUNT(matches.user1_id) AS dates
+      FROM users
+      LEFT JOIN matches
+      ON matches.user1_id = users.id
+      GROUP BY users.id
+      HAVING COUNT(matches.user1_id) < $1
+      ORDER BY dates
+      ;`, [datecount]
+	);
+	console.log(sortedUsers.rows)
+	res.json(sortedUsers.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* CREATE user */
+router.post('/', async(req, res)=>{
+	try {
+		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
+		const newUser = await db.query(
+		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography]
+	);
+	console.log(newUser.rows)
+	res.json(newUser.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
 
+/* GENERATE RANDOM user */
+router.post('/generate', async(req, res)=>{
+	try {
+  const userGenerationHelper = ()=>{
+    const {generatedUserHasGender, generatedUserGender, generatedUserHasSexuality, generatedUserSexuality} = req.body;
+    /* STATIC VALUES */
+    const genderOptions = ["male", "female", "non-binary"]
+    const sexualPreferenceOptions = ["bisexual", "male", "female"]
+    const softDefinerOptions = ["work", "dogs", "music", "travel", "outdoors", "books",
+      "adventure", "food", "hiking", "sports", "gaming", "movies", "tv", "art",
+      "nature", "animals", "cars", "tech", "fashion", "beauty", "fitness",
+      "health", "science", "history", "politics", "religion", "philosophy",
+      "psychology", "education", "family", "friends", "cats"]
+    /* HELPERS */
+    Array.prototype.random = function () {
+      return this[Math.floor((Math.random() * this.length))];
+    };
+    function getRandomInt(min, max) {
+      min = Math.ceil(min)
+      max = Math.floor(max)
+      return Math.floor(Math.random() * (max - min) + min)
+    };
+    function randomLimitedSelection(numberOfSelections, choices){
+      let updatedChoices = choices;
+      let selection = [];
+      for(let i=0 ; i<numberOfSelections; i++){
+        if(updatedChoices.length){
+          let selectedOption = choices.random();
+          updatedChoices = updatedChoices.filter((option)=> option!==selectedOption);
+          selection.push(selectedOption);
+        };
+      };
+      return selection;
+    };
+    let newUserPassword = "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa" ;
+    let newUserGender = generatedUserHasGender ? generatedUserGender : genderOptions.random();
+    let newUserFirstName = newUserGender === "non-binary" ? faker.person.firstName() : faker.person.firstName(newUserGender);
+    let newUserLastName = newUserGender === "non-binary" ? faker.person.lastName() : faker.person.lastName(newUserGender);
+    let newUserEmail = faker.internet.email({newUserFirstName, newUserLastName});
+    let newUserName = faker.internet.userName({newUserFirstName, newUserLastName});
+    let newUserAge = getRandomInt(18, 80);
+    let newUserSexualPreference = generatedUserHasSexuality ? generatedUserSexuality : sexualPreferenceOptions.random();
+    let newUserBiography = faker.lorem.paragraph();
+    let newUserInterests = randomLimitedSelection(5 , softDefinerOptions);
+    let newUserStatus = "available";
+    let generatedUser = {
+      username: newUserName,
+      firstname: newUserFirstName,
+      lastname: newUserLastName,
+      email: newUserEmail,
+      password: newUserPassword,
+      gender: newUserGender,
+      age: newUserAge,
+      sexual_pref: newUserSexualPreference,
+      biography: newUserBiography,
+      interests: newUserInterests,
+      status: newUserStatus
+    };
+    return generatedUser;
+  };
+  const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status} =userGenerationHelper();
+  const newUser = await db.query(
+  `insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+  [username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status]
+);
+console.log(newUser);
+res.json(newUser.rows);
+} catch (error) {
+  console.log("ERROR:  ", error.message)
+}
+});
 
-// const initUsers = async () => {
-// 	console.log("User creating started")
 
-// 	for (let i = 0; i < 140; i++) {
-// 		console.log("Creating user " + i)
-// 		let gender = genderOptions.random()
-// 		let id = await createUser(gender)
-// 		await createUserInfo(id, gender)
-// 	}
-// }
+/* UPDATE user by id */
+router.put('/:id', async(req,res)=>{
+	try {
+		const {id} = req.params
+		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
 
-// const generateDummyUserData = async (numberOfDummyUsers)=>{
-// 	console.log("User Generation started")
-// 	for (let i = 0; i < numberOfDummyUsers; i++) {
-// 		console.log("Creating user " + i)
-// 		let gender = genderOptions.random()
-// 		let id = await createUser(gender)
-// 		await createUserInfo(id, gender)
-// 	}
-// }
+		const updateUser = await db.query(
+		`UPDATE users SET username=$1, firstname=$2, lastname=$3, email=$4, password=$5, gender=$6, age=$7, interests=$8, sexual_pref=$9, biography=$10  WHERE id=$11`,		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, id]
+	);
+	console.log(updateUser.rows)
+	res.json(updateUser.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
-// //GET ALL USERS
-// app.get('/api/users', async (request, response) => {
-//     try{
-//         console.log("FETCHING USERS")
-//         var sql = "SELECT * FROM users INNER JOIN user_info ON users.id = user_info.user_id"
-//         var users = await pool.query(sql)
-//         const userLists = {  users }
-//         response.send(userLists)
-//     }catch (error) {
-//         response.send(false)
-//     }
-// })
+/* DELETE user by id */
+router.delete('/:id', async(req,res)=>{
+	try {
+		const {id} = req.params
+		const deleteUser = await db.query(
+		`DELETE FROM users WHERE id = $1`,[id]
+	);
+	console.log(deleteUser.rows)
+	res.json(deleteUser.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
-
-// app.post('/api/users/:number', async (request, response) => {
-//     try{
-//         console.log("Generating USERS")
-//         generateDummyUserData(number)
-//         var sql = "SELECT * FROM users INNER JOIN user_info ON users.id = user_info.user_id"
-//         var users = await pool.query(sql)
-//         const userLists = {  users }
-//         response.send(userLists)
-//     }catch (error) {
-//         response.send(false)
-//     }
-// })
-// }
+module.exports = router;

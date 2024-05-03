@@ -5,4 +5,8 @@ const connectionString = process.env.DATABASE_URL
 const pool = new Pool({connectionString,
 });
 
-module.exports = pool;
+module.exports = {
+    query: (queryText, params, callback)=>{
+        return pool.query(queryText, params, callback)
+    }
+};

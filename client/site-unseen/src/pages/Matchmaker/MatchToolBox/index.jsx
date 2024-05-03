@@ -2,11 +2,10 @@
 import './styles.css';
 /* BOOTSTRAP COMPONENTS */
 import Button from 'react-bootstrap/Button'
-import WaitListTable from '../../../components/WaitListTable';
 import SimulationDurationTracker from "../../../components/SimulationDurationTracker";
 
 
-const MatchToolBox = ({ roundCount, waitList, simIsRunning, runSimulation, addMatch})=>{
+const MatchToolBox = ({ pauseSimulation, roundCount, simIsRunning, runSimulation, addMatch})=>{
 
     return(
         <div className="matchtools-container">
@@ -16,9 +15,14 @@ const MatchToolBox = ({ roundCount, waitList, simIsRunning, runSimulation, addMa
                 </Button>
                 {
                     simIsRunning ?
+                    <>
+                <Button onClick={pauseSimulation }>
+                    PAUSE SIMULATION
+                </Button>
                 <Button onClick={()=>{} }>
                     CANCEL SIMULATION
                 </Button>
+                </>
                 : null
                 }
             </div>
@@ -26,9 +30,6 @@ const MatchToolBox = ({ roundCount, waitList, simIsRunning, runSimulation, addMa
                 <SimulationDurationTracker simIsRunning={simIsRunning} />
             <div>
             </div>
-            {/* <div className="waitlist-table-container">
-                {waitList.length && <WaitListTable waitList={waitList}/>}
-            </div> */}
         </div>
     )
 }

@@ -5,7 +5,7 @@
 
 .matches-container {
     width: 100%;
-    height: 500px;
+    height: 300px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

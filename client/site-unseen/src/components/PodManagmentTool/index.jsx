@@ -6,11 +6,13 @@ import './styles.css';
 import Form from 'react-bootstrap/Form';
 import InputGroup from "react-bootstrap/InputGroup"
 import Button from 'react-bootstrap/Button';
+/** API */
+import { addPods, deletePods } from "../../api/pods";
 /* FAKER */
 const { faker } = require('@faker-js/faker')
 
 
-const PodManagmentTools = ({pods, addPods, removePods, })=>{
+const PodManagmentTools = ({pods })=>{
     const [podAdditionCount, setPodAdditionCount] = useState(1);
     const [podRemovalCount, setPodRemovalCount] = useState(1);
 
@@ -31,14 +33,14 @@ const PodManagmentTools = ({pods, addPods, removePods, })=>{
         if(update<=0){
             setPodRemovalCount(0);
         }else
-        if( update> pods.length){
+        if( update > pods.length){
             setPodRemovalCount(pods.length);
         }else {
         setPodRemovalCount(update);
         }
     }
     const PodRemovalSubmissionHandler = ()=>{
-        removePods(podRemovalCount)
+        deletePods(podRemovalCount)
     }
 
     return (
@@ -87,7 +89,7 @@ const PodManagmentTools = ({pods, addPods, removePods, })=>{
                     </Button>
                 </div> */}
                 <div>
-                    <Button onClick={()=>removePods(pods.length)}>
+                    <Button onClick={()=>deletePods(pods.length)}>
                         Remove All Pods
                     </Button>
                 </div>

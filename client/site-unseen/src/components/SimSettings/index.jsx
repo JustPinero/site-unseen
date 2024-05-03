@@ -6,8 +6,15 @@ import './styles.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
-const SimSettings = ({ minimumDateAmount,
-    minimumDateAmountChangeHandler,bufferDuration, bufferDurationChangeHandler, dateDuration, dateDurationChangeHandler})=>{
+const SimSettings = ({ 
+    simIsRunning,
+    dateCap,
+    dateCapChangeHandler, 
+    bufferDuration, 
+    bufferDurationChangeHandler,
+     dateDuration,
+      dateDurationChangeHandler
+    })=>{
    
     return (
         <div className="simsettings-container">
@@ -15,7 +22,7 @@ const SimSettings = ({ minimumDateAmount,
             <div className="simsettings-duration-box">
                 <Form>
                     <Form.Label className={"simsettings-form_label"}>
-                         Date Length Duration (secs)     
+                         Date Length (secs)
                     </Form.Label>
                     <Form.Control
                         id="datebuffer-form"
@@ -24,15 +31,17 @@ const SimSettings = ({ minimumDateAmount,
                         aria-label="Small"
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
+                        disabled={simIsRunning}
                     /> 
                     <Form.Label className={"simsettings-form_label"}>
-                        Date Buffer Duration (secs)
+                        Date Grace Period (secs)
                     </Form.Label>
                     <Form.Control
                         id="dateduration-form"
                         value={dateDuration}
                         onChange={dateDurationChangeHandler}
                         type="number"
+                        disabled={simIsRunning}
                     />
                 </Form>
                 <Form style={{marginLeft:"6px"}}>
@@ -41,11 +50,12 @@ const SimSettings = ({ minimumDateAmount,
                     </Form.Label>
                     <Form.Control
                         id="minimumdate-form"
-                        value={minimumDateAmount}
-                        onChange={minimumDateAmountChangeHandler}
+                        value={dateCap}
+                        onChange={dateCapChangeHandler}
                         aria-label="Small"
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
+                        disabled={simIsRunning}
                     /> 
                 </Form>
             </div>

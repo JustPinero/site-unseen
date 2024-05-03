@@ -10,20 +10,15 @@ const statusKey= {
     }
 }
 
-const WaitListTableRow = ({userData})=>{
-    console.log("WAITLISTER DATA:  ", userData)
+const UserTableRow = ({userData})=>{
     const {id, username, dateCount, status} = userData;
-    // const statusInfo = statusKey[status];
-    // const {text, styleId} = statusInfo
     return(
         <tr className="waitlsit-row">
             <td >{id}</td>
             <td >{username}</td>
-            <td >{username}</td>
-            <td >{dateCount}</td>
             <td>{status}</td>
         </tr>
     )
 }
 
-export default WaitListTableRow;
+export default UserTableRow;

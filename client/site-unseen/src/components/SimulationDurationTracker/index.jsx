@@ -7,7 +7,9 @@ import './styles.css';
 const SimulationDurationTracker = ({simIsRunning})=>{
     const [elapsedTime, setElapsedTime] = useState(0)
         const countUp= ()=>{
-            setElapsedTime(({ elapsedTime }) => ({ elapsedTime: elapsedTime + 1 }));
+          if(simIsRunning){
+            setElapsedTime(( elapsedTime ) => (  setElapsedTime(elapsedTime + 1) ));
+          }
         }
         const startCounting=()=> {
           setInterval(countUp, 1000);

@@ -12,17 +12,27 @@ CREATE TABLE IF NOT EXISTS users (
 	interests VARCHAR(255)[] NOT NULL,
 	sexual_pref VARCHAR(255) NOT NULL,
 	biography VARCHAR(65535) NOT NULL,
+	status VARCHAR(55) NOT NULL,
 );
 
-
+CREATE TABLE IF NOT EXISTS pods (
+	id SERIAL NOT NULL PRIMARY KEY,
+	status VARCHAR(255) NOT NULL,
+	occupant_id int,
+	FOREIGN KEY (occupant_id) REFERENCES users (id)
+);
 
 CREATE TABLE IF NOT EXISTS matches (
-	connection_id SERIAL NOT NULL PRIMARY KEY,
+	id SERIAL NOT NULL PRIMARY KEY,
 	user1_id INT NOT NULL,
     pod1_id INT NOT NULL,
 	user2_id INT NOT NULL,
-    pod1_id INT NOT NULL,
-	FOREIGN KEY (user1_id) REFERENCES users (id) ON DELETE CASCADE
+    pod2_id INT NOT NULL,
+	status VARCHAR(255) NOT NULL,
+	FOREIGN KEY (user1_id) REFERENCES users (id),
+	FOREIGN KEY (user2_id) REFERENCES users (id),
+	FOREIGN KEY (pod1_id) REFERENCES pods (id),
+	FOREIGN KEY (pod2_id) REFERENCES pods (id)
 );
 
 

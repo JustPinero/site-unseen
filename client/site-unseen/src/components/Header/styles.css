@@ -3,7 +3,8 @@
     flex-direction: row;
     align-items: center;
     margin-top: 24px;
-    justify-content: center;
+    justify-content: space-around;
+    margin-bottom: 24px
 }
 
 .header-text{
