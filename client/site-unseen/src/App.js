@@ -16,8 +16,9 @@ import UserInfo from "./pages/UserInfo";
 import EventWarning from "./components/Alerts/EventWarning";
 
 /* API */
-import {fetchUsers, fetchElligibleUsers, } from "./api/users";
+import {fetchUsers, fetchUserDateCountAverage, fetchElligibleUsers, fetchFinishedUsers} from "./api/users";
 import {fetchPods, addPods } from "./api/pods.js";
+import { fetchMatches } from "./api/matches.js";
 
 /* DEFAULT VALUES */
 const USERNUMBER = 284;
@@ -42,6 +43,8 @@ const App = ()=> {
   const [dateCap, setDateCap] = useState(DEFAULTDATECAP)
   /* USERS */
   const [users, setUsers] = useState([]);
+  const [finishedUsersCount, setFinishedUsersCount] = useState(0)
+  const [userDateCountAverage, setUserDateCountAverage] = useState(0)
   /* PODS */
   const [podCount, setPodCount] = useState(PODNUMBER)
   /* MATCHES */
@@ -57,17 +60,25 @@ const App = ()=> {
 useEffect(()=>{
   async function startFetching() {
     try{
-    setUsers(null);
-    const userResults = await fetchUsers(dateCap);
+      console.log("FETCHING")
+
+    const userResults = await fetchUsers();
+    const finishedUserResults = await fetchFinishedUsers(dateCap);
     const podResults = await fetchPods()
+    const matchResults = await fetchMatches()
+    const userDateCountAverageResults = await fetchUserDateCountAverage()
     if(podCount===0){
       await addPods(PODNUMBER);
     }
     if (!ignore) {
       console.log("USERS:  ", userResults.data)
-      console.log("PDOS:  ", podResults.data)
+      console.log("PODS:  ", podResults.data)
+      console.log("userDateCountAverageResults:  ", userDateCountAverageResults.data[0].average_matches)
       setUsers(userResults.data);
       setPodCount(podResults.data.length)
+      setMatchCount(matchResults.data.length)
+      setFinishedUsersCount(finishedUserResults.data.length)
+      setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
     }
   }
   catch(err){
@@ -124,10 +135,11 @@ const dateCapChangeHandler = (e)=>{
 }
 
 /* --------------------HANDLERS------------- */
+const dateLength =   dateDuration+bufferDuration
   return (
     <div className="App">
       <div className="apphead-container">
-        <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount}/>
+        <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
       </div>
     <Tabs
       defaultActiveKey="matchmaker"
@@ -145,9 +157,7 @@ const dateCapChangeHandler = (e)=>{
           simIsComplete={simIsComplete}
           simIsRunning={simIsRunning}
           simulationStartHandler={simulationStartHandler}
-          dateDuration={dateDuration}
-          bufferDuration={bufferDuration}
-          users = {users}
+          dateDuration={dateLength}
           dateCap={dateCap}
         />
       </Tab>

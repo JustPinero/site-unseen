@@ -8,8 +8,7 @@ import InputGroup from "react-bootstrap/InputGroup"
 import Button from 'react-bootstrap/Button';
 /** API */
 import { addPods, deletePods } from "../../api/pods";
-/* FAKER */
-const { faker } = require('@faker-js/faker')
+
 
 
 const PodManagmentTools = ({pods })=>{
@@ -26,6 +25,7 @@ const PodManagmentTools = ({pods })=>{
         }
     }
     const PodAdditionSubmissionHandler = ()=>{
+        console.log("Generate", podAdditionCount, "PODS")
         addPods(podAdditionCount)
     }
     const PodRemovalChangeHandler = (e)=>{

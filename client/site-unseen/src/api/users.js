@@ -3,22 +3,32 @@ import axios from 'axios';
 const PATH = `${BASEURL}/users`
 
 /* USER GETS */
+/* GETS ALL USERS */
 const fetchUsers = async ()=>{
-    try{
-        return await axios.get(`${PATH}`);
-    }
-    catch(err){
-        console.log("ERROR:  ", err)
-    }
+    console.log("FETCHING ALL USERS")
+    return await axios.get(`${PATH}`);
 };
+/* GETS ALL USER BY ID */
 const fetchUserByID = async (id)=>{
     return await axios.get(`${PATH}/${id}`);
 };
-
+/* GETS ALL ELLIGIBLE USERS */
 const fetchElligibleUsers = async (dateCount)=>{
+    console.log("dateCount:  ", dateCount)
     return await axios.get(`${PATH}/dates/${dateCount}`);
 };
 
+/*GETS AVG USER DATE COUNT */
+const fetchUserDateCountAverage = async ()=>{
+    return await axios.get(`${PATH}/dates/avg`);
+};
+
+/* GETS ALL FINISHED USERS */
+const fetchFinishedUsers = async (dateCount)=>{
+    console.log("dateCount:  ", dateCount)
+    return await axios.get(`${PATH}/finished/${dateCount}`);
+};
+/* GETS USERS BY GENDER */
 const fetchUsersByGender = async (gender)=>{
     return await axios.get(`${PATH}/gender/${gender}`);
 };
@@ -48,4 +58,9 @@ const deleteUser =  async (id)=>{
     return await axios.delete(`${PATH}/${id}`);
 };
 
-export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser}
+/* USERS DELETE */
+const deleteUsers =  async (usercount)=>{
+    return await axios.delete(`${PATH}/remove/${usercount}`);
+};
+
+export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteUsers}

@@ -9,10 +9,12 @@ import SimSettings from '../SimSettings';
 const Header = ({
     simIsRunning,
     matchCount,
+    finishedUsersCount,
     dateCap,
     dateCapChangeHandler,
     userCount,
     podCount,
+    userDateCountAverage,
     bufferDuration,
     bufferDurationChangeHandler,
     dateDuration,
@@ -24,7 +26,7 @@ const Header = ({
                 Site Unseen
             </h1>
             <SimSettings simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}/>
-            <InfoBox simIsRunning={simIsRunning} userCount={userCount} podCount={podCount} matchCount={matchCount} />
+            <InfoBox simIsRunning={simIsRunning} userCount={userCount} podCount={podCount} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
             <div>
             {/* <SessionTimer sessionLength={sessionLength}/> */}
             </div>

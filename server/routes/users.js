@@ -7,12 +7,18 @@ const { faker } = require('@faker-js/faker');
 router.get('/', async(req,res)=>{
 	try {
 		const allUsers = await db.query(
-		`SELECT * FROM users`
-	);
-	console.log(allUsers.rows)
-	res.json(allUsers.rows)
+		  `
+      SELECT u.*, COUNT(m.id) AS num_matches
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      GROUP BY u.id
+      `
+	  );
+  const data = allUsers.rows;
+	console.log(data);
+	res.json(data);
 	} catch (error) {
-		console.log("ERROR:  ", error.message)
+		console.log("ERROR:  ", error.message);
 	}
 });
 
@@ -44,24 +50,86 @@ router.get('/:id', async(req,res)=>{
 	}
 });
 
+/* GET user dates by id */
+router.get('/:id/dates', async(req,res)=>{
+	try {
+    const {id} = req.params
+		const user = await db.query(
+		`select count(*) from matches
+      where $1 = user1_id or $1 = user2_id
+      ;`,[id]
+	);
+	console.log(user.rows)
+	res.json(user.rows)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* GET AVERAGE NUMBER OF USER MATCHES */
+router.get('/dates/avg', async(req,res)=>{
+	try {
+		const userAverageDateCountResults = await db.query(
+      `
+      SELECT AVG(num_matches) AS average_matches
+      FROM (
+          SELECT COUNT(*) AS num_matches
+          FROM matches
+          GROUP BY user1_id
+          UNION ALL
+          SELECT COUNT(*) AS num_matches
+          FROM matches
+          GROUP BY user2_id
+      ) AS match_counts
+      ;`
+	);
+  const userAverageDateCount= userAverageDateCountResults.rows
+	res.json(userAverageDateCount)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
 
 /* GET ALL users who still need dates */
 router.get('/dates/:datecount', async(req,res)=>{
 	try {
     const {datecount} = req.params
-		const sortedUsers = await db.query(
+		const sortedUsersResults = await db.query(
       `
-      SELECT users.*, COUNT(matches.user1_id) AS dates
-      FROM users
-      LEFT JOIN matches
-      ON matches.user1_id = users.id
-      GROUP BY users.id
-      HAVING COUNT(matches.user1_id) < $1
-      ORDER BY dates
+      SELECT u.id, u.username, COUNT(m.id) AS num_matches
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      WHERE u.available = TRUE
+      GROUP BY u.id, u.username
+      HAVING COUNT(m.id) <= $1
+      ORDER BY num_matches ASC;
       ;`, [datecount]
 	);
-	console.log(sortedUsers.rows)
-	res.json(sortedUsers.rows)
+  const sortedUsers = sortedUsersResults.rows;
+	console.log("sortedUsers:  ", sortedUsers)
+	res.json(sortedUsers)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* GET ALL users who have finished dating*/
+router.get('/finished/:datecount', async(req,res)=>{
+	try {
+    const {datecount} = req.params
+		const usersResults = await db.query(
+      `
+      SELECT u.id, u.username, COUNT(m.id) AS num_matches
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      GROUP BY u.id, u.username
+      HAVING COUNT(m.id) >= $1
+      ;`, [datecount]
+	);
+  const usersData = usersResults.rows;
+	console.log("usersData:  ", usersData)
+	res.json(usersData)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -71,12 +139,12 @@ router.get('/dates/:datecount', async(req,res)=>{
 router.post('/', async(req, res)=>{
 	try {
 		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
-		const newUser = await db.query(
-		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography]
+		await db.query(
+		`insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status, available) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, "available", true]
 	);
-	console.log(newUser.rows)
-	res.json(newUser.rows)
+  res.status(200)
+  res.json({status: `new user created`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -139,17 +207,18 @@ router.post('/generate', async(req, res)=>{
       sexual_pref: newUserSexualPreference,
       biography: newUserBiography,
       interests: newUserInterests,
-      status: newUserStatus
+      status: newUserStatus,
+      available: true
     };
     return generatedUser;
   };
-  const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status} =userGenerationHelper();
-  const newUser = await db.query(
-  `insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-  [username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status]
+  const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status, available} =userGenerationHelper();
+  await db.query(
+  `insert into users (username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status, available) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+  [username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status, available]
 );
-console.log(newUser);
-res.json(newUser.rows);
+    res.status(200)
+    res.json({status: `NEW USER GENERATED`})
 } catch (error) {
   console.log("ERROR:  ", error.message)
 }
@@ -160,13 +229,13 @@ res.json(newUser.rows);
 router.put('/:id', async(req,res)=>{
 	try {
 		const {id} = req.params
-		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography} =req.body;
+		const {username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, status, available} =req.body;
 
-		const updateUser = await db.query(
-		`UPDATE users SET username=$1, firstname=$2, lastname=$3, email=$4, password=$5, gender=$6, age=$7, interests=$8, sexual_pref=$9, biography=$10  WHERE id=$11`,		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, id]
+		await db.query(
+		`UPDATE users SET username=$1, firstname=$2, lastname=$3, email=$4, password=$5, gender=$6, age=$7, interests=$8, sexual_pref=$9, biography=$10 status=$12 available=$13  WHERE id=$11`,		[username, firstname, lastname, email, password, gender, age, interests, sexual_pref, biography, "available", true, id],
 	);
-	console.log(updateUser.rows)
-	res.json(updateUser.rows)
+  res.status(200)
+  res.json({status: `user ${id} updated`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -176,11 +245,35 @@ router.put('/:id', async(req,res)=>{
 router.delete('/:id', async(req,res)=>{
 	try {
 		const {id} = req.params
-		const deleteUser = await db.query(
+	  await db.query(
 		`DELETE FROM users WHERE id = $1`,[id]
 	);
-	console.log(deleteUser.rows)
-	res.json(deleteUser.rows)
+  res.status(200)
+  res.json({status: `user ${id} deleted`})
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* DELETE selected number of users */
+router.delete('/remove/:usercount', async(req,res)=>{
+	try {
+		const {usercount} = req.params
+		await db.query(
+		`DELETE FROM users
+    WHERE id IN (
+        SELECT id
+        FROM (
+            SELECT id
+            FROM users
+            WHERE available = TRUE
+            ORDER BY id ASC
+            LIMIT $1
+        ) AS subquery
+    );`, [usercount]
+	);
+	res.status(200);
+  res.json({status: `${usercount} available users deleted`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}

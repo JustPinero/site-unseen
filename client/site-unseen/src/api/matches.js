@@ -7,6 +7,10 @@ const fetchMatches = async ()=>{
     return await axios.get(`${PATH}/`);
 };
 
+const fetchActiveMatches = async ()=>{
+    return await axios.get(`${PATH}/inprogress`);
+};
+
 const fetchMatchesByStatus = async (matchStatus)=>{
     return await axios.get(`${PATH}/status/${matchStatus}`);
 };
@@ -16,12 +20,13 @@ const fetchMatchByID= async (id)=>{
 };
 
 /* MATCHES POSTS */
-const createMatch = async (userID, dateCount)=>{
-    const payload = {userID, dateCount}
+const createMatch = async (userID)=>{
+    const payload = {userID}
     return await axios.post(`${PATH}/`, payload);
 };
 
 const completeMatch = async (id, matchData)=>{
+    console.log("MATCH BEING COMPLETED:  ", id, matchData)
     return await axios.put(`${PATH}/complete/${id}`, matchData);
 };
 
@@ -37,4 +42,4 @@ const deleteMatch =  async (id)=>{
 };
 
 
-export {fetchMatches, fetchMatchesByStatus, fetchMatchByID, createMatch, completeMatch, updateMatch, deleteMatch};
+export {fetchMatches, fetchActiveMatches, fetchMatchesByStatus, fetchMatchByID, createMatch, completeMatch, updateMatch, deleteMatch};

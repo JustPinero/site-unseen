@@ -1,4 +1,4 @@
-CREATE  DATABASE site_unseen;
+CREATE  DATABASE IF NOT EXISTS site_unseen;
 
 CREATE TABLE IF NOT EXISTS users (
 	id SERIAL NOT NULL PRIMARY KEY,
@@ -13,11 +13,12 @@ CREATE TABLE IF NOT EXISTS users (
 	sexual_pref VARCHAR(255) NOT NULL,
 	biography VARCHAR(65535) NOT NULL,
 	status VARCHAR(55) NOT NULL,
+	available BOOLEAN NOT NUll
 );
 
 CREATE TABLE IF NOT EXISTS pods (
 	id SERIAL NOT NULL PRIMARY KEY,
-	status VARCHAR(255) NOT NULL,
+	occupied BOOLEAN NOT NULL,
 	occupant_id int,
 	FOREIGN KEY (occupant_id) REFERENCES users (id)
 );
@@ -29,12 +30,12 @@ CREATE TABLE IF NOT EXISTS matches (
 	user2_id INT NOT NULL,
     pod2_id INT NOT NULL,
 	status VARCHAR(255) NOT NULL,
+	complete BOOLEAN NOT NULL,
 	FOREIGN KEY (user1_id) REFERENCES users (id),
 	FOREIGN KEY (user2_id) REFERENCES users (id),
 	FOREIGN KEY (pod1_id) REFERENCES pods (id),
 	FOREIGN KEY (pod2_id) REFERENCES pods (id)
 );
-
 
 CREATE TABLE IF NOT EXISTS gender_options (
 	gender_id SERIAL NOT NULL PRIMARY KEY,

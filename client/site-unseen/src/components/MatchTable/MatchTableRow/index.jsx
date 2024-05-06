@@ -20,23 +20,22 @@ const statusKey= {
     },
 }
 
-const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration,bufferDuration, dateCompletionHandler})=>{
-    const [rowData, setRowData] = useState(null)
+const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration, dateCompletionHandler})=>{
+    console.log("MATCH DATA:  ", matchData)
+    const [timer, setTimer] = useState(`00:00:${dateDuration}`);
     function getRandomInt(min, max) {
         min = Math.ceil(min)
         max = Math.floor(max)
         return Math.floor(Math.random() * (max - min) + min)
       };
     const delay = getRandomInt(3, 10)
-    console.log("MATCH DATA:  ", matchData)
-    const {id, user1_id, pod1_id, user2_id, pod2_id, status} = matchData;
+    const {id, user1_username, user1_age, user1_gender, user1_match_count, pod1_id, user2_username, user2_age, user2_gender, user2_match_count, pod2_id, status} = matchData;
     const statusInfo = statusKey[status];
     const {text, styleId} = statusInfo;
     let dataColor = styleId;
     let statusText = text;
     const Ref = useRef(null);
     // The state for our timer
-    const [timer, setTimer] = useState("00:00:20");
     const getTimeRemaining = (e) => {
         const total =
             Date.parse(e) - Date.parse(new Date());
@@ -58,7 +57,7 @@ const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration,buff
         if(!simIsPaused){
         let { total, hours, minutes, seconds } =
             getTimeRemaining(e);
-        if (total >= 0 || !simIsPaused) {
+        if (total >= 0) {
             // update the timer
             // check if less than 10 then we need to
             // add '0' at the beginning of the variable
@@ -83,38 +82,9 @@ const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration,buff
     };
     const getDeadTime = () => {
         let deadline = new Date();
-        deadline.setSeconds(deadline.getSeconds() + 5+delay );
+        deadline.setSeconds(deadline.getSeconds()+ dateDuration + 5+delay );
         return deadline;
     };
-    useEffect(() => {
-        async function startFetching() {
-            try{
-                const pod1Results = await fetchPodsByID(pod1_id)
-                const pod2Results = await fetchPodsByID(pod2_id)
-                const user1Results = await fetchUserByID(user1_id)
-                const user2Results = await fetchUserByID(user2_id)
-                if (!ignore) {
-                   
-                    const user1Data =user1Results.data[0];
-                    const user2Data =user2Results.data[0];
-                    const pod1Data =pod1Results.data[0];
-                    const pod2Data = pod2Results.data[0];
-                    const updatedRowData = {user1Data, user2Data ,pod1Data, pod2Data};
-                    console.log("UDPATED ROW DATA:  ",updatedRowData )
-                    setRowData(updatedRowData);
-                }
-            }catch(err){
-                console.log("MATCH TABLE ROW ERROR:  ", err)
-            }
-        }
-        let ignore = false;
-        if(matchData){
-        startFetching();
-        return () => {
-          ignore = true;
-        }
-        }
-    }, [matchData]);
 
     useEffect(() => {
         if(status==="inProgress" && simIsRunning){
@@ -129,25 +99,25 @@ const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration,buff
 
     if(timer==="00:00:00"){
         console.log("DATE COMPLETING:  ", matchData)
-        dateCompletionHandler(id, matchData)
+        dateCompletionHandler(matchData)
     };
-    if(rowData){
-    const {user1Data, user2Data , pod1Data, pod2Data} = rowData;
+
     return(
-        <tr className="match-row">
-            <td id={dataColor}>{user1Data.username}</td>
-            <td id={dataColor}>{user1Data.age}</td>
-            <td id={dataColor}>{user1Data.gender}</td>
-            <td id={dataColor}>{pod1Data.id}</td>
-            <td id={dataColor}>{user2Data.username}</td>
-            <td id={dataColor}>{user2Data.age}</td>
-            <td id={dataColor}>{user2Data.gender}</td>
-            <td id={dataColor}>{pod2Data.id}</td>
-            <td id={dataColor}>{matchData.status}</td>
+        <tr className="match-row" onClick={()=>dateCompletionHandler(matchData)}>
+            <td id={dataColor}>{user1_username}</td>
+            <td id={dataColor}>{user1_age}</td>
+            <td id={dataColor}>{user1_gender}</td>
+            <td id={dataColor}>{user1_match_count}</td>
+            <td id={dataColor}>{pod1_id}</td>
+            <td id={dataColor}>{user2_username}</td>
+            <td id={dataColor}>{user2_age}</td>
+            <td id={dataColor}>{user2_gender}</td>
+            <td id={dataColor}>{user2_match_count}</td>
+            <td id={dataColor}>{pod2_id}</td>
+            <td id={dataColor}>{status}</td>
             <td>{timer}</td>
         </tr>
     )
-    }
 }
 
 export default MatchTableRow;

@@ -39,7 +39,7 @@ const UserInfo = ()=>{
   }, [])
 
   const removeUserHandler = async (id) => {
-    await deleteUser;
+    await deleteUser(id);
     let updatedUsers = users.filter((user)=>(user.id!==id));
     setUsers(updatedUsers)
   }
