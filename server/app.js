@@ -11,12 +11,14 @@ const matchesRouter = require('./routes/matches');
 const podsRouter = require('./routes/pods');
 const usersRouter = require('./routes/users');
 
+app.set('view engine', 'html');
 //MIDDLEWARE
 app.use(cors());
 app.use(express.json());
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 
 //ROUTES
 app.use('/users', usersRouter);
