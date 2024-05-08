@@ -24,3 +24,10 @@ function EventWarning({affectedUsers}) {
 }
 
 export default EventWarning;
+
+
+/*
+psql --host=ec2-54-157-172-245.compute-1.amazonaws.com  --port=5432 --username= vzzioibnyrjjum --password= f88e8d56757a994985a620e0e200f0588fa77b53841e95e0f4bb2d2e7aefebce --dbname=db0t6jjote93r
+ 
+ 
+ */
