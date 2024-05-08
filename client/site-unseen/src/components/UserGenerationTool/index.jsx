@@ -6,7 +6,7 @@ import './styles.css';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 /* API */
-import { generateUser, deleteUser } from "../../api/users";
+import { generateUser, deleteAllUsers } from "../../api/users";
 
 
 const UserGenerationTools = ()=>{
@@ -126,6 +126,9 @@ const UserGenerationTools = ()=>{
             <div className="usergen-buttonbox">
                 <Button onClick={generationRequestionSubmissionHandler}>
                     Generate Users
+                </Button>
+                <Button onClick={()=>deleteAllUsers()}>
+                    Delete All Users
                 </Button>
             </div>
             <div>

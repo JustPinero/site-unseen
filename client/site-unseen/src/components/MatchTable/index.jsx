@@ -32,7 +32,7 @@ const MatchTable = ({
         </thead>
         <tbody>
             {matches?.map((match)=>{
-                return match.id && <MatchTableRow key={match.id} simIsRunning={simIsRunning} simIsPaused={simIsPaused} dateDuration={dateDuration} matchData={match}  dateCompletionHandler={dateCompletionHandler} />}
+                return match && <MatchTableRow key={match.id} simIsRunning={simIsRunning} simIsPaused={simIsPaused} dateDuration={dateDuration} matchData={match}  dateCompletionHandler={dateCompletionHandler} />}
             )}
         </tbody>
     </Table>

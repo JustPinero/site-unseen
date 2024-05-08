@@ -22,6 +22,7 @@ app.use(cookieParser());
 app.use('/users', usersRouter);
 app.use('/pods', podsRouter);
 app.use('/matches', matchesRouter);
+app.use(express.static(path.join(__dirname, '../client/site-unseen/build')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -4,6 +4,7 @@ import {useState} from "react";
 import './styles.css';
 /* ICONS */
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { deleteUser } from "../../api/users";
 
 
 const UserTile = ({
@@ -21,7 +22,7 @@ const UserTile = ({
     <div className="usertile-container" onClick={tileClickFunction}>
         <div className="usertile-header ">
         <FaEdit />
-        <FaTrashAlt onClick={()=>removeUser(id)} color="red" />
+        <FaTrashAlt onClick={()=>deleteUser(id)} color="red" />
         </div>
         <div>
             <div>

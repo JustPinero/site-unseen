@@ -1,28 +1,27 @@
 /* REACT */
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect} from "react";
 /* STYLES */
 import './styles.css';
-/* BOOSTRAP COMPONENTS */
-import Button from "react-bootstrap/Button";
 
 const SimulationDurationTracker = ({simIsRunning})=>{
-    const [elapsedTime, setElapsedTime] = useState(0)
+  const [seconds, setSeconds] = useState(0);
 
-    const countUp = ()=> {
-      setElapsedTime(elapsedTime + 1 );
+  useEffect(() => {
+    let interval;
+    if (simIsRunning) {
+      interval = setInterval(() => {
+        setSeconds(seconds => seconds + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
     }
-    const startCounting = ()=> {
-      setInterval(countUp, 1000);
-    }
+    return () => clearInterval(interval);
+  }, [simIsRunning]);
 
-    useEffect(()=>{
-      if(simIsRunning){
-        startCounting()
-      }
-    },[simIsRunning])
+
           return (
             <div>
-              <div>{elapsedTime}</div>
+              <div>{seconds}</div>
             </div>
           );
       }

@@ -1,0 +1,27 @@
+.sim-results-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.stats-container{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+}
+
+.completion-count_container{
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.incompletion-count_container{
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}

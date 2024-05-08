@@ -20,15 +20,15 @@ router.get('/', async(req,res)=>{
 router.get('/inprogress', async(req,res)=>{
 	try {
 		const allCompleteMatches = await db.query(
-		`SELECT m.*, p1.*, p2.*, u1.username AS user1_username , u1.age AS user1_age, u1.gender AS user1_gender, u2.username AS user2_username, u2.age AS user2_age, u2.gender AS user2_gender,
-      (SELECT COUNT(*) FROM matches WHERE user1_id = m.user1_id) AS user1_match_count,
-      (SELECT COUNT(*) FROM matches WHERE user2_id = m.user2_id) AS user2_match_count
-    FROM matches m
-    LEFT JOIN pods p1 ON m.pod1_id = p1.id
-    LEFT JOIN pods p2 ON m.pod2_id = p2.id
-    LEFT JOIN users u1 ON m.user1_id = u1.id
-    LEFT JOIN users u2 ON m.user2_id = u2.id
-    WHERE m.complete = FALSE; `
+		`SELECT m.*, p1.id AS p1id, p2.id AS p2id , u1.username AS user1_username , u1.age AS user1_age, u1.gender AS user1_gender, u2.username AS user2_username, u2.age AS user2_age, u2.gender AS user2_gender,
+    (SELECT COUNT(*) FROM matches WHERE user1_id = m.user1_id) AS user1_match_count,
+    (SELECT COUNT(*) FROM matches WHERE user2_id = m.user2_id) AS user2_match_count
+  FROM matches m
+  LEFT JOIN pods p1 ON m.pod1_id = p1.id
+  LEFT JOIN pods p2 ON m.pod2_id = p2.id
+  LEFT JOIN users u1 ON m.user1_id = u1.id
+  LEFT JOIN users u2 ON m.user2_id = u2.id
+  WHERE m.complete = FALSE;`
 	);
   const data= allCompleteMatches.rows
 	console.log(data)
@@ -73,9 +73,11 @@ router.get('/:id', async(req,res)=>{
 /* CREATE match */
 router.post('/', async(req, res)=>{
 	try {
-		const {userID } =req.body;
+		const {userID, dateCount } =req.body;
     const userData = await db.query(`SELECT * FROM users WHERE id = $1`, [userID]);
     const user1 = userData.rows[0];
+    const isUserAvailable = user1.available;
+    if(isUserAvailable){
     const user1Gender = user1.gender;
     const user1SexualPreference = user1.sexual_pref;
     const user1PastDatesResults = await db.query(`SELECT user2_id, user1_id  FROM matches WHERE user1_id = $1 OR user2_id = $1 `, [userID]);
@@ -85,18 +87,13 @@ router.post('/', async(req, res)=>{
       return candidateID;
     })
     const vacantPodResults= await db.query(`SELECT * FROM pods WHERE pods.occupied = $1`, [false]);
-    console.log("PAST DATE LIST:  ", user1PastDatesList)
-    console.log("vacantPodData:  ", vacantPodResults)
     const vacantPodsData = vacantPodResults.rows;
     const vacantPodsList = vacantPodsData.map((podData)=>(podData.id));
-    console.log("vacantPodsList:  ", vacantPodsList)
     if(vacantPodsList.length >=2 ){
       const userPodID = vacantPodsList[0];
-      console.log("userPodID:  ", userPodID)
       let user1ProspectData
       if(user1Gender !== "non-binary" ){
         if(user1SexualPreference !== "bisexual"){
-          console.log(" HETERO OR HOMO SEXUAL MATCH")
           user1ProspectData = await db.query(
           `
           SELECT u.id, u.username, COUNT(m.id) AS num_matches
@@ -104,10 +101,10 @@ router.post('/', async(req, res)=>{
           LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
           WHERE (u.gender = $2 AND u.sexual_pref = $1) AND u.available=$3
           GROUP BY u.id, u.username
+          HAVING COUNT(m.id) <= $4
           ORDER BY num_matches ASC;
-          `,[ user1SexualPreference, user1Gender, true]);
+          `,[ user1SexualPreference, user1Gender, true, dateCount]);
         } else{
-          console.log(" BISEXUAL MATCH")
           user1ProspectData = await db.query(
           `
           SELECT u.id, u.username, COUNT(m.id) AS num_matches
@@ -115,11 +112,11 @@ router.post('/', async(req, res)=>{
           LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
           WHERE (u.sexual_pref = $1 OR u.sexual_pref = $2 ) AND u.available=$3
           GROUP BY u.id, u.username
+          HAVING COUNT(m.id) <= $4
           ORDER BY num_matches ASC;
-          `,[ user1Gender, "bisexual", true]);
+          `,[ user1Gender, "bisexual", true, dateCount]);
         }
       }else{
-        console.log(" BISEXUAL NON BINARY MATCH")
         user1ProspectData = await db.query(
           `
           SELECT u.id, u.username, COUNT(m.id) AS num_matches
@@ -127,22 +124,19 @@ router.post('/', async(req, res)=>{
           LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
           WHERE (u.sexual_pref = $1 AND u.available=$2)
           GROUP BY u.id, u.username
+          HAVING COUNT(m.id) <= $3
           ORDER BY num_matches ASC;
-          `, ["bisexual", true]);
+          `, ["bisexual", true, dateCount]);
       }    
       let user1ProspectsList = user1ProspectData.rows.map((prospectData)=>(prospectData.id));
-      console.log(" PROSPECTS LIST:  ", user1ProspectsList)
-      console.log(" PAST DATE  LIST:  ", user1PastDatesList)
       user1ProspectsList = user1ProspectsList.filter(prospectID => ((user1PastDatesList.indexOf(prospectID))<0) || prospectID!==userID )
       if(user1ProspectsList.length){
         const matchID = user1ProspectsList[0];
         const matchPodID = vacantPodsList[1];
-        console.log("matchPodID:  ", matchPodID)
         await db.query(
           `INSERT into matches (user1_id, pod1_id, user2_id, pod2_id, status, complete) VALUES ($1, $2, $3, $4, $5, $6);`,
           [userID, userPodID, matchID, matchPodID, "inProgress", false]
         );
-        console.log("1:  ", 1)
         await db.query(
           `UPDATE users SET status=$2, available=$3  WHERE id=$1;`,
           [userID, "unavailable", false]
@@ -169,7 +163,12 @@ router.post('/', async(req, res)=>{
         res.status(200)
         res.json({status: "match succesful"})
       }
+    }else {
+
+      res.status(200)
+      res.json({status: "USER NOT AVAILABLE"})
     }
+  }
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -236,6 +235,19 @@ router.delete('/:id', async(req,res)=>{
 		`DELETE FROM matches WHERE id = $1`,[id]
 	);
 	res.status(200);
+  res.json({message:`DELETED ${id}`})
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+router.delete('/', async(req,res)=>{
+	try {
+		await db.query(
+		`DELETE FROM matches `
+	);
+	res.status(200);
+  res.json({message:`DELETED ALL MATCHES`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}

@@ -5,7 +5,6 @@ const PATH = `${BASEURL}/users`
 /* USER GETS */
 /* GETS ALL USERS */
 const fetchUsers = async ()=>{
-    console.log("FETCHING ALL USERS")
     return await axios.get(`${PATH}`);
 };
 /* GETS ALL USER BY ID */
@@ -14,7 +13,6 @@ const fetchUserByID = async (id)=>{
 };
 /* GETS ALL ELLIGIBLE USERS */
 const fetchElligibleUsers = async (dateCount)=>{
-    console.log("dateCount:  ", dateCount)
     return await axios.get(`${PATH}/dates/${dateCount}`);
 };
 
@@ -24,10 +22,25 @@ const fetchUserDateCountAverage = async ()=>{
 };
 
 /* GETS ALL FINISHED USERS */
+
 const fetchFinishedUsers = async (dateCount)=>{
-    console.log("dateCount:  ", dateCount)
     return await axios.get(`${PATH}/finished/${dateCount}`);
 };
+/* STAT COUNTS */
+//TOTAL
+const fetchUserCount = async ()=>{
+    return await axios.get(`${PATH}/count`);
+};
+//FINISHED
+const fetchFinishedUserCount = async (dateCount)=>{
+    return await axios.get(`${PATH}/finished/${dateCount}/count`);
+};
+//UNFINISHED
+const fetchUnfinishedUserCount = async (dateCount)=>{
+    console.log("fetchUnfinishedUserCount dateCount:  ", dateCount)
+    return await axios.get(`${PATH}/unfinished/${dateCount}/count`);
+};
+
 /* GETS USERS BY GENDER */
 const fetchUsersByGender = async (gender)=>{
     return await axios.get(`${PATH}/gender/${gender}`);
@@ -63,4 +76,8 @@ const deleteUsers =  async (usercount)=>{
     return await axios.delete(`${PATH}/remove/${usercount}`);
 };
 
-export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteUsers}
+const deleteAllUsers =  async ()=>{
+    return await axios.delete(`${PATH}`);
+};
+
+export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers,fetchUserCount, fetchFinishedUserCount, fetchUnfinishedUserCount, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteUsers, deleteAllUsers}

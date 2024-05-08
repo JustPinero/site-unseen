@@ -50,7 +50,7 @@ router.post('/', async(req, res)=>{
 	try {
 		console.log("GENERATING POD")
 		await db.query(
-		`insert into pods (occupied, occupant_id) VALUES ($1, $2 )`,[false, null]
+		`insert into pods (occupied, occupant_id) VALUES ($1, $2 )`, [false, null]
 	);
 	res.status(200);
 	} catch (error) {
@@ -93,6 +93,19 @@ router.delete('/remove/:podcount', async(req,res)=>{
 		`DELETE from pods order by id desc limit $1`, [podcount]
 	);
 	res.status(200);
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* DELETE All pods */
+router.delete('/', async(req,res)=>{
+	try {
+		await db.query(
+		`DELETE FROM pods `
+	);
+	res.status(200);
+  res.json({message:`DELETED ALL pods`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}

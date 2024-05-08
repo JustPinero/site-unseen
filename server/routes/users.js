@@ -128,8 +128,154 @@ router.get('/finished/:datecount', async(req,res)=>{
       ;`, [datecount]
 	);
   const usersData = usersResults.rows;
-	console.log("usersData:  ", usersData)
 	res.json(usersData)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* DATES COUNTS */
+/* FINISHED */
+router.get('/finished/:datecount/count', async(req,res)=>{
+	try {
+    console.log("I'm NOT UN")
+    const {datecount} = req.params
+    console.log("MALE RES NOT UN")
+    const finishedTotalResults = await db.query(
+      `
+      SELECT COUNT(*) AS user_count
+      FROM (
+      SELECT u.id
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      GROUP BY u.id
+      HAVING COUNT(m.id) >= $1
+      ) AS subquery;
+`, [datecount]
+	);
+		const finishedMaleResults = await db.query(
+      `
+      SELECT COUNT(*) AS user_count
+      FROM (
+      SELECT u.id
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      WHERE u.gender = 'male'
+      GROUP BY u.id
+      HAVING COUNT(m.id) >= $1
+      ) AS subquery;
+`, [datecount]
+	);
+  console.log("FEMALE RES NOT UN")
+  const finishedFemaleResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'female'
+    GROUP BY u.id
+    HAVING COUNT(m.id) >= $1
+    ) AS subquery;
+`, [datecount]
+);
+console.log("NB RES NOT UN")
+  const finishedNbResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'non-binary'
+    GROUP BY u.id
+    HAVING COUNT(m.id) >= $1
+    ) AS subquery;
+  `, [datecount]
+  );
+  const finishedTotalData = finishedTotalResults.rows
+  const finishedMaleData = finishedMaleResults.rows;
+  const finishedFemaleData = finishedFemaleResults.rows;
+  const finishedNbData = finishedNbResults.rows;
+	const data ={
+    total:finishedTotalData,
+    male:finishedMaleData,
+    female: finishedFemaleData,
+    nb:finishedNbData
+  }
+	res.json(data)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* UNFINISHED */
+router.get('/unfinished/:datecount/count', async(req,res)=>{
+	try {
+    const {datecount} = req.params
+    const unfinishedTotalResults = await db.query(
+      `
+      SELECT COUNT(*) AS user_count
+      FROM (
+      SELECT u.id
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      GROUP BY u.id
+      HAVING COUNT(m.id) < $1
+      ) AS subquery;
+`, [datecount]
+	);
+		const unfinishedMaleResults = await db.query(
+      `
+      SELECT COUNT(*) AS user_count
+      FROM (
+      SELECT u.id
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      WHERE u.gender = 'male'
+      GROUP BY u.id
+      HAVING COUNT(m.id) < $1
+      ) AS subquery;
+`, [datecount]
+	);
+  const unfinishedFemaleResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'female'
+    GROUP BY u.id
+    HAVING COUNT(m.id) < $1
+    ) AS subquery;
+`, [datecount]
+);
+  const unfinishedNbResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'non-binary'
+    GROUP BY u.id
+    HAVING COUNT(m.id) < $1
+    ) AS subquery;
+  `, [datecount]
+  );
+  const unfinishedTotalData = unfinishedTotalResults.rows
+  const unfinishedMaleData = unfinishedMaleResults.rows;
+  const unfinishedFemaleData = unfinishedFemaleResults.rows;
+  const unfinishedNbData = unfinishedNbResults.rows;
+	const data ={
+    total: unfinishedTotalData,
+    male:unfinishedMaleData,
+    female: unfinishedFemaleData,
+    nb:unfinishedNbData
+  }
+	res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -274,6 +420,19 @@ router.delete('/remove/:usercount', async(req,res)=>{
 	);
 	res.status(200);
   res.json({status: `${usercount} available users deleted`})
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* DELETE All USERS */
+router.delete('/', async(req,res)=>{
+	try {
+		await db.query(
+		`DELETE FROM users `
+	);
+	res.status(200);
+  res.json({message:`DELETED ALL USERS`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}

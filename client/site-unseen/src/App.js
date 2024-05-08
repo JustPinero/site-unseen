@@ -1,5 +1,3 @@
-/* HELPERS */
-import userGenerationHelper from "./components/helpers/userGenerationHelper.js"
 /* REACT */
 import {useState, useEffect} from "react"
 /* STYLES */
@@ -13,10 +11,9 @@ import Header from "./components/Header/index.jsx";
 import Dashboard from "./pages/Dashboard";
 import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
-import EventWarning from "./components/Alerts/EventWarning";
 
 /* API */
-import {fetchUsers, fetchUserDateCountAverage, fetchElligibleUsers, fetchFinishedUsers} from "./api/users";
+import {fetchUsers, fetchUserDateCountAverage, fetchFinishedUsers} from "./api/users";
 import {fetchPods, addPods } from "./api/pods.js";
 import { fetchMatches } from "./api/matches.js";
 
@@ -26,7 +23,7 @@ const PODNUMBER = 20;
 const EVENTDURATION = 10800
 const BUFFERDURATION = 10;
 const DATEDURATION = 10;
-const DEFAULTDATECAP = 6
+const DEFAULTDATECAP = 3
 
 
 const App = ()=> {
@@ -60,8 +57,6 @@ const App = ()=> {
 useEffect(()=>{
   async function startFetching() {
     try{
-      console.log("FETCHING")
-
     const userResults = await fetchUsers();
     const finishedUserResults = await fetchFinishedUsers(dateCap);
     const podResults = await fetchPods()
@@ -71,9 +66,6 @@ useEffect(()=>{
       await addPods(PODNUMBER);
     }
     if (!ignore) {
-      console.log("USERS:  ", userResults.data)
-      console.log("PODS:  ", podResults.data)
-      console.log("userDateCountAverageResults:  ", userDateCountAverageResults.data[0].average_matches)
       setUsers(userResults.data);
       setPodCount(podResults.data.length)
       setMatchCount(matchResults.data.length)
@@ -115,6 +107,26 @@ const increaseMatchCount = ()=>{
   const updatedMatchCount = matchCount+1;
   setMatchCount(updatedMatchCount)
 }
+
+const updateMatchCount = async ()=>{
+  try{
+    const finishedUserResults = await fetchFinishedUsers(dateCap);
+    const matchResults = await fetchMatches()
+    const userDateCountAverageResults = await fetchUserDateCountAverage()
+    setFinishedUsersCount(finishedUserResults.data.length)
+    setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
+    setMatchCount(matchResults.data.length)
+  }
+  catch(err){
+    console.log("ERROR:  ", err)
+  }
+}
+
+const simCompletionHandler = ()=>{
+  setSimIsComplete(true)
+  setSimIsRunning(false)
+  setSimIsPaused(false)
+}
 /* ----------SIMULATION------------- */
 
 
@@ -151,6 +163,7 @@ const dateLength =   dateDuration+bufferDuration
       </Tab> */}
       <Tab eventKey="matchmaker" title="Matchmaker">
         <Matchmaker
+          simCompletionHandler={simCompletionHandler}
           increaseMatchCount={increaseMatchCount}
           simIsPaused={simIsPaused}
           pauseSimulation= {simulationPauseHandler}
@@ -159,10 +172,12 @@ const dateLength =   dateDuration+bufferDuration
           simulationStartHandler={simulationStartHandler}
           dateDuration={dateLength}
           dateCap={dateCap}
+          podCount={podCount}
+          updateMatchCount={updateMatchCount}
         />
       </Tab>
       <Tab eventKey="userlist" title="User List" >
-        <UserInfo />
+        <UserInfo podCount={podCount} />
       </Tab>
     </Tabs>
     </div>

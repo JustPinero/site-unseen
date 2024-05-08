@@ -18,20 +18,22 @@ const PodManagmentTools = ({pods })=>{
 
     const PodAdditionChangeHandler = (e)=>{
         const update = parseInt(e.target.value);
-        if(update<=0){
-            setPodAdditionCount(0);
+        console.log("POD ADDITION UPDATE:  ", update)
+        if(update<=1){
+            setPodAdditionCount(1);
         }else{
             setPodAdditionCount(update);
         }
     }
-    const PodAdditionSubmissionHandler = ()=>{
-        console.log("Generate", podAdditionCount, "PODS")
+    const PodAdditionSubmissionHandler = (e)=>{
+        e.preventDefault()
+        console.log("ADDITION EVENT:  ", e)
         addPods(podAdditionCount)
     }
     const PodRemovalChangeHandler = (e)=>{
         const update = parseInt(e.target.value);
-        if(update<=0){
-            setPodRemovalCount(0);
+        if(update<=1){
+            setPodRemovalCount(1);
         }else
         if( update > pods.length){
             setPodRemovalCount(pods.length);

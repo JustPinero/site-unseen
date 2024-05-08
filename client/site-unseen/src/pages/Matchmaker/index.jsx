@@ -11,11 +11,11 @@ import MatchUserOption from "../../components/MatchBox/MatchHalf/MatchUserOption
 import SimulationResults from "./SimulationResults"
 /* API */
 import {fetchUsers, fetchElligibleUsers, } from "../../api/users";
-import { fetchActiveMatches, createMatch, completeMatch } from "../../api/matches";
+import { fetchActiveMatches, createMatch, completeMatch, deleteMatches } from "../../api/matches";
 import Button from "react-bootstrap/esm/Button";
 
 const Matchmaker = ({
-  increaseMatchCount,
+  simCompletionHandler,
   simIsPaused,
   pauseSimulation,
   simIsComplete,
@@ -23,107 +23,81 @@ const Matchmaker = ({
   simulationStartHandler,
   dateDuration,
   podCount,
-  dateCap
+  dateCap,
+  updateMatchCount
 }) => {
   /* LOCAL STATE */
   /* MATCHLIST */
-  const [users, setUsers] = useState([]);
   const [currentMatches, setCurrentMatches] = useState([]);
   const [matchCompletionQueue, setMatchCompletionQueue] = useState([]);
 
-  let matchLimit = Math.floor(podCount/2)
-  const podsAreFull = currentMatches >= matchLimit
-  console.log("podsAreFull:  ", podsAreFull)
+  let LOADING =false
 
   useEffect(()=>{
-    async function updateMatches() {
+    async function updateStatus() {
       try{
-        const matchesResults = await fetchActiveMatches();
-        if (!ignore) {
-          console.log("matchesResults:  ", matchesResults.data);
-          let updatedCurrentMatchesData = matchesResults.data;
-          setCurrentMatches(updatedCurrentMatchesData)
+        if(!LOADING){
+          LOADING = true
+          const updatedActiveMatchesResults = await fetchActiveMatches();
+          const updatedActiveMatchesData = updatedActiveMatchesResults.data;
+          const elligibleUserList = await fetchElligibleUsers(dateCap);
+          const nextUser = elligibleUserList.data[0];
+          if(updatedActiveMatchesData.length===0 && matchCompletionQueue.length===0 && simIsRunning){
+            simCompletionHandler()
+          }else{
+            setCurrentMatches(updatedActiveMatchesData)
+          }
+        LOADING = false;
+      }
+      }
+      catch(err){
+        console.log("ERROR:  ", err)
+      }
+    }
+    updateStatus()
+  },[])
+
+  useEffect(()=>{
+    async function updateCompletionQueue() {
+      try{
+        if(!LOADING){
+          LOADING = true;
+          await completeMatchInQueue()
+          await updateMatchCount()
+          LOADING = false;
         }
       }
       catch(err){
         console.log("ERROR:  ", err)
       }
     }
-    let ignore = false;
-    updateMatches();
-    return () => {
-      ignore = true;
-    }
-  },[])
-
-  useEffect(()=>{
-    console.log("CURRENT MATCHES: ", currentMatches)
-    if(!podsAreFull){
-      console.log("pods are not full:  ", podsAreFull)
-      console.log("GENERATING NEW MATCH")
-      generateMatchHandler()
-    } else{
-      console.log("pods are full:  ", podsAreFull)
-    }
-//     async function updateUsers() {
-//       try{
-//         const userResults = await fetchElligibleUsers(dateCap);
-//         const nextUser=userResults.data[0];
-//         console.log("nextUser:  ", nextUser)
-//         if(nextUser){
-//           increaseMatchCount()
-//           await createMatch( nextUser.id, dateCap);
-//         if (!ignore) {
-//           let updatedUserData = userResults.data;
-//           console.log("updatedUserData:  ", updatedUserData.data);
-//           setUsers(updatedUserData)
-//         }
-//     }
-//   }
-// catch(err){
-//   console.log("ERROR:  ", )
-// }
-//   }
-//     let ignore = false;
-//     updateUsers();
-//     return () => {
-//       ignore = true;
-//     }
-  },[currentMatches])
-
-
-  useEffect(()=>{
-    console.log("COMPLETING MATCHES: ", matchCompletionQueue)
     if(matchCompletionQueue.length){
-      // completeMatchInQueue()
-    } else{
-
+      updateCompletionQueue();
     }
-//     async function updateUsers() {
-//       try{
-//         const userResults = await fetchElligibleUsers(dateCap);
-//         const nextUser=userResults.data[0];
-//         console.log("nextUser:  ", nextUser)
-//         if(nextUser){
-//           increaseMatchCount()
-//           await createMatch( nextUser.id, dateCap);
-//         if (!ignore) {
-//           let updatedUserData = userResults.data;
-//           console.log("updatedUserData:  ", updatedUserData.data);
-//           setUsers(updatedUserData)
-//         }
-//     }
-//   }
-// catch(err){
-//   console.log("ERROR:  ", )
-// }
-//   }
-//     let ignore = false;
-//     updateUsers();
-//     return () => {
-//       ignore = true;
-//     }
-  },[matchCompletionQueue, currentMatches])
+  }, [matchCompletionQueue])
+
+
+  useEffect(()=>{
+    async function updateCurrentMatches() {
+          try{
+            if(simIsRunning){
+            if(!LOADING){
+              LOADING = true
+                await generateMatchHandler()
+            }
+            LOADING = false;
+          }
+        }
+          catch(err){
+            console.log("ERROR:  ", err)
+          }
+        }
+    let matchLimit = Math.floor(podCount/2)
+    console.log("MATCH LIMIT:  ", matchLimit)
+    if(currentMatches.length<=matchLimit){
+      updateCurrentMatches();
+    }
+  },[ currentMatches, simIsRunning])
 
 
 
@@ -134,7 +108,6 @@ const Matchmaker = ({
   const fetchMatches = async ()=> {
     try{
       const activeMatches = await fetchActiveMatches()
-      console.log("ACTIVE MATCHES:  ", activeMatches.data)
       setCurrentMatches(activeMatches.data)
     }
     catch(err){
@@ -146,9 +119,7 @@ const completeMatchInQueue = async ()=>{
   try{
     if(matchCompletionQueue.length){
       const nextCompletedMatch = matchCompletionQueue[0];
-      console.log("nextCompletedMatch:", nextCompletedMatch)
       const updatedCompletionQueue = matchCompletionQueue.filter(completedMatch=>(nextCompletedMatch.id !== completedMatch.id))
-      console.log("updatedCompletionQueue:", updatedCompletionQueue)
       setMatchCompletionQueue(updatedCompletionQueue)
       await completeMatch(nextCompletedMatch.id, nextCompletedMatch)
     }
@@ -162,10 +133,9 @@ const completeMatchInQueue = async ()=>{
     try{
       if(currentMatches.length){
       const nextCompletingMatch = completingMatch  || currentMatches[0]
-      console.log("nextCompletingMatch:", nextCompletingMatch)
       const updatedCurrentMatches = currentMatches.filter((match)=>(nextCompletingMatch.id!==match.id))
-      setCurrentMatches(updatedCurrentMatches)
       let updatedCompletionQueue = [...matchCompletionQueue, nextCompletingMatch];
+      setCurrentMatches(updatedCurrentMatches)
       setMatchCompletionQueue(updatedCompletionQueue)
       }
     }
@@ -176,7 +146,6 @@ const completeMatchInQueue = async ()=>{
 
   const dateCompletionHandler = async (matchData)=> {
     try{
-      increaseMatchCount()
       addMatchToCompletionQueue(matchData)
     }
     catch(err){
@@ -185,17 +154,15 @@ const completeMatchInQueue = async ()=>{
   }
   const generateMatchHandler = async ()=>{
     try{
-    console.log("CURRENT MATCHES: ", currentMatches.length)
-    console.log("arePodsFull: ", podsAreFull)
-
-      if(!podsAreFull){
         const elligibleUserList = await fetchElligibleUsers(dateCap);
-        console.log("MATCH HANDLER")
-        console.log("elligibleUserList:  ", elligibleUserList)
         const nextUser = elligibleUserList.data[0];
-        console.log("NEXT USER:  ", nextUser)
-        await createMatch(nextUser.id)
-      }
+        if((currentMatches.length===0 && !nextUser)||(currentMatches.length===0 && matchCompletionQueue.length===0 && simIsRunning)){
+          simCompletionHandler()
+        }
+          await createMatch(nextUser.id, dateCap)
+          const updatedActiveMatchesResults = await fetchActiveMatches();
+          const updatedActiveMatchesData = updatedActiveMatchesResults.data;
+          setCurrentMatches(updatedActiveMatchesData)
     }
     catch(err){
       console.log("ERROR:  ", err)
@@ -204,11 +171,11 @@ const completeMatchInQueue = async ()=>{
 
   return (
     <div className="matchmaker-tab">
-      <MatchToolBox simIsPaused={simIsPaused} pauseSimulation={pauseSimulation} simIsRunning={simIsRunning} runSimulation={runSimulation} waitList={users}  />
+      <MatchToolBox simIsPaused={simIsPaused} pauseSimulation={pauseSimulation} simIsRunning={simIsRunning} runSimulation={runSimulation}  />
       <div className="matches-container">
         <div styles={{display:"flex", flexDirection:"row"}}>
           <Button onClick={()=>generateMatchHandler()} >
-          {podsAreFull ? "PODS ARE FULL" :" GENERATE MATCH"}
+          {( currentMatches.length >= Math.floor(podCount/2)) ? "PODS ARE FULL" :" GENERATE MATCH"}
           </Button>
           <Button onClick={()=>addMatchToCompletionQueue()} >
             ADD MATCH to COMPLETION QUEUE
@@ -219,15 +186,18 @@ const completeMatchInQueue = async ()=>{
           <Button onClick={fetchMatches} >
             ShowMatches
           </Button>
+          <Button onClick={()=>deleteMatches()} >
+            RESET MATCHES
+          </Button>
       </div>
       <div>
         {matchCompletionQueue.map((completedMatch, index)=>{
-          console.log("COMPLETED MATCH:  ", completedMatch)
           return (<div key={index}>{completedMatch.id}</div>)})}
       </div>
+      <div className="stats-container">
         {
         simIsComplete ?
-        <SimulationResults/>:
+        <SimulationResults dateCount={dateCap}/>:
         <MatchTable
           simIsRunning={simIsRunning}
           simIsPaused={simIsPaused}
@@ -237,7 +207,6 @@ const completeMatchInQueue = async ()=>{
         />
         }
       </div>
-      <div className="demographic-tables-container">
 
       </div>
     </div>

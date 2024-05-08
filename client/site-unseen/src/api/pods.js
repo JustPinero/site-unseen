@@ -17,15 +17,16 @@ const fetchPodsByID = async (id)=>{
 
 /* PODS POSTS */
 const addPod = async ()=>{
-    return await axios.post(`${PATH}`);
+    await axios.post(`${PATH}`);
 };
 
 const addPods = async (podCount)=>{
     try{
-        console.log("POD COUNT:  ", podCount)
-        for(let i= 0; i<podCount; i++){
-            console.log("MAKING POD", i)
-            await axios.post(`${PATH}`);
+        console.log("POD COUNT:  ", typeof podCount)
+        for(let i= 0; i<=podCount; i++){
+            console.log("POD COUNTER:  ", i<=podCount)
+            console.log("MAKING PODS :   ", podCount)
+            await axios.post(`${PATH}/`);
         }
     }
     catch(err){

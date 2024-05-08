@@ -10,7 +10,7 @@ import PodManagementTools from "../../components/PodManagmentTool"
 import { fetchUsers, deleteUser } from "../../api/users";
 import { fetchPods } from "../../api/pods";
 
-const UserInfo = ()=>{
+const UserInfo = ({podCount})=>{
   const [users, setUsers] = useState([]);
   const [pods, setPods] = useState([]);
   useEffect(()=>{
@@ -19,8 +19,6 @@ const UserInfo = ()=>{
       const userResults = await fetchUsers();
       const podResults = await fetchPods();
       if (!ignore) {
-        console.log("USERS:  ", userResults.data)
-        console.log("PDOS:  ", podResults.data)
         const usersUpdate = userResults.data;
         const podsUpdate = podResults.data;
         setUsers(usersUpdate);
@@ -48,7 +46,7 @@ const UserInfo = ()=>{
     <div className="userinfo-tab">
       <div className="userinfo-column">
         <div className="userinfo-column_header">
-          <h5>{users.length ? `${users.length} ACTIVE USERS` : " NO USERS"} </h5>
+          <h5>{users.length ? `${users.length} USERS` : " NO USERS"} </h5>
         </div>
         <div className="userinfo-column-body">
         {users?.length && users.map(user=><UserTile key={user.id} userData={user} removeUser={removeUserHandler}/>)}
@@ -59,7 +57,7 @@ const UserInfo = ()=>{
           <h5>Tools</h5>
         </div>
         <div className="userinfo-column-body">
-          <UserGenerationTools users={users} pods={pods} />
+          <UserGenerationTools users={users} pods={pods} podCount={podCount} />
           <PodManagementTools pods={pods} />
         </div>
       </div>
