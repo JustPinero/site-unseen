@@ -41,7 +41,7 @@ if( process.env.NODE_ENV === 'staging' || process.env.NODE_ENV === 'production')
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    res.json({'error': err});
   });
 }
 
