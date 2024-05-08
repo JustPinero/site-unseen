@@ -43,7 +43,7 @@ const App = ()=> {
   const [finishedUsersCount, setFinishedUsersCount] = useState(0)
   const [userDateCountAverage, setUserDateCountAverage] = useState(0)
   /* PODS */
-  const [podCount, setPodCount] = useState(PODNUMBER)
+  const [podCount, setPodCount] = useState(0)
   /* MATCHES */
   const [matchCount, setMatchCount] = useState(0);
   
@@ -62,9 +62,6 @@ useEffect(()=>{
     const podResults = await fetchPods()
     const matchResults = await fetchMatches()
     const userDateCountAverageResults = await fetchUserDateCountAverage()
-    if(podCount===0){
-      await addPods(PODNUMBER);
-    }
     if (!ignore) {
       setUsers(userResults.data);
       setPodCount(podResults.data.length)
@@ -150,9 +147,9 @@ const dateCapChangeHandler = (e)=>{
 const dateLength =   dateDuration+bufferDuration
   return (
     <div className="App">
-       <div className="apphead-container">
+       {/* <div className="apphead-container">
         <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
-      </div>
+      </div> */}
       I AM WORKING BUT YOUR MEMORY LEAK IS KILLING ME
       {/* <div className="apphead-container">
         <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
