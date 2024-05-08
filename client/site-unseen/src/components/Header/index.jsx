@@ -1,7 +1,6 @@
 /* STYLES */
 import './styles.css';
 /* CUSTOM COMPONENTS */
-import SessionTimer from "../SessionTimer";
 import InfoBox from '../InfoBox';
 import SimSettings from '../SimSettings';
 
