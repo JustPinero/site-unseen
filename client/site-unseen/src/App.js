@@ -150,7 +150,11 @@ const dateCapChangeHandler = (e)=>{
 const dateLength =   dateDuration+bufferDuration
   return (
     <div className="App">
-      <div className="apphead-container">
+       <div className="apphead-container">
+        <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
+      </div>
+      I AM WORKING BUT YOUR MEMORY LEAK IS KILLING ME
+      {/* <div className="apphead-container">
         <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
       </div>
     <Tabs
@@ -158,9 +162,9 @@ const dateLength =   dateDuration+bufferDuration
       id="uncontrolled-tab-example"
       className="mb-3"
     >
-      {/* <Tab eventKey="dashboard" title="Dashboard">
+      <Tab eventKey="dashboard" title="Dashboard">
         <Dashboard users={users} matchQueue={matchQueue} pods={pods} availablePods={availablePods} />
-      </Tab> */}
+      </Tab>
       <Tab eventKey="matchmaker" title="Matchmaker">
         <Matchmaker
           simCompletionHandler={simCompletionHandler}
@@ -179,7 +183,7 @@ const dateLength =   dateDuration+bufferDuration
       <Tab eventKey="userlist" title="User List" >
         <UserInfo podCount={podCount} />
       </Tab>
-    </Tabs>
+    </Tabs> */}
     </div>
   );
 }
