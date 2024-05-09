@@ -134,6 +134,49 @@ router.get('/finished/:datecount', async(req,res)=>{
 	}
 });
 
+/* COUNTS */
+/* GENERAL COUNTS */
+router.get('/counts/all', async(req,res)=>{
+	try {
+
+
+    const totalUsersCountResults = await db.query(
+      `
+      SELECT COUNT(*) AS total_count
+      FROM users;
+`,
+	);
+		const waitingUsersCountResults = await db.query(
+      `
+      SELECT COUNT(*) AS waiting_user_count
+      FROM users
+      WHERE status='waiting';
+`
+	);
+  const availableUsersCountResults = await db.query(
+    `
+    SELECT COUNT(*) AS available_user_count
+    FROM users
+    WHERE status='available';
+`
+);
+  const totalUsersCountData = totalUsersCountResults.rows;
+  const waitingUsersCountData= waitingUsersCountResults.rows;
+  const availableUsersCountData= availableUsersCountResults.rows;
+
+	const data ={
+    total: totalUsersCountData,
+    waiting: waitingUsersCountData,
+    available: availableUsersCountData
+  };
+  console.log("data:  ", data)
+	res.json(data)
+    res.status(200)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
 /* DATES COUNTS */
 /* FINISHED */
 router.get('/finished/:datecount/count', async(req,res)=>{
@@ -213,6 +256,7 @@ console.log("NB RES NOT UN")
 /* UNFINISHED */
 router.get('/unfinished/:datecount/count', async(req,res)=>{
 	try {
+    console.log("UN")
     const {datecount} = req.params
     const unfinishedTotalResults = await db.query(
       `
@@ -389,13 +433,24 @@ router.put('/:id', async(req,res)=>{
 
 /* DELETE user by id */
 router.delete('/:id', async(req,res)=>{
+  const {id} = req.params
 	try {
-		const {id} = req.params
-	  await db.query(
-		`DELETE FROM users WHERE id = $1`,[id]
+    console.log(" I AM DELETING USER", id)
+		await db.query(
+		`DELETE FROM users WHERE id=$1`,[id]
 	);
-  res.status(200)
-  res.json({status: `user ${id} deleted`})
+  const postDeletionUsersResults = await db.query(
+    `
+    SELECT u.*, COUNT(m.id) AS num_matches
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    GROUP BY u.id
+    `
+	);
+  const data = postDeletionUsersResults.rows;
+  console.log("DATE AFTER DELETION:  ", data)
+	res.status(200);
+  res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -426,13 +481,19 @@ router.delete('/remove/:usercount', async(req,res)=>{
 });
 
 /* DELETE All USERS */
-router.delete('/', async(req,res)=>{
+router.delete('/removeall', async(req,res)=>{
 	try {
 		await db.query(
 		`DELETE FROM users `
 	);
+  const postDeletionUsersResults = await db.query(
+    `
+    SELECT * from users;
+    `
+	);
+  const data = postDeletionUsersResults.rows;
 	res.status(200);
-  res.json({message:`DELETED ALL USERS`})
+  res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}

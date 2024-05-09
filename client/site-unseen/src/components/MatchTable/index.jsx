@@ -11,7 +11,6 @@ const MatchTable = ({
     dateCompletionHandler,
     dateDuration,
     })=>{
-        console.log("MATCHES:  ", matches)
     return(
     <Table striped bordered hover>
         <thead style={{position: "sticky", top: 0}}>

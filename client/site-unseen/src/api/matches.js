@@ -19,10 +19,23 @@ const fetchMatchByID= async (id)=>{
     return await axios.get(`${PATH}/${id}`);
 };
 
+/* MATCHES GETS */
+const fetchMatchCount= async ()=>{
+    console.log(" I AM MATCHES AND I AM THE BROKEN ONE", `${PATH}/count`)
+    return await axios.get(`${PATH}/count`);
+};
+
+
 /* MATCHES POSTS */
 const createMatch = async (userID, dateCount)=>{
+    try{
     const payload = {userID, dateCount}
-    return await axios.post(`${PATH}/`, payload);
+        await axios.post(`${PATH}/`, payload);
+        return await axios.get(`${PATH}/inprogress`);
+    }
+    catch(error){
+        console.log("CREATE MATCH ERROR:  ", )
+    }
 };
 
 const completeMatch = async (id, matchData)=>{
@@ -46,4 +59,4 @@ const deleteMatches =  async ()=>{
 };
 
 
-export {fetchMatches, fetchActiveMatches, fetchMatchesByStatus, fetchMatchByID, createMatch, completeMatch, updateMatch, deleteMatch, deleteMatches};
+export {fetchMatches, fetchActiveMatches, fetchMatchesByStatus, fetchMatchByID, fetchMatchCount, createMatch, completeMatch, updateMatch, deleteMatch, deleteMatches};

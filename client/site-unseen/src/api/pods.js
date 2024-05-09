@@ -15,6 +15,13 @@ const fetchPodsByID = async (id)=>{
     return await axios.get(`${PATH}/${id}`);
 };
 
+/* COUNTS */
+/* PODS COUNT */
+const fetchPodsCount = async ()=>{
+    console.log(" I AM PODS AND I AM THE BROKEN ONE")
+    return await axios.get(`${PATH}/count`);
+};
+
 /* PODS POSTS */
 const addPod = async ()=>{
     await axios.post(`${PATH}`);
@@ -54,4 +61,4 @@ const deletePods =  async (podcount)=>{
     return await axios.delete(`${PATH}/remove/${podcount}`);
 };
 
-export {fetchPods, fetchPodsByStatus, fetchPodsByID, addPod, addPods, updatePod, emptyPod, deletePod, deletePods};
+export {fetchPods, fetchPodsByStatus, fetchPodsByID, fetchPodsCount, addPod, addPods, updatePod, emptyPod, deletePod, deletePods};

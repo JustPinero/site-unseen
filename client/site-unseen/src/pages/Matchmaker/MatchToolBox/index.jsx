@@ -26,7 +26,6 @@ const MatchToolBox = ({ simIsPaused, pauseSimulation, roundCount, simIsRunning, 
                 : null
                 }
             </div>
-                <p> ROUNDS</p>
                 <SimulationDurationTracker simIsRunning={simIsRunning} />
             <div>
             </div>

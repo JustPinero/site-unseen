@@ -29,7 +29,8 @@ const fetchFinishedUsers = async (dateCount)=>{
 /* STAT COUNTS */
 //TOTAL
 const fetchUserCount = async ()=>{
-    return await axios.get(`${PATH}/count`);
+    console.log(" IAM RUNNING fetchUserCount")
+    return await axios.get(`${PATH}/counts/all`);
 };
 //FINISHED
 const fetchFinishedUserCount = async (dateCount)=>{
@@ -77,7 +78,7 @@ const deleteUsers =  async (usercount)=>{
 };
 
 const deleteAllUsers =  async ()=>{
-    return await axios.delete(`${PATH}`);
+    return await axios.delete(`${PATH}/removeall`);
 };
 
 export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers,fetchUserCount, fetchFinishedUserCount, fetchUnfinishedUserCount, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteUsers, deleteAllUsers}

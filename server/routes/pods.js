@@ -29,6 +29,29 @@ router.get('/available', async(req,res)=>{
 	}
 });
 
+/* GET POD COUNTS */
+router.get('/count', async(req,res)=>{
+	try {
+		const occupiedPodCountResults = await db.query(
+		`SELECT COUNT(*) as occupied_pod_count FROM pods WHERE occupied = $1`,[true]
+		);
+		const availablePodCountResults = await db.query(
+			`SELECT COUNT(*) as available_pod_count FROM pods WHERE occupied = $1`,[false]
+		);
+		const totalPodCountResults = await db.query(
+			`SELECT COUNT(*) as total_pod_count FROM pods`
+		);
+		const data = {
+			occupiedPodCount: occupiedPodCountResults.rows,
+			availablePodCount: availablePodCountResults.rows,
+			totalPodCount: totalPodCountResults.rows
+		}
+		console.log("POD COUNT DATA:  ", data);
+		res.json(data);
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
 
 /* GET POD BY ID */
 router.get('/:id', async(req,res)=>{

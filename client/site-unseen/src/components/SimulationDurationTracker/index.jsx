@@ -21,7 +21,7 @@ const SimulationDurationTracker = ({simIsRunning})=>{
 
           return (
             <div>
-              <div>{seconds}</div>
+              <div>TOTAL EVENT DURATION : {seconds} (seconds)</div>
             </div>
           );
       }

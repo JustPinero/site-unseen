@@ -14,6 +14,26 @@
     overflow-y: scroll;
 }
 
+.matchmaker-buttonbox{
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+}
+
+.matchmaker-infobox{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    border-width: 1px;
+    border-style: solid;
+    padding: 8px;
+}
+
+.matchmaker-infobox_text{
+    font-size: 14px;
+    font-weight: solid;
+}
+
 .matchuser-subheader{
     display: flex;
     flex-direction: row;

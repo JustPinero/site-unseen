@@ -10,19 +10,19 @@ import PodManagementTools from "../../components/PodManagmentTool"
 import { fetchUsers, deleteUser } from "../../api/users";
 import { fetchPods } from "../../api/pods";
 
-const UserInfo = ({podCount})=>{
-  const [users, setUsers] = useState([]);
+const UserInfo = ({ users, podCount, userDeleteHandler})=>{
   const [pods, setPods] = useState([]);
+  const [userList, setuserList] =useState([])
   useEffect(()=>{
     async function startFetching() {
       try{
-      const userResults = await fetchUsers();
       const podResults = await fetchPods();
+      const usersResults = await fetchUsers();
       if (!ignore) {
-        const usersUpdate = userResults.data;
         const podsUpdate = podResults.data;
-        setUsers(usersUpdate);
+        const usersUpdate= usersResults.data
         setPods(podsUpdate);
+        setuserList(usersUpdate)
       }
     }
     catch(err){
@@ -34,14 +34,12 @@ const UserInfo = ({podCount})=>{
     return () => {
       ignore = true;
     }
-  }, [])
+  }, [users])
 
   const removeUserHandler = async (id) => {
-    await deleteUser(id);
-    let updatedUsers = users.filter((user)=>(user.id!==id));
-    setUsers(updatedUsers)
+    await userDeleteHandler(id);
   }
-
+console.log("USERS:  ", userList)
   return (
     <div className="userinfo-tab">
       <div className="userinfo-column">
@@ -49,7 +47,7 @@ const UserInfo = ({podCount})=>{
           <h5>{users.length ? `${users.length} USERS` : " NO USERS"} </h5>
         </div>
         <div className="userinfo-column-body">
-        {users?.length && users.map(user=><UserTile key={user.id} userData={user} removeUser={removeUserHandler}/>)}
+        {userList.length ? userList.map(user=><UserTile key={user.id} userData={user} removeUser={removeUserHandler}/>): null}
         </div>
       </div>
       <div className="userinfo-column">

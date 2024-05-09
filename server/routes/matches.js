@@ -56,7 +56,7 @@ router.get('/status/:matchstatus', async(req,res)=>{
 
 
 /* GET MATCHES BY ID */
-router.get('/:id', async(req,res)=>{
+router.get('match/:id', async(req,res)=>{
 	try {
     const {id} = req.params
 		const match = await db.query(
@@ -70,6 +70,34 @@ router.get('/:id', async(req,res)=>{
 	}
 });
 
+
+/* COUNTS */
+/* GET MATCH COUNTS */
+router.get('/count', async(req,res)=>{
+	try {
+    console.log("Match count")
+    const totalMatchesCountResults = await db.query(
+      `SELECT COUNT(*) AS total_match_count FROM matches`
+      );
+		const currentMatchesCountResults = await db.query(
+		`SELECT COUNT(*) AS current_match_count FROM matches WHERE status = $1`, ['inProgress']
+		);
+		const completedMatchesCountResults = await db.query(
+			`SELECT COUNT(*) AS complete_match_count FROM matches WHERE complete = $1`,[true]
+			);
+		const data = {
+      totalMatchesCount: totalMatchesCountResults.rows,
+			currentMatchesCount: currentMatchesCountResults.rows,
+			completedMatchesCount: completedMatchesCountResults.rows
+		}
+		console.log("MATCHES COUNT DATA:  ", data);
+		res.json(data);
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+/* CREATE */
 /* CREATE match */
 router.post('/', async(req, res)=>{
 	try {
@@ -190,12 +218,12 @@ router.put('/complete/:id', async (req, res)=>{
 
     await db.query(
       `UPDATE users SET status=$1, available=$2  WHERE id=$3;`,
-      ["available", true, user2_id,]
+      ["available", true, user2_id]
     );
 
     await db.query(
       `UPDATE pods SET occupied=$1, occupant_id=$2 WHERE id=$3;`,
-      [  false, null, pod1_id,]
+      [  false, null, pod1_id]
     );
 
     await db.query(
@@ -211,7 +239,7 @@ router.put('/complete/:id', async (req, res)=>{
 });
 
 
-
+/* UPDATE */
 /* UPDATE match by id */
 router.put('/:id', async(req,res)=>{
 	try {
@@ -227,6 +255,7 @@ router.put('/:id', async(req,res)=>{
 	}
 });
 
+/* DELETE */
 /* DELETE match by id */
 router.delete('/:id', async(req,res)=>{
 	try {
@@ -246,8 +275,14 @@ router.delete('/', async(req,res)=>{
 		await db.query(
 		`DELETE FROM matches `
 	);
+  await db.query(
+		`UPDATE pods SET occupied=FALSE, occupant_id = NULL;`,
+	);
+  await db.query(
+		`UPDATE users SET available=TRUE, status = 'available';`,
+	);
 	res.status(200);
-  res.json({message:`DELETED ALL MATCHES`})
+  res.json({message:`DELETED ALL MATCHES, EMPTIED PODS, FREED UP USERS`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}

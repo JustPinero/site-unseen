@@ -14,13 +14,13 @@ import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
 
 /* API */
-import {fetchUsers, fetchUserDateCountAverage, fetchFinishedUsers} from "./api/users";
-import {fetchPods, addPods } from "./api/pods.js";
-import { fetchMatches } from "./api/matches.js";
+import {fetchUsers, fetchUserCount, fetchUserDateCountAverage, fetchFinishedUsers, deleteUser} from "./api/users";
+import {fetchPods,fetchPodsCount, addPods } from "./api/pods.js";
+import { fetchMatches, fetchMatchCount } from "./api/matches.js";
 
 /* DEFAULT VALUES */
-const USERNUMBER = 284;
-const PODNUMBER = 20;
+const USERNUMBER = 0;
+const PODNUMBER = 0;
 const EVENTDURATION = 10800
 const BUFFERDURATION = 10;
 const DATEDURATION = 10;
@@ -29,6 +29,8 @@ const DEFAULTDATECAP = 3
 
 const App = ()=> {
   /*--------LOCAL STATE---------- */
+  /*LOADING */
+  const [isLoading, setIsLoading] = useState(false)
   /* SIMULATION */
   const [simIsRunning, setSimIsRunning] = useState(false);
   const [simIsPaused, setSimIsPaused] = useState(false);
@@ -41,34 +43,54 @@ const App = ()=> {
   const [dateCap, setDateCap] = useState(DEFAULTDATECAP)
   /* USERS */
   const [users, setUsers] = useState([]);
+  const [availableUsersCount, setAvailableUsersCount] = useState(0)
+  const [waitingUsersCount, setWaitingUsersCount] = useState(0)
+  const [totalUsersCount, setTotalUsersCount] = useState(0)
   const [finishedUsersCount, setFinishedUsersCount] = useState(0)
   const [userDateCountAverage, setUserDateCountAverage] = useState(0)
   /* PODS */
-  const [podCount, setPodCount] = useState(PODNUMBER)
+  const [totalPodCount, setTotalPodCount] = useState(PODNUMBER)
+  const [availablePodCount, setAvailablePodCount] = useState(PODNUMBER)
+  const [occupiedPodCount, setOccupiedPodCount] = useState(0)
   /* MATCHES */
   const [matchCount, setMatchCount] = useState(0);
   
   /* ----------LOCAL STATE------------- */
-  /* ---------------STATE DEPENDANT VARIABLES FORMATTED DATA AND METRICS-------------------------- */
-  /* DATE DURATION */
 
+  /* ---------------STATE DEPENDANT VARIABLES FORMATTED DATA AND METRICS-------------------------- */
 //   /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
 //   /* ---------------LIFECYCLE-------------------------- */
 /* --------INIT-------- */
 useEffect(()=>{
   async function startFetching() {
     try{
+    setIsLoading(true)
     const userResults = await fetchUsers();
     const finishedUserResults = await fetchFinishedUsers(dateCap);
-    const podResults = await fetchPods()
-    const matchResults = await fetchMatches()
-    const userDateCountAverageResults = await fetchUserDateCountAverage()
-    if(podCount===0){
-      await addPods(PODNUMBER);
-    }
-    if (!ignore) {
+    const podCountResults = await fetchPodsCount();
+    const usersCountResults = await fetchUserCount();
+    const updatedAvailableUsersCountData = usersCountResults.data.available[0].available_user_count;
+    const updatedWaitingUsersCountData = usersCountResults.data.waiting[0].waiting_user_count;
+    const updatedTotalUsersCountData = usersCountResults.data.total[0].total_count;
+    const updatedOccupiedPodCountData = podCountResults.data.occupiedPodCount[0].occupied_pod_count;
+    const updatedAvailablePodCountData = podCountResults.data.availablePodCount[0].available_pod_count;
+    const updatedTotalPodCountData = podCountResults.data.totalPodCount[0].total_pod_count;
+    const matchResults = await fetchMatches();
+    const userDateCountAverageResults = await fetchUserDateCountAverage();
+    setIsLoading(false)
+    console.log("usersCountResults:  ", usersCountResults)
+    console.log("occupiedPodCount:  ",  podCountResults.data.occupiedPodCount[0]);
+    console.log("availablePodCount:  ",  podCountResults.data.availablePodCount[0]);
+    console.log("totalPodCount:  ",  podCountResults.data.totalPodCount[0]);
+    if (!isLoading) {
+      const updatedAvailableUsersCount = parseInt(updatedAvailableUsersCountData);
+      const updatedWaitingUsersCount = parseInt(updatedWaitingUsersCountData);
+      const updatedTotalUsersCount = parseInt(updatedTotalUsersCountData);
+      setAvailableUsersCount(updatedAvailableUsersCount)
+      setWaitingUsersCount(updatedWaitingUsersCount);
+      setTotalUsersCount(updatedTotalUsersCount);
       setUsers(userResults.data);
-      setPodCount(podResults.data.length)
+      setTotalPodCount(updatedTotalPodCountData)
       setMatchCount(matchResults.data.length)
       setFinishedUsersCount(finishedUserResults.data.length)
       setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
@@ -78,11 +100,7 @@ useEffect(()=>{
     console.log("INITIAL LOAD FAILED:  ", err)
   }
 }
-  let ignore = false;
   startFetching();
-  return () => {
-    ignore = true;
-  }
 },[])
 
   /* --------INIT-------- */
@@ -111,16 +129,26 @@ const increaseMatchCount = ()=>{
 
 const updateMatchCount = async ()=>{
   try{
+    setIsLoading(true)
+    const matchCountResults = await fetchMatchCount();
     const finishedUserResults = await fetchFinishedUsers(dateCap);
-    const matchResults = await fetchMatches()
     const userDateCountAverageResults = await fetchUserDateCountAverage()
-    setFinishedUsersCount(finishedUserResults.data.length)
-    setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
-    setMatchCount(matchResults.data.length)
+    if(!isLoading){
+      const matchCountData = matchCountResults.data
+      console.log("matchCountData:  ", matchCountData)
+      const updatedMatchCount = matchCountData.totalMatchesCount[0].total_match_count;
+      setMatchCount(updatedMatchCount)
+      setFinishedUsersCount(finishedUserResults.data.length)
+      setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
+    }
   }
   catch(err){
     console.log("ERROR:  ", err)
   }
+}
+const tempMatchCountHandler = (count )=>{
+  const updatedMatchCount = parseInt(count)
+  setMatchCount(updatedMatchCount)
 }
 
 const simCompletionHandler = ()=>{
@@ -128,9 +156,86 @@ const simCompletionHandler = ()=>{
   setSimIsRunning(false)
   setSimIsPaused(false)
 }
+const simResetHandler = async()=>{
+  try {
+    setIsLoading(true);
+    await updateMatchCount()
+    await podCountUpdateHandler()
+    setIsLoading(false);
+    if(!isLoading){
+      simulationCancellationHandler()
+    }
+  } catch (err) {
+    console.log("ERROR:  ", err)
+  }
+}
 /* ----------SIMULATION------------- */
+/* --------------------USERS-------------*/
+const userDeleteHandler = async (id)=> {
+  try{
+    console.log("DELETEY", id)
+    const updatedUsersResults = await deleteUser(id)
+    console.log("updatedUsersData:  ", updatedUsersResults)
+    const updatedUsersData= updatedUsersResults.data
+    console.log("updatedUsersData:  ", updatedUsersData)
+    setUsers(updatedUsersData)
+  }
+  catch(err){
+    console.log("ERROR:  ", err)
+  }
+}
 
-
+const userCountUpdateHandler = async ()=> {
+  try{
+    console.log("userCountUpdateHandler fired")
+    setIsLoading(true)
+    const usersCountResults = await fetchUserCount();
+    console.log("usersCountResults:  ", usersCountResults)
+    const updatedAvailableUsersCountData = usersCountResults.data.available[0].available_user_count;
+    const updatedWaitingUsersCountData = usersCountResults.data.waiting[0].waiting_user_count;
+    const updatedTotalUsersCountData = usersCountResults.data.total[0].total_count;
+    setIsLoading(false)
+    if (!isLoading) {
+      const updatedAvailableUsersCount = parseInt(updatedAvailableUsersCountData);
+      const updatedWaitingUsersCount = parseInt(updatedWaitingUsersCountData);
+      const updatedTotalUsersCount = parseInt(updatedTotalUsersCountData);
+      setAvailableUsersCount(updatedAvailableUsersCount)
+      setWaitingUsersCount(updatedWaitingUsersCount);
+      setTotalUsersCount(updatedTotalUsersCount);
+    }
+  }
+  catch(err){
+    console.log("ERROR:  ", err)
+  }
+}
+/* --------------------USERS------------- */
+/* ----------PODS-------------*/
+const podCountUpdateHandler = async ()=>{
+  try{
+    setIsLoading(true)
+    const podCountResults = await fetchPodsCount();
+    console.log("occupiedPodCount:  ",  podCountResults.data.occupiedPodCount[0]);
+    console.log("availablePodCount:  ",  podCountResults.data.availablePodCount[0]);
+    console.log("totalPodCount:  ",  podCountResults.data.totalPodCount[0]);
+    const updatedOccupiedPodCountData = podCountResults.data.occupiedPodCount[0].occupied_pod_count;
+    const updatedAvailablePodCountData = podCountResults.data.availablePodCount[0].available_pod_count;
+    const updatedTotalPodCountData = podCountResults.data.totalPodCount[0].total_pod_count;
+    setIsLoading(false)
+    if (!isLoading) {
+      const updatedAvailablePodCount = parseInt(updatedAvailablePodCountData);
+      const updatedOccupiedPodCount = parseInt(updatedOccupiedPodCountData);
+      const updatedTotalPodCount = parseInt(updatedTotalPodCountData);
+      setTotalPodCount(updatedTotalPodCount);
+      setOccupiedPodCount(updatedOccupiedPodCount);
+      setAvailablePodCount(updatedAvailablePodCount);
+    }
+  }
+  catch(err){
+    console.log("INITIAL LOAD FAILED:  ", err)
+  }
+}
+/* ----------PODS------------- */
+/* ----------EVENT CONDITION CHANGE------------- */
 const bufferDurationChangeHandler = (e)=>{
   let updatedBufferDuration = e.target.value
   updatedBufferDuration=parseInt(updatedBufferDuration)
@@ -146,13 +251,13 @@ const dateCapChangeHandler = (e)=>{
   let updatedMinimumDateAmount= e.target.value
   setDateCap(updatedMinimumDateAmount)
 }
-
+/* ----------EVENT CONDITION CHANGE------------- */
 /* --------------------HANDLERS------------- */
 const dateLength =   dateDuration+bufferDuration
   return (
     <div className="App">
       <div className="apphead-container">
-        <Header simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} podCount={podCount} userCount={users?.length} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
+        <Header simIsComplete={simIsComplete} simIsPaused={simIsPaused} simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  sessionLength={sessionLength} totalPodCount={totalPodCount} occupiedPodCount={occupiedPodCount} totalUsersCount={totalUsersCount} availableUsersCount={availableUsersCount} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
       </div>
     <Tabs
       defaultActiveKey="matchmaker"
@@ -165,6 +270,7 @@ const dateLength =   dateDuration+bufferDuration
       <Tab eventKey="matchmaker" title="Matchmaker">
         <Matchmaker
           simCompletionHandler={simCompletionHandler}
+          simResetHandler={simResetHandler}
           increaseMatchCount={increaseMatchCount}
           simIsPaused={simIsPaused}
           pauseSimulation= {simulationPauseHandler}
@@ -173,12 +279,16 @@ const dateLength =   dateDuration+bufferDuration
           simulationStartHandler={simulationStartHandler}
           dateDuration={dateLength}
           dateCap={dateCap}
-          podCount={podCount}
+          podCount={totalPodCount}
+          matchCount={matchCount}
+          updateUserCount={userCountUpdateHandler}
           updateMatchCount={updateMatchCount}
+          updatePodCount={podCountUpdateHandler}
+          tempUpdateMatchCount={tempMatchCountHandler}
         />
       </Tab>
       <Tab eventKey="userlist" title="User List" >
-        <UserInfo podCount={podCount} />
+        <UserInfo users={users} podCount={totalPodCount} userDeleteHandler={userDeleteHandler} />
       </Tab>
     </Tabs>
     </div>
