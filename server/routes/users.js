@@ -15,7 +15,6 @@ router.get('/', async(req,res)=>{
       `
 	  );
   const data = allUsers.rows;
-	console.log(data);
 	res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message);
@@ -29,7 +28,6 @@ router.get('/gender/:gender', async(req,res)=>{
 		const allUsersByGender = await db.query(
 		`SELECT * FROM users WHERE gender = $1`,[gender]
 	);
-	console.log(allUsersByGender.rows)
 	res.json(allUsersByGender)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -43,7 +41,6 @@ router.get('/:id', async(req,res)=>{
 		const user = await db.query(
 		`SELECT * FROM users where id=$1`,[id]
 	);
-	console.log(user.rows)
 	res.json(user.rows)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -59,7 +56,6 @@ router.get('/:id/dates', async(req,res)=>{
       where $1 = user1_id or $1 = user2_id
       ;`,[id]
 	);
-	console.log(user.rows)
 	res.json(user.rows)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -107,7 +103,6 @@ router.get('/dates/:datecount', async(req,res)=>{
       ;`, [datecount]
 	);
   const sortedUsers = sortedUsersResults.rows;
-	console.log("sortedUsers:  ", sortedUsers)
 	res.json(sortedUsers)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -169,7 +164,6 @@ router.get('/counts/all', async(req,res)=>{
     waiting: waitingUsersCountData,
     available: availableUsersCountData
   };
-  console.log("data:  ", data)
 	res.json(data)
     res.status(200)
 	} catch (error) {
@@ -181,9 +175,7 @@ router.get('/counts/all', async(req,res)=>{
 /* FINISHED */
 router.get('/finished/:datecount/count', async(req,res)=>{
 	try {
-    console.log("I'm NOT UN")
     const {datecount} = req.params
-    console.log("MALE RES NOT UN")
     const finishedTotalResults = await db.query(
       `
       SELECT COUNT(*) AS user_count
@@ -209,7 +201,6 @@ router.get('/finished/:datecount/count', async(req,res)=>{
       ) AS subquery;
 `, [datecount]
 	);
-  console.log("FEMALE RES NOT UN")
   const finishedFemaleResults = await db.query(
     `
     SELECT COUNT(*) AS user_count
@@ -223,7 +214,6 @@ router.get('/finished/:datecount/count', async(req,res)=>{
     ) AS subquery;
 `, [datecount]
 );
-console.log("NB RES NOT UN")
   const finishedNbResults = await db.query(
     `
     SELECT COUNT(*) AS user_count
@@ -256,7 +246,6 @@ console.log("NB RES NOT UN")
 /* UNFINISHED */
 router.get('/unfinished/:datecount/count', async(req,res)=>{
 	try {
-    console.log("UN")
     const {datecount} = req.params
     const unfinishedTotalResults = await db.query(
       `
@@ -435,7 +424,6 @@ router.put('/:id', async(req,res)=>{
 router.delete('/:id', async(req,res)=>{
   const {id} = req.params
 	try {
-    console.log(" I AM DELETING USER", id)
 		await db.query(
 		`DELETE FROM users WHERE id=$1`,[id]
 	);
@@ -448,7 +436,6 @@ router.delete('/:id', async(req,res)=>{
     `
 	);
   const data = postDeletionUsersResults.rows;
-  console.log("DATE AFTER DELETION:  ", data)
 	res.status(200);
   res.json(data)
 	} catch (error) {

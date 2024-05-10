@@ -8,8 +8,7 @@ const MatchTable = ({
     matches,
     simIsRunning,
     simIsPaused,
-    dateCompletionHandler,
-    dateDuration,
+    dateDuration
     })=>{
     return(
     <Table striped bordered hover>
@@ -26,12 +25,12 @@ const MatchTable = ({
                 <th>MATCH DATE COUNT</th>
                 <th>MATCH POD </th>
                 <th>STATUS</th>
-                <th>REMAINING TIME</th>
+                <th>TIME LEFT</th>
             </tr>
         </thead>
         <tbody>
             {matches?.map((match)=>{
-                return match && <MatchTableRow key={match.id} simIsRunning={simIsRunning} simIsPaused={simIsPaused} dateDuration={dateDuration} matchData={match}  dateCompletionHandler={dateCompletionHandler} />}
+                return match && <MatchTableRow key={match.id} simIsRunning={simIsRunning} simIsPaused={simIsPaused} matchData={match} dateDuration={dateDuration} />}
             )}
         </tbody>
     </Table>

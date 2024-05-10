@@ -6,40 +6,20 @@ import './styles.css';
 import UserTile from "../../components/UserTile";
 import UserGenerationTools from "../../components/UserGenerationTool";
 import PodManagementTools from "../../components/PodManagmentTool"
-/* API */
-import { fetchUsers, deleteUser } from "../../api/users";
 import { fetchPods } from "../../api/pods";
 
-const UserInfo = ({ users, podCount, userDeleteHandler})=>{
-  const [pods, setPods] = useState([]);
-  const [userList, setuserList] =useState([])
-  useEffect(()=>{
-    async function startFetching() {
-      try{
-      const podResults = await fetchPods();
-      const usersResults = await fetchUsers();
-      if (!ignore) {
-        const podsUpdate = podResults.data;
-        const usersUpdate= usersResults.data
-        setPods(podsUpdate);
-        setuserList(usersUpdate)
-      }
-    }
-    catch(err){
-      console.log("INITIAL LOAD FAILED:  ", err)
-    }
-  }
-    let ignore = false;
-    startFetching();
-    return () => {
-      ignore = true;
-    }
-  }, [users])
+const UserInfo = ({ users, podCount, userDeleteHandler, userUpdateHandler, podCountUpdateHandler})=>{
+  const pods = []
 
   const removeUserHandler = async (id) => {
+    try{
     await userDeleteHandler(id);
+    await userUpdateHandler()
+    }
+    catch(err){
+      console.log(err)
+    }
   }
-console.log("USERS:  ", userList)
   return (
     <div className="userinfo-tab">
       <div className="userinfo-column">
@@ -47,7 +27,7 @@ console.log("USERS:  ", userList)
           <h5>{users.length ? `${users.length} USERS` : " NO USERS"} </h5>
         </div>
         <div className="userinfo-column-body">
-        {userList.length ? userList.map(user=><UserTile key={user.id} userData={user} removeUser={removeUserHandler}/>): null}
+        {users?.length ? users.map(user=><UserTile key={user.id} userData={user} removeUserHandler={removeUserHandler}/>): null}
         </div>
       </div>
       <div className="userinfo-column">
@@ -56,7 +36,7 @@ console.log("USERS:  ", userList)
         </div>
         <div className="userinfo-column-body">
           <UserGenerationTools users={users} pods={pods} podCount={podCount} />
-          <PodManagementTools pods={pods} />
+          <PodManagementTools podCountUpdateHandler={podCountUpdateHandler} pods={pods} podCount={podCount} />
         </div>
       </div>
     </div>

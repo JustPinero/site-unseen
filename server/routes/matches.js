@@ -2,6 +2,72 @@ var express = require('express');
 var router = express.Router();
 const db = require("../db");
 
+
+/* GET Data  */
+router.post('/data', async(req,res)=>{
+  const {maxDateDuration} =req.body
+  console.log("maxDateDuration:  ", maxDateDuration)
+	try {
+		const allMatches = await db.query(
+		`SELECT m.*, p1.id AS p1id, p2.id AS p2id , u1.username AS user1_username , u1.age AS user1_age, u1.gender AS user1_gender, u2.username AS user2_username, u2.age AS user2_age, u2.gender AS user2_gender,
+    (SELECT COUNT(*) FROM matches WHERE user1_id = m.user1_id) AS user1_match_count,
+    (SELECT COUNT(*) FROM matches WHERE user2_id = m.user2_id) AS user2_match_count
+    FROM matches m
+    LEFT JOIN pods p1 ON m.pod1_id = p1.id
+    LEFT JOIN pods p2 ON m.pod2_id = p2.id
+    LEFT JOIN users u1 ON m.user1_id = u1.id
+    LEFT JOIN users u2 ON m.user2_id = u2.id
+    WHERE started_at > CURRENT_TIMESTAMP - ($1 || ' seconds')::interval;
+    `,[maxDateDuration]
+	);
+  const completeMatchesResults = await db.query(
+		`SELECT m.*, p1.id AS p1id, p2.id AS p2id , u1.username AS user1_username , u1.age AS user1_age, u1.gender AS user1_gender, u2.username AS user2_username, u2.age AS user2_age, u2.gender AS user2_gender,
+    (SELECT COUNT(*) FROM matches WHERE user1_id = m.user1_id) AS user1_match_count,
+    (SELECT COUNT(*) FROM matches WHERE user2_id = m.user2_id) AS user2_match_count
+    FROM matches m
+    LEFT JOIN pods p1 ON m.pod1_id = p1.id
+    LEFT JOIN pods p2 ON m.pod2_id = p2.id
+    LEFT JOIN users u1 ON m.user1_id = u1.id
+    LEFT JOIN users u2 ON m.user2_id = u2.id
+    WHERE started_at < CURRENT_TIMESTAMP - ($1 || ' seconds')::interval;
+    `,[maxDateDuration]
+	);
+  const completeMatchesList = completeMatchesResults.rows
+  for(let i=0; i<completeMatchesList.length ; i++){
+    const match = completeMatchesList[i];
+    const {id, user1_id, user2_id, pod1_id, pod2_id} = match;
+  await db.query(
+    `UPDATE matches SET status=$1, complete=$2 WHERE id=$3`, ["complete", true, id]
+  );
+  await db.query(
+    `UPDATE users SET status=$1, available=$2 WHERE id=$3;`,
+    [ "available", true, user1_id]
+  );
+
+  await db.query(
+    `UPDATE users SET status=$1, available=$2  WHERE id=$3;`,
+    ["available", true, user2_id]
+  );
+
+  await db.query(
+    `UPDATE pods SET occupied=$1, occupant_id=$2 WHERE id=$3;`,
+    [  false, null, pod1_id]
+  );
+  await db.query(
+    `UPDATE pods SET occupied=$1, occupant_id=$2 WHERE id=$3;`,
+    [ false, null, pod2_id]
+  );
+}
+
+  const data= allMatches.rows;
+	res.json(data)
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+
+
 /* GET all matches  */
 router.get('/', async(req,res)=>{
 	try {
@@ -9,7 +75,6 @@ router.get('/', async(req,res)=>{
 		`SELECT * FROM matches`
 	);
   const data= allMatches.rows;
-	console.log(data)
 	res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -20,7 +85,8 @@ router.get('/', async(req,res)=>{
 router.get('/inprogress', async(req,res)=>{
 	try {
 		const allCompleteMatches = await db.query(
-		`SELECT m.*, p1.id AS p1id, p2.id AS p2id , u1.username AS user1_username , u1.age AS user1_age, u1.gender AS user1_gender, u2.username AS user2_username, u2.age AS user2_age, u2.gender AS user2_gender,
+		`
+    SELECT m.*, p1.id AS p1id, p2.id AS p2id , u1.username AS user1_username , u1.age AS user1_age, u1.gender AS user1_gender, u2.username AS user2_username, u2.age AS user2_age, u2.gender AS user2_gender,
     (SELECT COUNT(*) FROM matches WHERE user1_id = m.user1_id) AS user1_match_count,
     (SELECT COUNT(*) FROM matches WHERE user2_id = m.user2_id) AS user2_match_count
   FROM matches m
@@ -31,7 +97,6 @@ router.get('/inprogress', async(req,res)=>{
   WHERE m.complete = FALSE;`
 	);
   const data= allCompleteMatches.rows
-	console.log(data)
 	res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -47,7 +112,6 @@ router.get('/status/:matchstatus', async(req,res)=>{
 		`SELECT * FROM matches WHERE status = $1 `,[matchstatus]
 	);
   const data= allMatches.rows
-	console.log(data)
 	res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -63,7 +127,7 @@ router.get('match/:id', async(req,res)=>{
 		`SELECT * FROM matches where id=$1`,[id]
 	);
   const data = match.rows;
-	console.log(data);
+
 	res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -75,7 +139,6 @@ router.get('match/:id', async(req,res)=>{
 /* GET MATCH COUNTS */
 router.get('/count', async(req,res)=>{
 	try {
-    console.log("Match count")
     const totalMatchesCountResults = await db.query(
       `SELECT COUNT(*) AS total_match_count FROM matches`
       );
@@ -90,7 +153,6 @@ router.get('/count', async(req,res)=>{
 			currentMatchesCount: currentMatchesCountResults.rows,
 			completedMatchesCount: completedMatchesCountResults.rows
 		}
-		console.log("MATCHES COUNT DATA:  ", data);
 		res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -101,9 +163,46 @@ router.get('/count', async(req,res)=>{
 /* CREATE match */
 router.post('/', async(req, res)=>{
 	try {
-		const {userID, dateCount } =req.body;
-    const userData = await db.query(`SELECT * FROM users WHERE id = $1`, [userID]);
+    console.log("I AM IN THE GEN FUNCtion")
+    const {dateCount} = req.body
+    console.log("req.body:  ", req.body)
+    console.log("dateCount:  ", dateCount)
+    let success = false;
+    const availablePodCountResults = await db.query(
+      `SELECT COUNT(*) as available_pod_count FROM pods WHERE occupied = $1`,[false]
+    );
+    console.log("availablePodCountResults:  ", availablePodCountResults)
+    const availablePodCount=  availablePodCountResults.rows[0].available_pod_count
+    if(availablePodCount<=1){
+      const response = {simstatus: "podsFull"}
+      return res.status(200).json(response)
+    }
+    for(let i=0 ; i<(availablePodCount/2) ; i++){
+      console.log("MATCH ROUND:  ", i)
+      console.log("dateCount:  ", dateCount)
+      const sortedUsersResults = await db.query(
+        `
+        SELECT u.id, u.username, COUNT(m.id) AS num_matches
+        FROM users u
+        LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+        WHERE u.available = TRUE
+        GROUP BY u.id, u.username
+        HAVING COUNT(m.id) < $1
+        ORDER BY num_matches ASC;
+        ;`, [dateCount]
+      );
+    console.log("sortedUsersResults:  ", sortedUsersResults)
+    const sortedUsers = sortedUsersResults.rows;
+    console.log("sortedUsers:  ", sortedUsers)
+    if(!sortedUsers.length){
+      const response = {simstatus: ""}
+      return res.status(200).json(response)
+    }
+    const selectedUser= sortedUsers[0];
+    console.log("selectedUser:  ", selectedUser)
+    const userData = await db.query(`SELECT * FROM users WHERE id = $1`, [selectedUser.id]);
     const user1 = userData.rows[0];
+    const userID = user1.id
     const isUserAvailable = user1.available;
     if(isUserAvailable){
     const user1Gender = user1.gender;
@@ -129,7 +228,7 @@ router.post('/', async(req, res)=>{
           LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
           WHERE (u.gender = $2 AND u.sexual_pref = $1) AND u.available=$3
           GROUP BY u.id, u.username
-          HAVING COUNT(m.id) <= $4
+          HAVING COUNT(m.id) < $4
           ORDER BY num_matches ASC;
           `,[ user1SexualPreference, user1Gender, true, dateCount]);
         } else{
@@ -140,7 +239,7 @@ router.post('/', async(req, res)=>{
           LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
           WHERE (u.sexual_pref = $1 OR u.sexual_pref = $2 ) AND u.available=$3
           GROUP BY u.id, u.username
-          HAVING COUNT(m.id) <= $4
+          HAVING COUNT(m.id) < $4
           ORDER BY num_matches ASC;
           `,[ user1Gender, "bisexual", true, dateCount]);
         }
@@ -152,7 +251,7 @@ router.post('/', async(req, res)=>{
           LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
           WHERE (u.sexual_pref = $1 AND u.available=$2)
           GROUP BY u.id, u.username
-          HAVING COUNT(m.id) <= $3
+          HAVING COUNT(m.id) < $3
           ORDER BY num_matches ASC;
           `, ["bisexual", true, dateCount]);
       }    
@@ -181,21 +280,23 @@ router.post('/', async(req, res)=>{
           `UPDATE pods SET occupied=$3, occupant_id=$1 WHERE id=$2;`,
           [ matchID, matchPodID, true]
         );
-        res.status(200)
-        res.json({status: "match made"})
+        success= true
       }else {
         await db.query(
           `UPDATE users SET status=$2  WHERE id=$1;`,
           [userID, "waiting"]
         );
-        res.status(200)
-        res.json({status: "match succesful"})
+       success= true
       }
     }else {
-
-      res.status(200)
-      res.json({status: "USER NOT AVAILABLE"})
+      success= false
     }
+  }
+}
+  if(success){
+    res.status(200).json({message: "match succesful"})
+  }else{
+    res.status(404).json({message: "match not found"})
   }
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -203,11 +304,46 @@ router.post('/', async(req, res)=>{
 });
 
 /* COMPLETE MATCH */
+router.post('/complete', async (req, res)=>{
+	try {
+		const {matches} =req.body;
+    for(let i=0; i<matches.length ; i++){
+      const match = matches[i];
+      const {id, user1_id, user2_id, pod1_id, pod2_id} = match;
+		await db.query(
+		  `UPDATE matches SET status=$1, complete=$2 WHERE id=$3`, ["complete", true, id]
+	  );
+    await db.query(
+      `UPDATE users SET status=$1, available=$2 WHERE id=$3;`,
+      [ "available", true, user1_id]
+    );
+
+    await db.query(
+      `UPDATE users SET status=$1, available=$2  WHERE id=$3;`,
+      ["available", true, user2_id]
+    );
+
+    await db.query(
+      `UPDATE pods SET occupied=$1, occupant_id=$2 WHERE id=$3;`,
+      [  false, null, pod1_id]
+    );
+    await db.query(
+      `UPDATE pods SET occupied=$1, occupant_id=$2 WHERE id=$3;`,
+      [ false, null, pod2_id]
+    );
+  }
+    res.status(200)
+    res.json({status: `matches ${matches.map(match=>(match.id))} completed`})
+	} catch (error) {
+		console.log("ERROR:  ", error.message)
+	}
+});
+
+
 router.put('/complete/:id', async (req, res)=>{
 	try {
 		const {id} = req.params;
 		const {user1_id, pod1_id, user2_id, pod2_id} =req.body;
-    console.log("body:  ", user1_id, pod1_id, user2_id, pod2_id)
 		await db.query(
 		  `UPDATE matches SET status=$1, complete=$2 WHERE id=$3`, ["complete", true, id]
 	  );

@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import { generateUser, deleteAllUsers } from "../../api/users";
 
 
-const UserGenerationTools = ()=>{
+const UserGenerationTools = ({users, pods, podCount })=>{
     const [userGenerationNumber, setUserGenerationNumber] = useState(1);
     const [showfilters, setShowFilters] = useState(false)
     const [generatedUserHasGender, setGeneratedUserHasGender] = useState(false)

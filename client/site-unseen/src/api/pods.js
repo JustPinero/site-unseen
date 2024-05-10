@@ -22,24 +22,22 @@ const fetchPodsCount = async ()=>{
     return await axios.get(`${PATH}/count`);
 };
 
-/* PODS POSTS */
-const addPod = async ()=>{
-    await axios.post(`${PATH}`);
-};
 
 const addPods = async (podCount)=>{
     try{
-        console.log("POD COUNT:  ", typeof podCount)
-        for(let i= 0; i<=podCount; i++){
-            console.log("POD COUNTER:  ", i<=podCount)
-            console.log("MAKING PODS :   ", podCount)
-            await axios.post(`${PATH}/`);
-        }
+        console.log("ADD PODS:  ", podCount)
+        await axios.post(`${PATH}/generate/${podCount}`);
     }
     catch(err){
         console.log("ERROR:  ", err)
     }
 };
+
+/* PODS POSTS */
+const addPod = async ()=>{
+    await axios.post(`${PATH}/`);
+};
+
 
 /* PODS UPDATE */
 const updatePod =  async (id, podUpdate)=>{
@@ -61,4 +59,9 @@ const deletePods =  async (podcount)=>{
     return await axios.delete(`${PATH}/remove/${podcount}`);
 };
 
-export {fetchPods, fetchPodsByStatus, fetchPodsByID, fetchPodsCount, addPod, addPods, updatePod, emptyPod, deletePod, deletePods};
+const deleteAllPods =  async ()=>{
+    return await axios.delete(`${PATH}/removeall`);
+};
+
+
+export {fetchPods, fetchPodsByStatus, fetchPodsByID, fetchPodsCount, addPod, addPods, updatePod, emptyPod, deletePod, deletePods, deleteAllPods};

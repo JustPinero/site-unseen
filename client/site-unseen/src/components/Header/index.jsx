@@ -13,6 +13,7 @@ const Header = ({
     finishedUsersCount,
     dateCap,
     dateCapChangeHandler,
+    users,
     totalUsersCount,
     availableUsersCount,
     occupiedPodCount,
@@ -21,7 +22,9 @@ const Header = ({
     bufferDuration,
     bufferDurationChangeHandler,
     dateDuration,
-    dateDurationChangeHandler
+    dateDurationChangeHandler,
+    totalMatchCount,
+     activeMatchCount,
 })=>{
     return(
         <div className="header-container">
@@ -29,7 +32,7 @@ const Header = ({
                 Site Unseen
             </h1>
             <SimSettings simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}/>
-            <InfoBox simIsComplete={simIsComplete} simIsPaused={simIsPaused} simIsRunning={simIsRunning} totalUsersCount={totalUsersCount} availableUsersCount={availableUsersCount} occupiedPodCount={occupiedPodCount} totalPodCount={totalPodCount} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
+            <InfoBox users={users} simIsComplete={simIsComplete} simIsPaused={simIsPaused} simIsRunning={simIsRunning} totalUsersCount={totalUsersCount} availableUsersCount={availableUsersCount} occupiedPodCount={occupiedPodCount} totalPodCount={totalPodCount} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage} activeMatchCount={activeMatchCount} totalMatchCount={totalMatchCount}/>
             <div>
             {/* <SessionTimer sessionLength={sessionLength}/> */}
             </div>

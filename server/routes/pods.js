@@ -8,7 +8,6 @@ router.get('/', async(req,res)=>{
 		const allPods = await db.query(
 		`SELECT * FROM pods`
 	);
-	console.log(allPods.rows)
 	res.json(allPods.rows)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -22,7 +21,6 @@ router.get('/available', async(req,res)=>{
 		`SELECT * FROM pods WHERE occupied = $1`,[false]
 		);
 		const data = allAvailablePods.rows;
-		console.log(data);
 		res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -46,7 +44,6 @@ router.get('/count', async(req,res)=>{
 			availablePodCount: availablePodCountResults.rows,
 			totalPodCount: totalPodCountResults.rows
 		}
-		console.log("POD COUNT DATA:  ", data);
 		res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -61,7 +58,6 @@ router.get('/:id', async(req,res)=>{
 		`SELECT * FROM pods where id=$1`,[id]
 	);
 	const data = pod.rows;
-	console.log(data);
 	res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
@@ -69,13 +65,18 @@ router.get('/:id', async(req,res)=>{
 });
 
 /* ADD POD */
-router.post('/', async(req, res)=>{
+
+router.post('/generate/:count', async(req, res)=>{
 	try {
-		console.log("GENERATING POD")
-		await db.query(
-		`insert into pods (occupied, occupant_id) VALUES ($1, $2 )`, [false, null]
-	);
-	res.status(200);
+		const {count} = req.params
+		console.log("POD GENERATION:  ", count)
+		for(let i=0; i< count; i++ ){
+			console.log(" IN THE LOOP")
+			await db.query(
+			`insert into pods (occupied, occupant_id) VALUES ($1, $2 )`, [false, null]
+			);
+		res.status(200);
+	}
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
 	}
@@ -95,25 +96,19 @@ router.put('/:id', async(req,res)=>{
 	}
 });
 
-/* DELETE pod by id */
-router.delete('/:id', async(req,res)=>{
-	try {
-		const {id} = req.params
-		const deletePod = await db.query(
-		`DELETE FROM pods WHERE id = $1`,[id]
-	);
-	res.status(200);
-	} catch (error) {
-		console.log("ERROR:  ", error.message)
-	}
-});
+
 
 /* DELETE selected number of pods */
 router.delete('/remove/:podcount', async(req,res)=>{
 	try {
 		const {podcount} = req.params
 		await db.query(
-		`DELETE from pods order by id desc limit $1`, [podcount]
+		`	DELETE FROM pods
+		WHERE id IN (
+		SELECT id
+		FROM pods
+		LIMIT $1
+	);`, [podcount]
 	);
 	res.status(200);
 	} catch (error) {
@@ -122,7 +117,7 @@ router.delete('/remove/:podcount', async(req,res)=>{
 });
 
 /* DELETE All pods */
-router.delete('/', async(req,res)=>{
+router.delete('/removeall', async(req,res)=>{
 	try {
 		await db.query(
 		`DELETE FROM pods `

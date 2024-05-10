@@ -1,5 +1,5 @@
 /* REACT */
-import {useState} from "react";
+import {useState, useEffect} from "react";
 /* STYLES */
 import './styles.css';
 /* BOOTSTRAP */
@@ -7,14 +7,18 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from "react-bootstrap/InputGroup"
 import Button from 'react-bootstrap/Button';
 /** API */
-import { addPods, deletePods } from "../../api/pods";
+import { addPods, deletePod, deletePods, deleteAllPods } from "../../api/pods";
 
 
 
-const PodManagmentTools = ({pods })=>{
+const PodManagmentTools = ({pods, podCountUpdateHandler, podCount })=>{
     const [podAdditionCount, setPodAdditionCount] = useState(1);
     const [podRemovalCount, setPodRemovalCount] = useState(1);
-
+    const [isLoading, setIsLoading] = useState(false)
+    useEffect(() => {
+        console.log("IS LOADING")
+     podCountUpdateHandler()
+    }, [isLoading]);
 
     const PodAdditionChangeHandler = (e)=>{
         const update = parseInt(e.target.value);
@@ -25,24 +29,35 @@ const PodManagmentTools = ({pods })=>{
             setPodAdditionCount(update);
         }
     }
-    const PodAdditionSubmissionHandler = (e)=>{
-        e.preventDefault()
-        console.log("ADDITION EVENT:  ", e)
-        addPods(podAdditionCount)
-    }
     const PodRemovalChangeHandler = (e)=>{
         const update = parseInt(e.target.value);
         if(update<=1){
             setPodRemovalCount(1);
         }else
-        if( update > pods.length){
+        if( update > podCount ){
             setPodRemovalCount(pods.length);
         }else {
-        setPodRemovalCount(update);
+            setPodRemovalCount(update);
         }
     }
-    const PodRemovalSubmissionHandler = ()=>{
-        deletePods(podRemovalCount)
+
+    //SUBMISSION HANDLERS
+    const PodRemovalSubmissionHandler = async ()=>{
+        setIsLoading(true)
+        await deletePods(podRemovalCount)
+        setIsLoading(false)
+    }
+
+    const PodAdditionSubmissionHandler = async (e)=>{
+        setIsLoading(true)
+        await addPods(podAdditionCount)
+        setIsLoading(false)
+    }
+
+    const removeAllPodsButtonClickHandler = async (e)=>{
+        setIsLoading(true)
+        await deleteAllPods()
+        setIsLoading(false)
     }
 
     return (
@@ -91,7 +106,7 @@ const PodManagmentTools = ({pods })=>{
                     </Button>
                 </div> */}
                 <div>
-                    <Button onClick={()=>deletePods(pods.length)}>
+                    <Button onClick={removeAllPodsButtonClickHandler}>
                         Remove All Pods
                     </Button>
                 </div>

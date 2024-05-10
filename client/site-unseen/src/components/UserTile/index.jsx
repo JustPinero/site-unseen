@@ -10,7 +10,7 @@ import { deleteUser } from "../../api/users";
 const UserTile = ({
     userData,
     tileClickFunction,
-    removeUser
+    removeUserHandler
 })=>{
     const [showMore, setShowMore] = useState(false)
     const {id, username, firstname, lastname, sexual_pref, gender, biography, age} = userData
@@ -22,7 +22,7 @@ const UserTile = ({
     <div className="usertile-container" onClick={tileClickFunction}>
         <div className="usertile-header ">
         <FaEdit />
-        <FaTrashAlt onClick={()=>deleteUser(id)} color="red" />
+        <FaTrashAlt onClick={()=>removeUserHandler(id)} color="red" />
         </div>
         <div>
             <div>

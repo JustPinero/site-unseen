@@ -1,5 +1,3 @@
-/* REACT */
-import {useState, useEffect, useRef} from "react"
 /* STYLES */
 import './styles.css';
 
@@ -18,51 +16,37 @@ const statusKey= {
     },
 }
 
-function getRandomInt(min, max) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min) + min)
-  };
+// function getRandomInt(min, max) {
+//     min = Math.ceil(min)
+//     max = Math.floor(max)
+//     return Math.floor(Math.random() * (max - min) + min)
+//   };
 
-const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration, dateCompletionHandler})=>{
-    const delay = getRandomInt(3, 10)
+const MatchTableRow = ({ matchData, dateDuration})=>{
     /* DATA */
-    const {id, user1_username, user1_age, user1_gender, user1_match_count, pod1_id, user2_username, user2_age, user2_gender, user2_match_count, pod2_id, status} = matchData;
-    /* STATE */
-    const [seconds, setSeconds] = useState(dateDuration+delay);
-    // const [isActive, setIsActive] = useState(false);
-    // const [timer, setTimer] = useState(`00:00:${dateDuration}`);
-    // const Ref = useRef(null);
+    const {id, user1_username, user1_age, user1_gender, user1_match_count, pod1_id, user2_username, user2_age, user2_gender, user2_match_count, pod2_id, status, started_at} = matchData;
     /* HELPERS */
     const statusInfo = statusKey[status];
     const {text, styleId} = statusInfo;
     let dataColor = styleId;
-    let statusText = text;
 
+    const currentTimestamp = Date.now();
+console.log("started_at",started_at)
+    // Get the specific timestamp in milliseconds (replace `specificTimestamp` with your timestamp)
+    const specificTimestamp = new Date(started_at).getTime(); // example timestamp
 
+    // Calculate the time difference in milliseconds
+    const timeDifferenceMs = specificTimestamp - currentTimestamp;
 
-    useEffect(() => {
-        let interval;
-        if(status==="inProgress" && simIsRunning){
-            interval = setInterval(() => {
-                setSeconds(seconds => seconds -1);
-              }, 1000);
-        }else{
-            clearInterval(interval);
-        }
-        return () => clearInterval(interval);
-    }, [simIsRunning]);
+    // Convert the time difference from milliseconds to seconds
+    const timeDifferenceSec = Math.floor(timeDifferenceMs / 1000);
 
-    if(seconds<5){
-        dataColor= "date-ending"
-        statusText= "Date Ending"
-    };
-    if(seconds===0){
-        dateCompletionHandler(matchData)
-    };
+    console.log('Time difference in seconds:', timeDifferenceSec+dateDuration+1 );
+
+    let dateTimeLeft = timeDifferenceSec+dateDuration
 
     return(
-        <tr className="match-row" onClick={()=>dateCompletionHandler(matchData)}>
+        <tr className="match-row" >
             <td id={dataColor}>{user1_username}</td>
             <td id={dataColor}>{user1_age}</td>
             <td id={dataColor}>{user1_gender}</td>
@@ -74,7 +58,7 @@ const MatchTableRow = ({ simIsRunning, simIsPaused, matchData, dateDuration, dat
             <td id={dataColor}>{user2_match_count}</td>
             <td id={dataColor}>{pod2_id}</td>
             <td id={dataColor}>{status}</td>
-            <td>{seconds}</td>
+            <td id={dataColor}>{dateTimeLeft>0 ? dateTimeLeft : "Date Ending" }</td>
         </tr>
     )
 }
