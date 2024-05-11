@@ -7,6 +7,7 @@ const SimulationDurationTracker = ({simIsRunning, sessionDuration, sessionDurati
   // const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
+    console.log(" SIM IS RUNNING:  ", simIsRunning)
     let interval;
     if (simIsRunning) {
       interval = setInterval(() => {

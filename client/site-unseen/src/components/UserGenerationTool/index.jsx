@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import { generateUser, deleteAllUsers } from "../../api/users";
 
 
-const UserGenerationTools = ({users, pods, podCount })=>{
+const UserGenerationTools = ({users, pods, podCount, userCountUpdateHandler })=>{
     const [userGenerationNumber, setUserGenerationNumber] = useState(1);
     const [showfilters, setShowFilters] = useState(false)
     const [generatedUserHasGender, setGeneratedUserHasGender] = useState(false)
@@ -58,7 +58,15 @@ const UserGenerationTools = ({users, pods, podCount })=>{
     const generationRequestionSubmissionHandler = async ()=>{
         const generationDetails = {generatedUserHasGender, generatedUserGender, generatedUserHasSexuality, generatedUserSexuality} ;
         await generateUser(userGenerationNumber, generationDetails)
+        await userCountUpdateHandler()
     }
+
+
+    const removeAllUsersClickHandler = async ()=>{
+        await deleteAllUsers()
+        await userCountUpdateHandler()
+    }
+
     return (
         <div>
             <h3>User Generation</h3>
@@ -113,7 +121,7 @@ const UserGenerationTools = ({users, pods, podCount })=>{
                         onChange={toggleGeneratedUserHasSexuality}
                     />
                         {generatedUserHasSexuality &&
-                            <Form.Select aria-label="SelectGender" value={generatedUserSexuality} onChange={generatedUserSexualityChangeHandler}>
+                            <Form.Select aria-label="SelectSexuality" value={generatedUserSexuality} onChange={generatedUserSexualityChangeHandler}>
                             <option value="">Select Generated User Sexual Preference</option>
                             <option value="bisexual">Bisexual</option>
                             <option value="male">Male</option>
@@ -127,7 +135,7 @@ const UserGenerationTools = ({users, pods, podCount })=>{
                 <Button onClick={generationRequestionSubmissionHandler}>
                     Generate Users
                 </Button>
-                <Button onClick={()=>deleteAllUsers()}>
+                <Button onClick={removeAllUsersClickHandler}>
                     Delete All Users
                 </Button>
             </div>

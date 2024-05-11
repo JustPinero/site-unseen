@@ -18,9 +18,10 @@ const SimSettings = ({
    
     return (
         <div className="simsettings-container">
-            <h5>Simulation Settings</h5>
-            <div className="simsettings-duration-box">
-                <Form>
+            <h5 className="simsettings-header_text">Simulation Settings</h5>
+            <div className="simsettings-body">
+            <div className="simsettings-box">
+                <Form >
                     <Form.Label className={"simsettings-form_label"}>
                          Date Length (secs)
                     </Form.Label>
@@ -44,9 +45,11 @@ const SimSettings = ({
                         disabled={simIsRunning}
                     />
                 </Form>
+            </div>
+            <div className="simsettings-box">
                 <Form style={{marginLeft:"6px"}}>
                     <Form.Label className={"simsettings-form_label"}>
-                        Minimum Number of Dates 
+                        Minimum Number of Dates
                     </Form.Label>
                     <Form.Control
                         id="minimumdate-form"
@@ -58,6 +61,21 @@ const SimSettings = ({
                         disabled={simIsRunning}
                     /> 
                 </Form>
+                <Form style={{marginLeft:"6px"}}>
+                    <Form.Label className={"simsettings-form_label"}>
+                        Maximum Number of Dates
+                    </Form.Label>
+                    <Form.Control
+                        id="minimumdate-form"
+                        value={dateCap}
+                        onChange={dateCapChangeHandler}
+                        aria-label="Small"
+                        aria-describedby="inputGroup-sizing-sm"
+                        type="number"
+                        disabled={simIsRunning}
+                    /> 
+                </Form>
+            </div>
             </div>
         </div>
     )

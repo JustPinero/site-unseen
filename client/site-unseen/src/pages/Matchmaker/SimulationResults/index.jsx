@@ -24,7 +24,7 @@ const SimulationResults = ({dateCount})=>{
                 setFemaleFinishedUsers(finishedUserData.female[0].user_count)
                 setMaleFinishedUsers(finishedUserData.male[0].user_count)
                 setNbFinishedUsers(finishedUserData.nb[0].user_count)
-                setTotalUninishedUserCount(finishedUserData.total[0].user_count)
+                setTotalUninishedUserCount(unfinishedUserData.total[0].user_count)
                 setFemaleUnfinishedUsers(unfinishedUserData.female[0].user_count)
                 setMaleUnfinishedUsers(unfinishedUserData.male[0].user_count)
                 setNbUnfinishedUsers(unfinishedUserData.nb[0].user_count)

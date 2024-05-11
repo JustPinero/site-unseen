@@ -8,7 +8,7 @@ import UserGenerationTools from "../../components/UserGenerationTool";
 import PodManagementTools from "../../components/PodManagmentTool"
 import { fetchPods } from "../../api/pods";
 
-const UserInfo = ({ users, podCount, userDeleteHandler, userUpdateHandler, podCountUpdateHandler})=>{
+const UserInfo = ({ users, podCount, userDeleteHandler, userUpdateHandler, podCountUpdateHandler, userCountUpdateHandler})=>{
   const pods = []
 
   const removeUserHandler = async (id) => {
@@ -35,7 +35,7 @@ const UserInfo = ({ users, podCount, userDeleteHandler, userUpdateHandler, podCo
           <h5>Tools</h5>
         </div>
         <div className="userinfo-column-body">
-          <UserGenerationTools users={users} pods={pods} podCount={podCount} />
+          <UserGenerationTools users={users} pods={pods} podCount={podCount} userCountUpdateHandler={userCountUpdateHandler} />
           <PodManagementTools podCountUpdateHandler={podCountUpdateHandler} pods={pods} podCount={podCount} />
         </div>
       </div>

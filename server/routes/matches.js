@@ -230,7 +230,7 @@ router.post('/', async(req, res)=>{
           GROUP BY u.id, u.username
           HAVING COUNT(m.id) < $4
           ORDER BY num_matches ASC;
-          `,[ user1SexualPreference, user1Gender, true, dateCount]);
+          `,[  user1Gender, user1SexualPreference, true, dateCount]);
         } else{
           user1ProspectData = await db.query(
           `
@@ -256,9 +256,15 @@ router.post('/', async(req, res)=>{
           `, ["bisexual", true, dateCount]);
       }    
       let user1ProspectsList = user1ProspectData.rows.map((prospectData)=>(prospectData.id));
+      let waitingProspectList = user1ProspectData.rows.map((prospectData)=>{
+        if(prospectData.status==="waiting"){
+          return(prospectData.id)
+        }
+      });
+      waitingProspectList = user1ProspectsList.filter(prospectID => (((user1PastDatesList.indexOf(prospectID))<0) || prospectID!==userID) && prospectID!==undefined )
       user1ProspectsList = user1ProspectsList.filter(prospectID => ((user1PastDatesList.indexOf(prospectID))<0) || prospectID!==userID )
       if(user1ProspectsList.length){
-        const matchID = user1ProspectsList[0];
+        const matchID = waitingProspectList.lenght>0 ? waitingProspectList[0]: user1ProspectsList[0];
         const matchPodID = vacantPodsList[1];
         await db.query(
           `INSERT into matches (user1_id, pod1_id, user2_id, pod2_id, status, complete) VALUES ($1, $2, $3, $4, $5, $6);`,

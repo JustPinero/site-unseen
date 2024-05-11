@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 /* BOOTSTRAP COMPONENTS */
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import Button from "react-bootstrap/esm/Button.js";
 /* COMPONENTS */
 import Header from "./components/Header/index.jsx";
 import Dashboard from "./pages/Dashboard";
@@ -30,6 +31,7 @@ const App = ()=> {
   /*LOADING */
   const [isLoading, setIsLoading] = useState(false)
   /* SIMULATION */
+  const [simIsStarting, setSimIsStarting] = useState(false);
   const [simIsRunning, setSimIsRunning] = useState(false);
   const [simIsPaused, setSimIsPaused] = useState(false);
   const [simIsComplete, setSimIsComplete] = useState(false);
@@ -65,6 +67,13 @@ const App = ()=> {
 /* --------------------HANDLERS------------- */
 /* ----------SIMULATION------------- */
 const simulationStartHandler = ()=>{
+  setSimIsStarting(true)
+  setSimIsRunning(false)
+  setSimIsPaused(false)
+  setSimIsComplete(false)
+}
+const simulationRunHandler = ()=>{
+  setSimIsStarting(true)
   setSimIsRunning(true)
   setSimIsPaused(false)
   setSimIsComplete(false)
@@ -74,6 +83,7 @@ const simulationPauseHandler = ()=>{
   setSimIsPaused(true)
 }
 const simulationCancellationHandler = ()=>{
+  setSimIsStarting(false)
   setSimIsRunning(false)
   setSimIsPaused(false)
   setSimIsComplete(false)
@@ -151,10 +161,12 @@ const userCountUpdateHandler = async ()=> {
     console.log("userCountUpdateHandler fired")
     setIsLoading(true)
     const usersCountResults = await fetchUserCount();
+    const userAverageDateCountResults = await fetchUserDateCountAverage()
     console.log("usersCountResults:  ", usersCountResults)
     const updatedAvailableUsersCountData = usersCountResults.data.available[0].available_user_count;
     const updatedWaitingUsersCountData = usersCountResults.data.waiting[0].waiting_user_count;
     const updatedTotalUsersCountData = usersCountResults.data.total[0].total_count;
+    const userAverageDateCountData = userAverageDateCountResults.data[0].average_matches;
     setIsLoading(false)
     if (!isLoading) {
       const updatedAvailableUsersCount = parseInt(updatedAvailableUsersCountData);
@@ -280,6 +292,9 @@ const dateLength =   dateDuration+bufferDuration
       <div className="apphead-container">
         <Header users={users} simIsComplete={simIsComplete} simIsPaused={simIsPaused} simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  totalPodCount={totalPodCount} occupiedPodCount={occupiedPodCount} totalUsersCount={totalUsersCount} availableUsersCount={availableUsersCount} totalMatchCount={totalMatchCount} activeMatchCount={activeMatchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
       </div>
+      <Button onClick={simCompletionHandler}>
+        simCompletionHandler
+        </Button>
     <Tabs
       defaultActiveKey="matchmaker"
       id="uncontrolled-tab-example"
@@ -290,6 +305,7 @@ const dateLength =   dateDuration+bufferDuration
       </Tab> */}
       <Tab eventKey="matchmaker" title="Matchmaker">
         <Matchmaker
+          simulationRunHandler={simulationRunHandler}
           sessionDuration={sessionDuration}
           sessionDurationChangeHandler={sessionDurationChangeHandler}
           simCompletionHandler={simCompletionHandler}
@@ -298,6 +314,7 @@ const dateLength =   dateDuration+bufferDuration
           pauseSimulation= {simulationPauseHandler}
           simIsComplete={simIsComplete}
           simIsRunning={simIsRunning}
+          simIsStarting={simIsStarting}
           simulationStartHandler={simulationStartHandler}
           elligibleUsers={elligibleUsers}
           dateDuration={dateLength}
@@ -312,7 +329,7 @@ const dateLength =   dateDuration+bufferDuration
         />
       </Tab>
       <Tab eventKey="userlist" title="User List" >
-        <UserInfo users={users} podCount={totalPodCount} userDeleteHandler={userDeleteHandler} userUpdateHandler={userUpdateHandler} podCountUpdateHandler={podCountUpdateHandler}/>
+        <UserInfo users={users} podCount={totalPodCount} userDeleteHandler={userDeleteHandler} userUpdateHandler={userUpdateHandler} podCountUpdateHandler={podCountUpdateHandler} userCountUpdateHandler={userCountUpdateHandler}/>
       </Tab>
     </Tabs>
     </div>

@@ -72,13 +72,9 @@ const deleteUser =  async (id)=>{
     return await axios.delete(`${PATH}/${id}`);
 };
 
-/* USERS DELETE */
-const deleteUsers =  async (usercount)=>{
-    return await axios.delete(`${PATH}/remove/${usercount}`);
-};
 
 const deleteAllUsers =  async ()=>{
     return await axios.delete(`${PATH}/removeall`);
 };
 
-export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers,fetchUserCount, fetchFinishedUserCount, fetchUnfinishedUserCount, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteUsers, deleteAllUsers}
+export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers,fetchUserCount, fetchFinishedUserCount, fetchUnfinishedUserCount, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteAllUsers}

@@ -314,6 +314,14 @@ router.get('/unfinished/:datecount/count', async(req,res)=>{
 	}
 });
 
+router.post('/simresults', async(req, res)=>{
+
+
+
+
+})
+
+
 /* CREATE user */
 router.post('/', async(req, res)=>{
 	try {
@@ -421,7 +429,7 @@ router.put('/:id', async(req,res)=>{
 });
 
 /* DELETE user by id */
-router.delete('/:id', async(req,res)=>{
+router.delete('remove/:id', async(req,res)=>{
   const {id} = req.params
 	try {
 		await db.query(
@@ -443,42 +451,12 @@ router.delete('/:id', async(req,res)=>{
 	}
 });
 
-/* DELETE selected number of users */
-router.delete('/remove/:usercount', async(req,res)=>{
-	try {
-		const {usercount} = req.params
-		await db.query(
-		`DELETE FROM users
-    WHERE id IN (
-        SELECT id
-        FROM (
-            SELECT id
-            FROM users
-            WHERE available = TRUE
-            ORDER BY id ASC
-            LIMIT $1
-        ) AS subquery
-    );`, [usercount]
-	);
-	res.status(200);
-  res.json({status: `${usercount} available users deleted`})
-	} catch (error) {
-		console.log("ERROR:  ", error.message)
-	}
-});
-
 /* DELETE All USERS */
 router.delete('/removeall', async(req,res)=>{
 	try {
 		await db.query(
 		`DELETE FROM users `
 	);
-  const postDeletionUsersResults = await db.query(
-    `
-    SELECT * from users;
-    `
-	);
-  const data = postDeletionUsersResults.rows;
 	res.status(200);
   res.json(data)
 	} catch (error) {

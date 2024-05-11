@@ -13,12 +13,15 @@ import {fetchMatchesData, createMatch } from "../../api/matches";
 import Button from "react-bootstrap/esm/Button";
 
 const Matchmaker = ({
+  simulationRunHandler,
+  sessionTimerStartHandler,
   sessionDuration,
   sessionDurationChangeHandler,
   simIsPaused,
   pauseSimulation,
   simIsComplete,
   simIsRunning,
+  simIsStarting,
   simulationStartHandler,
   simCompletionHandler,
   simResetHandler,
@@ -94,10 +97,24 @@ const Matchmaker = ({
     updateCounts()
   }, [currentMatches]);
 
+  useEffect(() => {
+    console.log("sim is running")
+    async function firstPull() {
+
+       generateMatchHandler().then(()=>  sessionTimerStartHandler())
+
+
+   }
+   if(simIsStarting===true){
+   return ()=>firstPull()
+   }
+  }, [simIsStarting]);
+
 
   /*--------LIFECYCLE ---------- */
   const runSimulation = () => {
-    simulationStartHandler()
+    console.log("AM I STARTING")
+    simulationRunHandler()
   };
 
 
@@ -129,7 +146,7 @@ const Matchmaker = ({
 
   return (
     <div className="matchmaker-tab">
-      <MatchToolBox sessionDuration={sessionDuration} sessionDurationChangeHandler={sessionDurationChangeHandler} simIsPaused={simIsPaused} pauseSimulation={pauseSimulation} simIsRunning={simIsRunning} runSimulation={runSimulation}  />
+      <MatchToolBox  sessionDuration={sessionDuration} sessionDurationChangeHandler={sessionDurationChangeHandler} simIsPaused={simIsPaused} pauseSimulation={pauseSimulation} simIsRunning={simIsRunning} runSimulation={runSimulation}  />
       <div className="matchmaker-buttonbox" styles={{display:"flex", flexDirection:"row"}}>
             <Button onClick={()=>generateMatchHandler()} >
             {( totalPodCount===0 ? "CURRENTLY NO PODS EXIST": currentMatches.length === Math.floor(totalPodCount/2)) ? "PODS ARE FULL" :" GENERATE MATCH"}
@@ -143,11 +160,6 @@ const Matchmaker = ({
             <Button onClick={simResetHandler} >
               RESET MATCHES
             </Button>
-        </div>
-        <div className ="matchmaker-infobox">
-            <p>
-              To
-            </p>
         </div>
         <div style={{display:"flex", flexWrap:"wrap"}}>
         </div>

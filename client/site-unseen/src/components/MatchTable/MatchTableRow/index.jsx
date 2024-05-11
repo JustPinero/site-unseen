@@ -50,12 +50,12 @@ console.log("started_at",started_at)
             <td id={dataColor}>{user1_username}</td>
             <td id={dataColor}>{user1_age}</td>
             <td id={dataColor}>{user1_gender}</td>
-            <td id={dataColor}>{user1_match_count}</td>
+            <td id={dataColor}>{user1_match_count-1}</td>
             <td id={dataColor}>{pod1_id}</td>
             <td id={dataColor}>{user2_username}</td>
             <td id={dataColor}>{user2_age}</td>
             <td id={dataColor}>{user2_gender}</td>
-            <td id={dataColor}>{user2_match_count}</td>
+            <td id={dataColor}>{user2_match_count-1}</td>
             <td id={dataColor}>{pod2_id}</td>
             <td id={dataColor}>{status}</td>
             <td id={dataColor}>{dateTimeLeft>0 ? dateTimeLeft : "Date Ending" }</td>

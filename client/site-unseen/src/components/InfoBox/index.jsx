@@ -5,7 +5,7 @@ const InfoBox = ({simIsComplete, simIsPaused, simIsRunning, totalUsersCount, ava
     activeMatchCount})=>{
     return(
         <div className="infobox-container">
-            <h5>Sim Info</h5>
+            <h3>Sim Info</h3>
             <p className="infobox-text">SIM STATUS:  {simIsComplete? "COMPLETE" : simIsRunning ?  "SIM IS RUNNING" : simIsPaused ? "SIM IS PAUSED" :"READY"}</p>
             <p className="infobox-text">USER COUNT : {totalUsersCount-availableUsersCount}/{totalUsersCount} (dating/total)</p>
             <p className="infobox-text"> FINISHED USER COUNT : {finishedUsersCount}</p>
