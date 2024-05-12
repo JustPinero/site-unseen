@@ -15,9 +15,6 @@ const PodManagmentTools = ({pods, podCountUpdateHandler, podCount })=>{
     const [podAdditionCount, setPodAdditionCount] = useState(1);
     const [podRemovalCount, setPodRemovalCount] = useState(1);
     const [isLoading, setIsLoading] = useState(false)
-    useEffect(() => {
-     podCountUpdateHandler()
-    }, [isLoading]);
 
     const PodAdditionChangeHandler = (e)=>{
         const update = parseInt(e.target.value);
@@ -41,21 +38,15 @@ const PodManagmentTools = ({pods, podCountUpdateHandler, podCount })=>{
 
     //SUBMISSION HANDLERS
     const PodRemovalSubmissionHandler = async ()=>{
-        setIsLoading(true)
-        await deletePods(podRemovalCount)
-        setIsLoading(false)
+        await deletePods(podRemovalCount).then(podCountUpdateHandler)
     }
 
     const PodAdditionSubmissionHandler = async (e)=>{
-        setIsLoading(true)
         await addPods(podAdditionCount)
-        setIsLoading(false)
     }
 
     const removeAllPodsButtonClickHandler = async (e)=>{
-        setIsLoading(true)
         await deleteAllPods()
-        setIsLoading(false)
     }
 
     return (

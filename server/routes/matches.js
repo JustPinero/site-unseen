@@ -200,6 +200,7 @@ router.post("/", async (req, res) => {
         );
         const vacantPodsIdResults = vacantPodResults.rows;
         const vacantPodsIds = vacantPodsIdResults.map((podData)=>(podData.id));
+        console.log("vacantPodsIds:  ", vacantPodsIds)
           //SELECT OPEN POD FOR USER
           const userPodID = vacantPodsIds[0];
           let user1ProspectData;

@@ -39,7 +39,8 @@ const BUFFERDURATION = 5;
 const DATEDURATION = 1;
 const DEFAULTDATECAP = 3;
 
-const App = () => {
+const App = ({socket}) => {
+  console.log("SOCKET:  ",socket )
   /*--------LOCAL STATE---------- */
   /*LOADING */
   const [isLoading, setIsLoading] = useState(false);
@@ -330,7 +331,7 @@ const App = () => {
   useEffect(() => {
     const progressSimulation = async ()=>{
       // console.log("SIM IS PROGRESSING")
-      // await fetchUserAndPodData()
+      await fetchUserAndPodData()
       await fetchAndSetMatches()
       await createMatch(dateMax)
       await checkForSimCompletion()
@@ -366,6 +367,21 @@ const App = () => {
   }, [simIsComplete]);
 
   /* ---------------LIFECYCLE-------------------------- */
+  /* ---------------SOCKET STUFF-------------------------- */
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    console.log(
+      "spocketID", 
+    socket
+    )
+      socket.emit('message', {
+        text: "flurby wurby derby",
+        socketID: socket.id,
+        data:"JINGLE BELLS"
+      });
+  };
+    /* ---------------SOCKET STUFF-------------------------- */
   const dateLength = dateDuration + bufferDuration;
   return (
     <div className="App">
@@ -393,7 +409,7 @@ const App = () => {
           userDateCountAverage={userDateCountAverage}
         />
       </div>
-      <Button onClick={simCompletionHandler}>simCompletionHandler</Button>
+      <Button onClick={handleSendMessage}>SOCKET CONNECTION</Button>
       <Tabs defaultActiveKey="matchmaker" id="tab-text">
         {/* <Tab eventKey="dashboard" title="Dashboard">
         <Dashboard users={users} matchQueue={matchQueue} pods={pods} availablePods={availablePods} />

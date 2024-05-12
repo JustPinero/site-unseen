@@ -38,10 +38,10 @@ const SimulationResultsSection = ({sectionData})=>{
             </div>
             <div className="simresults-subsection">
             {formattedSectionData.length ?
-                formattedSectionData?.map(entry=>{
+                formattedSectionData?.map((entry, index)=>{
                     const {statTitle, statData} = entry
                    return  (
-                   <div className="simresults-subsection_container">
+                   <div key={index} className="simresults-subsection_container">
                     <div className="simresults-subsection-header">
                         <h5>{statTitle}</h5>
                     </div>
@@ -49,7 +49,7 @@ const SimulationResultsSection = ({sectionData})=>{
                     {
                         statData.length ?
                         statData.map((entry)=>{
-                            return ( <SimulationResultsEntry entryData={entry}/>)
+                            return ( <SimulationResultsEntry key={entry.label} entryData={entry}/>)
                         })
                         :null
                     }

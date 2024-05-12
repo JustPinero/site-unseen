@@ -27,15 +27,11 @@ const getUsersWithDatesUnderThreshold = async (minDateThreshold) => {
 router.post("/status", async (req, res) => {
   const { minDateThreshold, maxDateThreshHold, maxDateDuration } = req.body;
   try {
-    console.log("GET SIM STATUS FIRED:  minDateThreshold, maxDateThreshHold, maxDateDuration ", minDateThreshold, maxDateThreshHold, maxDateDuration )
     let isSimComplete = false;
     // if max duration exceded
     const usersWithDatesUnderThreshold = await getUsersWithDatesUnderThreshold(minDateThreshold)
     const matchesInProgress = await getMatchesInProgress(maxDateDuration)
     const potentialMatches = await getPotentialMatches(maxDateThreshHold)
-    await console.log("NUMBER OF USERS WITH DATA UNDER THRESHHOLD", usersWithDatesUnderThreshold)
-    await console.log("NUMBER OF matchesInProgress", matchesInProgress.length)
-    await console.log("NUMBER OF potentialMatches", potentialMatches.length)
     // if all users have had min dates
     if (await usersWithDatesUnderThreshold.length < 1) {
       console.log("NUMBER OF USERS WITH DATA UNDER THRESHHOLD", usersWithDatesUnderThreshold.length)
