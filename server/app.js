@@ -6,11 +6,11 @@ const logger = require('morgan');
 const app = express();
 const http = require('http').Server(app);
 const cors = require("cors");
-const socketIO = require('socket.io')(http, {
-  cors: {
-      origin: "http://localhost:3000"
-  }
-});
+// const socketIO = require('socket.io')(http, {
+//   cors: {
+//       origin: "http://localhost:3000"
+//   }
+// });
 
 //ROUTERS
 const matchesRouter = require('./routes/matches');
@@ -35,21 +35,21 @@ app.use('/sim', simRouter);
 
 if( process.env.NODE_ENV === 'staging' || process.env.NODE_ENV === 'production'){
   //SOCKET CONNECTION
-  socketIO.on('connection', (socket) => {
-    console.log("New Client Connected!");
-    console.log(`⚡: ${socket.id} user just connected!`);
-    socket.on("message", data => {
-      console.log(data);
+  // socketIO.on('connection', (socket) => {
+  //   console.log("New Client Connected!");
+  //   console.log(`⚡: ${socket.id} user just connected!`);
+  //   socket.on("message", data => {
+  //     console.log(data);
 
-      // let interval = setInterval(()=> getSelPos(socket), 2000);
-  });
-  // const getSelPos = async(socket) =>{
-  //   console.log(" IAM WORKING")
-  // }
-    socket.on('disconnect', () => {
-      console.log('🔥: A user disconnected');
-    });
-  });
+  //     // let interval = setInterval(()=> getSelPos(socket), 2000);
+  // });
+  // // const getSelPos = async(socket) =>{
+  // //   console.log(" IAM WORKING")
+  // // }
+  //   socket.on('disconnect', () => {
+  //     console.log('🔥: A user disconnected');
+  //   });
+  // });
   app.get('*', (req, res)=>{
     res.sendFile(path.join(__dirname, '../client/site-unseen/build/index.html'))
   })

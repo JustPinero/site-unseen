@@ -39,8 +39,8 @@ const BUFFERDURATION = 5;
 const DATEDURATION = 1;
 const DEFAULTDATECAP = 3;
 
-const App = ({socket}) => {
-  console.log("SOCKET:  ",socket )
+const App = () => {
+  // console.log("SOCKET:  ",socket )
   /*--------LOCAL STATE---------- */
   /*LOADING */
   const [isLoading, setIsLoading] = useState(false);
@@ -369,18 +369,18 @@ const App = ({socket}) => {
   /* ---------------LIFECYCLE-------------------------- */
   /* ---------------SOCKET STUFF-------------------------- */
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    console.log(
-      "spocketID", 
-    socket
-    )
-      socket.emit('message', {
-        text: "flurby wurby derby",
-        socketID: socket.id,
-        data:"JINGLE BELLS"
-      });
-  };
+  // const handleSendMessage = (e) => {
+  //   e.preventDefault();
+  //   console.log(
+  //     "spocketID", 
+  //   socket
+  //   )
+  //     socket.emit('message', {
+  //       text: "flurby wurby derby",
+  //       socketID: socket.id,
+  //       data:"JINGLE BELLS"
+  //     });
+  // };
     /* ---------------SOCKET STUFF-------------------------- */
   const dateLength = dateDuration + bufferDuration;
   return (
@@ -409,7 +409,7 @@ const App = ({socket}) => {
           userDateCountAverage={userDateCountAverage}
         />
       </div>
-      <Button onClick={handleSendMessage}>SOCKET CONNECTION</Button>
+      {/* <Button onClick={handleSendMessage}>SOCKET CONNECTION</Button> */}
       <Tabs defaultActiveKey="matchmaker" id="tab-text">
         {/* <Tab eventKey="dashboard" title="Dashboard">
         <Dashboard users={users} matchQueue={matchQueue} pods={pods} availablePods={availablePods} />

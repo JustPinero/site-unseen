@@ -8,14 +8,14 @@ import reportWebVitals from './reportWebVitals';
 import './index.css';
 // const loc = window.location;
 // axios.defaults.baseURL = `${loc.protocol}//${loc.hostname}${loc.hostname === 'localhost' ? ':8080' : ''}`
-import socketIO from 'socket.io-client';
+// import socketIO from 'socket.io-client';
 
-const socket = socketIO.connect('http://localhost:5001');
+// const socket = socketIO.connect('http://localhost:5001');
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App socket={socket} />
+    <App />
   </React.StrictMode>
 );
 reportWebVitals();
