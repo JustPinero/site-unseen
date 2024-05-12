@@ -16,13 +16,11 @@ const PodManagmentTools = ({pods, podCountUpdateHandler, podCount })=>{
     const [podRemovalCount, setPodRemovalCount] = useState(1);
     const [isLoading, setIsLoading] = useState(false)
     useEffect(() => {
-        console.log("IS LOADING")
      podCountUpdateHandler()
     }, [isLoading]);
 
     const PodAdditionChangeHandler = (e)=>{
         const update = parseInt(e.target.value);
-        console.log("POD ADDITION UPDATE:  ", update)
         if(update<=1){
             setPodAdditionCount(1);
         }else{

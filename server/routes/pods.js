@@ -11,6 +11,7 @@ router.get('/', async(req,res)=>{
 	res.json(allPods.rows)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -24,6 +25,7 @@ router.get('/available', async(req,res)=>{
 		res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -47,6 +49,7 @@ router.get('/count', async(req,res)=>{
 		res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -61,6 +64,7 @@ router.get('/:id', async(req,res)=>{
 	res.json(data);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -79,6 +83,7 @@ router.post('/generate/:count', async(req, res)=>{
 	}
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -93,6 +98,7 @@ router.put('/:id', async(req,res)=>{
 	res.status(200);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -113,6 +119,7 @@ router.delete('/remove/:podcount', async(req,res)=>{
 	res.status(200);
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 
@@ -126,6 +133,7 @@ router.delete('/removeall', async(req,res)=>{
   res.json({message:`DELETED ALL pods`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+		throw error
 	}
 });
 

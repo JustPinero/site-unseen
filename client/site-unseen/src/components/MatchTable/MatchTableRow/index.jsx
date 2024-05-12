@@ -31,7 +31,6 @@ const MatchTableRow = ({ matchData, dateDuration})=>{
     let dataColor = styleId;
 
     const currentTimestamp = Date.now();
-console.log("started_at",started_at)
     // Get the specific timestamp in milliseconds (replace `specificTimestamp` with your timestamp)
     const specificTimestamp = new Date(started_at).getTime(); // example timestamp
 
@@ -41,7 +40,6 @@ console.log("started_at",started_at)
     // Convert the time difference from milliseconds to seconds
     const timeDifferenceSec = Math.floor(timeDifferenceMs / 1000);
 
-    console.log('Time difference in seconds:', timeDifferenceSec+dateDuration+1 );
 
     let dateTimeLeft = timeDifferenceSec+dateDuration
 

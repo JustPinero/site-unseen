@@ -314,11 +314,348 @@ router.get('/unfinished/:datecount/count', async(req,res)=>{
 	}
 });
 
+
+//USER SIMULATION RESULTS
 router.post('/simresults', async(req, res)=>{
+  try{
+  const {dateMax, dateMin} =req.body;
+  /* --------------------FINISHED USER TOTALS----------------------- */
+  const finishedTotalResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    GROUP BY u.id
+    HAVING COUNT(m.id) >= $1
+    ) AS subquery;
+`, [dateMin]
+);
+  const finishedMaleResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'male'
+    GROUP BY u.id
+    HAVING COUNT(m.id) >= $1
+    ) AS subquery;
+`, [dateMin]
+);
+const finishedFemaleResults = await db.query(
+  `
+  SELECT COUNT(*) AS user_count
+  FROM (
+  SELECT u.id
+  FROM users u
+  LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+  WHERE u.gender = 'female'
+  GROUP BY u.id
+  HAVING COUNT(m.id) >= $1
+  ) AS subquery;
+`, [dateMin]
+);
+const finishedNbResults = await db.query(
+  `
+  SELECT COUNT(*) AS user_count
+  FROM (
+  SELECT u.id
+  FROM users u
+  LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+  WHERE u.gender = 'non-binary'
+  GROUP BY u.id
+  HAVING COUNT(m.id) >= $1
+  ) AS subquery;
+`, [dateMin]
+);
+/* --------------------UNFINISHED USER TOTALS----------------------- */
+  const unfinishedTotalResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    GROUP BY u.id
+    HAVING COUNT(m.id) < $1
+    ) AS subquery;
+`, [dateMin]
+);
+  const unfinishedMaleResults = await db.query(
+    `
+    SELECT COUNT(*) AS user_count
+    FROM (
+    SELECT u.id
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'male'
+    GROUP BY u.id
+    HAVING COUNT(m.id) < $1
+    ) AS subquery;
+`, [dateMin]
+);
+const unfinishedFemaleResults = await db.query(
+  `
+  SELECT COUNT(*) AS user_count
+  FROM (
+  SELECT u.id
+  FROM users u
+  LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+  WHERE u.gender = 'female'
+  GROUP BY u.id
+  HAVING COUNT(m.id) < $1
+  ) AS subquery;
+`, [dateMin]
+);
+const unfinishedNbResults = await db.query(
+  `
+  SELECT COUNT(*) AS user_count
+  FROM (
+  SELECT u.id
+  FROM users u
+  LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+  WHERE u.gender = 'non-binary'
+  GROUP BY u.id
+  HAVING COUNT(m.id) < $1
+  ) AS subquery;
+`, [dateMin]
+);
+
+/* --------------------SIM DETAILS----------------------- */
+//MALE
+const maleDetailsResults = await db.query(
+  `
+SELECT
+    u.gender,
+    u.sexual_pref,
+    COUNT(DISTINCT u.id) AS male_user_count,
+    COUNT(m.id) AS match_count,
+    max_min_avg_match_counts.max_match_count,
+    max_min_avg_match_counts.min_match_count,
+    max_min_avg_match_counts.avg_match_count
+FROM
+    users u
+LEFT JOIN
+    matches m ON u.id = m.user1_id OR u.id = m.user2_id
+LEFT JOIN
+    (
+        SELECT
+            u.gender,
+            u.sexual_pref,
+            MAX(sub_matches.match_count) AS max_match_count,
+            MIN(sub_matches.match_count) AS min_match_count,
+            AVG(sub_matches.match_count) AS avg_match_count
+        FROM
+            users u
+        LEFT JOIN
+            (
+                SELECT
+                    user1_id AS user_id,
+                    COUNT(id) AS match_count
+                FROM
+                    matches
+                GROUP BY
+                    user1_id
+
+                UNION ALL
+
+                SELECT
+                    user2_id AS user_id,
+                    COUNT(id) AS match_count
+                FROM
+                    matches
+                GROUP BY
+                    user2_id
+            ) AS sub_matches ON u.id = sub_matches.user_id
+        WHERE
+            u.gender = 'male'
+        GROUP BY
+            u.gender,
+            u.sexual_pref
+    ) AS max_min_avg_match_counts ON u.gender = max_min_avg_match_counts.gender AND u.sexual_pref = max_min_avg_match_counts.sexual_pref
+WHERE
+    u.gender = 'male'
+GROUP BY
+    u.gender,
+    u.sexual_pref,
+    max_min_avg_match_counts.max_match_count,
+    max_min_avg_match_counts.min_match_count,
+    max_min_avg_match_counts.avg_match_count;
+`
+);
+
+//FEMALE USERS
+const femaleDetailsResults = await db.query(
+  `
+SELECT
+    u.gender,
+    u.sexual_pref,
+    COUNT(DISTINCT u.id) AS female_user_count,
+    COUNT(m.id) AS match_count,
+    max_min_avg_match_counts.max_match_count,
+    max_min_avg_match_counts.min_match_count,
+    max_min_avg_match_counts.avg_match_count
+FROM
+    users u
+LEFT JOIN
+    matches m ON u.id = m.user1_id OR u.id = m.user2_id
+LEFT JOIN
+    (
+        SELECT
+            u.gender,
+            u.sexual_pref,
+            MAX(sub_matches.match_count) AS max_match_count,
+            MIN(sub_matches.match_count) AS min_match_count,
+            AVG(sub_matches.match_count) AS avg_match_count
+        FROM
+            users u
+        LEFT JOIN
+            (
+                SELECT
+                    user1_id AS user_id,
+                    COUNT(id) AS match_count
+                FROM
+                    matches
+                GROUP BY
+                    user1_id
+
+                UNION ALL
+
+                SELECT
+                    user2_id AS user_id,
+                    COUNT(id) AS match_count
+                FROM
+                    matches
+                GROUP BY
+                    user2_id
+            ) AS sub_matches ON u.id = sub_matches.user_id
+        WHERE
+            u.gender = 'female'
+        GROUP BY
+            u.gender,
+            u.sexual_pref
+    ) AS max_min_avg_match_counts ON u.gender = max_min_avg_match_counts.gender AND u.sexual_pref = max_min_avg_match_counts.sexual_pref
+WHERE
+    u.gender = 'female'
+GROUP BY
+    u.gender,
+    u.sexual_pref,
+    max_min_avg_match_counts.max_match_count,
+    max_min_avg_match_counts.min_match_count,
+    max_min_avg_match_counts.avg_match_count;
 
 
+`
+);
+
+//NON-BINARY USERS
+const nonbinaryDetailsResults = await db.query(
+  `
+SELECT
+    u.gender,
+    u.sexual_pref,
+    COUNT(DISTINCT u.id) AS nb_user_count,
+    COUNT(m.id) AS match_count,
+    max_min_avg_match_counts.max_match_count,
+    max_min_avg_match_counts.min_match_count,
+    max_min_avg_match_counts.avg_match_count
+FROM
+    users u
+LEFT JOIN
+    matches m ON u.id = m.user1_id OR u.id = m.user2_id
+LEFT JOIN
+    (
+        SELECT
+            u.gender,
+            u.sexual_pref,
+            MAX(sub_matches.match_count) AS max_match_count,
+            MIN(sub_matches.match_count) AS min_match_count,
+            AVG(sub_matches.match_count) AS avg_match_count
+        FROM
+            users u
+        LEFT JOIN
+            (
+                SELECT
+                    user1_id AS user_id,
+                    COUNT(id) AS match_count
+                FROM
+                    matches
+                GROUP BY
+                    user1_id
+
+                UNION ALL
+
+                SELECT
+                    user2_id AS user_id,
+                    COUNT(id) AS match_count
+                FROM
+                    matches
+                GROUP BY
+                    user2_id
+            ) AS sub_matches ON u.id = sub_matches.user_id
+        WHERE
+            u.gender = 'non-binary'
+        GROUP BY
+            u.gender,
+            u.sexual_pref
+    ) AS max_min_avg_match_counts ON u.gender = max_min_avg_match_counts.gender AND u.sexual_pref = max_min_avg_match_counts.sexual_pref
+WHERE
+    u.gender = 'non-binary'
+GROUP BY
+    u.gender,
+    u.sexual_pref,
+    max_min_avg_match_counts.max_match_count,
+    max_min_avg_match_counts.min_match_count,
+    max_min_avg_match_counts.avg_match_count;
 
 
+`
+);
+//FINISHED
+const finishedMaleData = finishedMaleResults.rows;
+const finishedFemaleData = finishedFemaleResults.rows;
+const finishedNbData = finishedNbResults.rows;
+const finishedTotalData = finishedTotalResults.rows
+//UNFINISHED
+const unfinishedMaleData = unfinishedMaleResults.rows;
+const unfinishedFemaleData = unfinishedFemaleResults.rows;
+const unfinishedNbData = unfinishedNbResults.rows;
+const unfinishedTotalData = unfinishedTotalResults.rows
+//DETAILS
+const maleDetailsData = maleDetailsResults.rows
+const femaleDetailsData = femaleDetailsResults.rows
+const nonBinaryDetailsData = nonbinaryDetailsResults.rows
+
+/*--------------PAYLOAD---------------*/
+
+const data ={
+  finished:{
+    male:finishedMaleData,
+    female: finishedFemaleData,
+    nb: finishedNbData,
+    total:finishedTotalData
+  },
+  unfinished:{
+    male:unfinishedMaleData,
+    female: unfinishedFemaleData,
+    nb: unfinishedNbData,
+    total:unfinishedTotalData
+  },
+  details:{
+    male:maleDetailsData,
+    female: femaleDetailsData,
+    nb: nonBinaryDetailsData,
+  },
+};
+console.log("data: ", data)
+res.status(200).json(data)
+} catch (error) {
+  console.log("ERROR:  ", error.message)
+  throw error
+}
 })
 
 
@@ -334,6 +671,7 @@ router.post('/', async(req, res)=>{
   res.json({status: `new user created`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+    throw error
 	}
 });
 
@@ -408,6 +746,7 @@ router.post('/generate', async(req, res)=>{
     res.json({status: `NEW USER GENERATED`})
 } catch (error) {
   console.log("ERROR:  ", error.message)
+  throw error;
 }
 });
 
@@ -425,6 +764,7 @@ router.put('/:id', async(req,res)=>{
   res.json({status: `user ${id} updated`})
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+    throw error;
 	}
 });
 
@@ -448,6 +788,7 @@ router.delete('remove/:id', async(req,res)=>{
   res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+    throw error;
 	}
 });
 
@@ -461,6 +802,7 @@ router.delete('/removeall', async(req,res)=>{
   res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
+    throw err
 	}
 });
 

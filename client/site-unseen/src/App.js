@@ -1,12 +1,12 @@
 /* REACT */
-import {useState, useEffect} from "react"
+import { useState, useEffect } from "react";
 
 /* STYLES */
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 /* BOOTSTRAP COMPONENTS */
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
 import Button from "react-bootstrap/esm/Button.js";
 /* COMPONENTS */
 import Header from "./components/Header/index.jsx";
@@ -15,325 +15,418 @@ import Matchmaker from "./pages/Matchmaker";
 import UserInfo from "./pages/UserInfo";
 
 /* API */
-import {fetchUsers, fetchElligibleUsers, fetchUserCount, fetchUserDateCountAverage, fetchFinishedUsers, deleteUser} from "./api/users";
-import {fetchPods,fetchPodsCount, addPods } from "./api/pods.js";
-import { fetchMatches, fetchMatchCount, deleteMatches } from "./api/matches.js";
+import {
+  fetchUsers,
+  fetchElligibleUsers,
+  fetchUserCount,
+  fetchUserDateCountAverage,
+  fetchFinishedUsers,
+  fetchUserSimResults,
+  deleteUser,
+} from "./api/users";
+import { fetchPods, fetchPodsCount, addPods } from "./api/pods.js";
+import {
+  fetchMatchesData,
+  fetchMatchCount,
+  createMatch,
+  deleteMatches,
+} from "./api/matches.js";
+import { fetchSimStatus } from "./api/sim.js";
 
 /* DEFAULT VALUES */
 
 const BUFFERDURATION = 5;
 const DATEDURATION = 1;
-const DEFAULTDATECAP = 3
+const DEFAULTDATECAP = 3;
 
-
-const App = ()=> {
+const App = () => {
   /*--------LOCAL STATE---------- */
   /*LOADING */
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   /* SIMULATION */
   const [simIsStarting, setSimIsStarting] = useState(false);
   const [simIsRunning, setSimIsRunning] = useState(false);
   const [simIsPaused, setSimIsPaused] = useState(false);
   const [simIsComplete, setSimIsComplete] = useState(false);
+  const [simResultsData, setSimResultsData] =useState(null);
   /* Session Time */
-  const [sessionDuration, setSessionDuration]= useState(0);
+  const [sessionDuration, setSessionDuration] = useState(0);
   /* DATES */
-  const [bufferDuration, setBufferDuration]= useState(BUFFERDURATION);
-  const [dateDuration, setDateDuration]= useState(DATEDURATION);
-  const [dateCap, setDateCap] = useState(DEFAULTDATECAP)
+  const [bufferDuration, setBufferDuration] = useState(BUFFERDURATION);
+  const [dateDuration, setDateDuration] = useState(DATEDURATION);
+  const [dateMax, setDateMax] = useState(DEFAULTDATECAP);
+  const [dateMin, setDateMin] = useState(DEFAULTDATECAP);
   /* USERS */
   const [users, setUsers] = useState([]);
-  const [elligibleUsers, setElligibleUsers] = useState([])
+  const [elligibleUsers, setElligibleUsers] = useState([]);
   //COUNT
-  const [availableUsersCount, setAvailableUsersCount] = useState(0)
-  const [waitingUsersCount, setWaitingUsersCount] = useState(0)
-  const [totalUsersCount, setTotalUsersCount] = useState(0)
-  const [finishedUsersCount, setFinishedUsersCount] = useState(0)
-  const [userDateCountAverage, setUserDateCountAverage] = useState(0)
+  const [availableUsersCount, setAvailableUsersCount] = useState(0);
+  const [waitingUsersCount, setWaitingUsersCount] = useState(0);
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const [finishedUsersCount, setFinishedUsersCount] = useState(0);
+  const [userDateCountAverage, setUserDateCountAverage] = useState(0);
   /* PODS */
-  const [totalPodCount, setTotalPodCount] = useState(0)
-  const [availablePodCount, setAvailablePodCount] = useState(0)
-  const [occupiedPodCount, setOccupiedPodCount] = useState(0)
+  const [totalPodCount, setTotalPodCount] = useState(0);
+  const [availablePodCount, setAvailablePodCount] = useState(0);
+  const [occupiedPodCount, setOccupiedPodCount] = useState(0);
   /* MATCHES */
+  const [matchesInProgress, setMatchesInProgress] = useState([]);
   const [totalMatchCount, setTotalMatchCount] = useState(0);
-  const [activeMatchCount, setActiveMatchCount] = useState(0)
-  const [completedMatchCount, setCompletedMatchCount] =useState(0)
-  
-/* ----------LOCAL STATE------------- */
+  const [activeMatchCount, setActiveMatchCount] = useState(0);
+  const [completedMatchCount, setCompletedMatchCount] = useState(0);
 
-/* ---------------STATE DEPENDANT VARIABLES FORMATTED DATA AND METRICS-------------------------- */
-/* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
+  /* ----------LOCAL STATE------------- */
 
-/* --------------------HANDLERS------------- */
-/* ----------SIMULATION------------- */
-const simulationStartHandler = ()=>{
-  setSimIsStarting(true)
-  setSimIsRunning(false)
-  setSimIsPaused(false)
-  setSimIsComplete(false)
-}
-const simulationRunHandler = ()=>{
-  setSimIsStarting(true)
-  setSimIsRunning(true)
-  setSimIsPaused(false)
-  setSimIsComplete(false)
-}
-const simulationPauseHandler = ()=>{
-  setSimIsRunning(false)
-  setSimIsPaused(true)
-}
-const simulationCancellationHandler = ()=>{
-  setSimIsStarting(false)
-  setSimIsRunning(false)
-  setSimIsPaused(false)
-  setSimIsComplete(false)
-}
-const simCompletionHandler = ()=>{
-  setSimIsComplete(true)
-  setSimIsRunning(false)
-  setSimIsPaused(false)
-}
+  /* ---------------STATE DEPENDANT VARIABLES FORMATTED DATA AND METRICS-------------------------- */
+  /* ---------------STATE DEPENDANT FORMATTED DATA AND METRICS-------------------------- */
 
-const simCompletionCheckerHandler = async ()=>{
-  try {
-   if(simIsRunning && !elligibleUsers){
-    if(!activeMatchCount){
-      simCompletionHandler()
+  /* --------------------HANDLERS------------- */
+  /* ----------SIMULATION------------- */
+  //*
+  const simulationStartHandler = () => {
+    setSimIsStarting(true);
+    setSimIsRunning(false);
+    setSimIsPaused(false);
+    setSimIsComplete(false);
+  };
+  const simulationRunHandler = () => {
+    setSimIsStarting(true);
+    setSimIsRunning(true);
+    setSimIsPaused(false);
+    setSimIsComplete(false);
+  };
+  //*
+  const simulationPauseHandler = () => {
+    setSimIsRunning(false);
+    setSimIsPaused(true);
+  };
+  //*
+  const simulationCancellationHandler = () => {
+    setSimIsStarting(false);
+    setSimIsRunning(false);
+    setSimIsPaused(false);
+    setSimIsComplete(false);
+  };
+  const simCompletionHandler = () => {
+    setSimIsComplete(true);
+    setSimIsRunning(false);
+    setSimIsPaused(false);
+    setSimIsStarting(false);
+  };
+
+
+  const simResetHandler = async () => {
+      await deleteMatches();
+      await matchCountUpdateHandler();
+      await podCountUpdateHandler();
+      await setSessionDuration(0);
+      await simulationCancellationHandler();
+  };
+
+  /* ----------SIMULATION------------- */
+
+  /* --------------------USERS-------------*/
+  const userUpdateHandler = async () => {
+    try {
+      setIsLoading(true);
+      const userResults = await fetchUsers();
+      const elligibleUsersResults = await fetchElligibleUsers(dateMin);
+      setIsLoading(false);
+      if (!isLoading) {
+        const updatedUserData = userResults.data;
+        const updatedElligibleUsersData = elligibleUsersResults.data;
+        setUsers(updatedUserData);
+        setElligibleUsers(updatedElligibleUsersData);
+      }
+    } catch (error) {
+      console.log("ERROR:  ", error);
+      throw error
     }
-   }
-  } catch (error) {
-    console.log("error:  ", error)
-  }
-}
-const simResetHandler = async()=>{
-  try {
-    setIsLoading(true);
-    await deleteMatches()
-    await matchCountUpdateHandler()
-    await podCountUpdateHandler()
-    setIsLoading(false);
-    if(!isLoading){
-      setSessionDuration(0)
-      simulationCancellationHandler()
+  };
+  const userDeleteHandler = async (id) => {
+    try {
+      console.log("DELETEY", id);
+      setIsLoading(true);
+      await deleteUser(id);
+      await userUpdateHandler();
+      setIsLoading(false);
+    } catch (err) {
+      console.log("ERROR:  ", err);
+      throw err
     }
-  } catch (err) {
-    console.log("ERROR:  ", err)
-  }
-}
+  };
 
-/* ----------SIMULATION------------- */
-
-/* --------------------USERS-------------*/
-const userUpdateHandler = async ()=>{
-  try {
-    setIsLoading(true)
-    const userResults = await fetchUsers();
-    const elligibleUsersResults = await fetchElligibleUsers(dateCap);
-    const finishedUserResults = await fetchFinishedUsers(dateCap);
-    setIsLoading(false)
-    if(!isLoading){
-      const updatedUserData = userResults.data;
-      const updatedElligibleUsersData= elligibleUsersResults.data
-      const finishedUserData = finishedUserResults.data;
-      setUsers(updatedUserData)
-      setElligibleUsers(updatedElligibleUsersData)
-      // setFinishedUsersCount()
+  const userCountUpdateHandler = async () => {
+    try {
+      console.log("userCountUpdateHandler fired");
+      setIsLoading(true);
+      const usersCountResults = await fetchUserCount();
+      const userAverageDateCountResults = await fetchUserDateCountAverage();
+      console.log("usersCountResults:  ", usersCountResults);
+      const updatedAvailableUsersCountData =
+        usersCountResults.data.available[0].available_user_count;
+      const updatedWaitingUsersCountData =
+        usersCountResults.data.waiting[0].waiting_user_count;
+      const updatedTotalUsersCountData =
+        usersCountResults.data.total[0].total_count;
+      const userAverageDateCountData =
+        userAverageDateCountResults.data[0].average_matches;
+      setIsLoading(false);
+      if (!isLoading) {
+        const updatedAvailableUsersCount = parseInt(
+          updatedAvailableUsersCountData
+        );
+        const updatedWaitingUsersCount = parseInt(updatedWaitingUsersCountData);
+        const updatedTotalUsersCount = parseInt(updatedTotalUsersCountData);
+        setAvailableUsersCount(updatedAvailableUsersCount);
+        setWaitingUsersCount(updatedWaitingUsersCount);
+        setTotalUsersCount(updatedTotalUsersCount);
+      }
+    } catch (err) {
+      console.log("ERROR:  ", err);
+      throw err
     }
-  } catch (error) {
-    console.log("ERROR:  ", error)
-  }
-}
-const userDeleteHandler = async (id)=> {
-  try{
-    console.log("DELETEY", id)
-    setIsLoading(true)
-      await deleteUser(id)
-      await userUpdateHandler()
-    setIsLoading(false)
-  }
-  catch(err){
-    console.log("ERROR:  ", err)
-  }
-}
-
-const userCountUpdateHandler = async ()=> {
-  try{
-    console.log("userCountUpdateHandler fired")
-    setIsLoading(true)
-    const usersCountResults = await fetchUserCount();
-    const userAverageDateCountResults = await fetchUserDateCountAverage()
-    console.log("usersCountResults:  ", usersCountResults)
-    const updatedAvailableUsersCountData = usersCountResults.data.available[0].available_user_count;
-    const updatedWaitingUsersCountData = usersCountResults.data.waiting[0].waiting_user_count;
-    const updatedTotalUsersCountData = usersCountResults.data.total[0].total_count;
-    const userAverageDateCountData = userAverageDateCountResults.data[0].average_matches;
-    setIsLoading(false)
-    if (!isLoading) {
-      const updatedAvailableUsersCount = parseInt(updatedAvailableUsersCountData);
-      const updatedWaitingUsersCount = parseInt(updatedWaitingUsersCountData);
-      const updatedTotalUsersCount = parseInt(updatedTotalUsersCountData);
-      setAvailableUsersCount(updatedAvailableUsersCount)
-      setWaitingUsersCount(updatedWaitingUsersCount);
-      setTotalUsersCount(updatedTotalUsersCount);
+  };
+  /* --------------------USERS------------- */
+  /* ----------PODS-------------*/
+  const podCountUpdateHandler = async () => {
+    try {
+      setIsLoading(true);
+      const podCountResults = await fetchPodsCount();
+      const updatedOccupiedPodCountData =
+        podCountResults.data.occupiedPodCount[0].occupied_pod_count;
+      const updatedAvailablePodCountData =
+        podCountResults.data.availablePodCount[0].available_pod_count;
+      const updatedTotalPodCountData =
+        podCountResults.data.totalPodCount[0].total_pod_count;
+      setIsLoading(false);
+      if (!isLoading) {
+        const updatedAvailablePodCount = parseInt(updatedAvailablePodCountData);
+        const updatedOccupiedPodCount = parseInt(updatedOccupiedPodCountData);
+        const updatedTotalPodCount = parseInt(updatedTotalPodCountData);
+        setTotalPodCount(updatedTotalPodCount);
+        setOccupiedPodCount(updatedOccupiedPodCount);
+        setAvailablePodCount(updatedAvailablePodCount);
+      }
+    } catch (err) {
+      console.log("INITIAL LOAD FAILED:  ", err);
+      throw err
     }
-  }
-  catch(err){
-    console.log("ERROR:  ", err)
-  }
-}
-/* --------------------USERS------------- */
-/* ----------PODS-------------*/
-const podCountUpdateHandler = async ()=>{
-  try{
-    setIsLoading(true)
-    const podCountResults = await fetchPodsCount();
-    const updatedOccupiedPodCountData = podCountResults.data.occupiedPodCount[0].occupied_pod_count;
-    const updatedAvailablePodCountData = podCountResults.data.availablePodCount[0].available_pod_count;
-    const updatedTotalPodCountData = podCountResults.data.totalPodCount[0].total_pod_count;
-    setIsLoading(false)
-    if (!isLoading) {
-      const updatedAvailablePodCount = parseInt(updatedAvailablePodCountData);
-      const updatedOccupiedPodCount = parseInt(updatedOccupiedPodCountData);
-      const updatedTotalPodCount = parseInt(updatedTotalPodCountData);
-      setTotalPodCount(updatedTotalPodCount);
-      setOccupiedPodCount(updatedOccupiedPodCount);
-      setAvailablePodCount(updatedAvailablePodCount);
+  };
+  /* ----------PODS------------- */
+  /* ----------MATCHES------------- */
+  const matchCountUpdateHandler = async () => {
+    try {
+      setIsLoading(true);
+      const matchCountResults = await fetchMatchCount();
+      const finishedUserResults = await fetchFinishedUsers(dateMin);
+      const userDateCountAverageResults = await fetchUserDateCountAverage();
+      setIsLoading(false);
+      if (!isLoading) {
+        const updatedActiveMatchCountData =
+          matchCountResults.data.currentMatchesCount[0].current_match_count;
+        const updatedCompletedMatchCountData =
+          matchCountResults.data.completedMatchesCount[0].complete_match_count;
+        const updatedTotalMatchCountData =
+          matchCountResults.data.totalMatchesCount[0].total_match_count;
+
+        setActiveMatchCount(updatedActiveMatchCountData);
+        setCompletedMatchCount(updatedCompletedMatchCountData);
+        setTotalMatchCount(updatedTotalMatchCountData);
+        setFinishedUsersCount(finishedUserResults.data.length);
+        setUserDateCountAverage(
+          userDateCountAverageResults.data[0].average_matches
+        );
+      }
+    } catch (err) {
+      console.log("ERROR:  ", err);
+      throw err
     }
-  }
-  catch(err){
-    console.log("INITIAL LOAD FAILED:  ", err)
-  }
-}
-/* ----------PODS------------- */
-/* ----------MATCHES------------- */
-const matchCountUpdateHandler = async ()=>{
-  try{
-    setIsLoading(true);
-    const matchCountResults = await fetchMatchCount();
-    const finishedUserResults = await fetchFinishedUsers(dateCap);
-    const userDateCountAverageResults = await fetchUserDateCountAverage();
-    setIsLoading(false);
-    if(!isLoading){
-      const updatedActiveMatchCountData = matchCountResults.data.currentMatchesCount[0].current_match_count;
-      const updatedCompletedMatchCountData = matchCountResults.data.completedMatchesCount[0].complete_match_count;
-      const updatedTotalMatchCountData = matchCountResults.data.totalMatchesCount[0].total_match_count;
+  };
 
-      setActiveMatchCount(updatedActiveMatchCountData)
-      setCompletedMatchCount(updatedCompletedMatchCountData)
-      setTotalMatchCount(updatedTotalMatchCountData)
-      setFinishedUsersCount(finishedUserResults.data.length)
-      setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
-    }
-  }
-  catch(err){
-    console.log("ERROR:  ", err)
-  }
-}
+  /* ----------MATCHES------------- */
 
-/* ----------MATCHES------------- */
-/* ----------SESSION DURATION------------- */
-const sessionDurationChangeHandler = (updatedSessionTime)=>{
-  setSessionDuration(updatedSessionTime)
-}
-/* ----------SESSION DURATION------------- */
-/* ----------EVENT CONDITION CHANGE------------- */
-const bufferDurationChangeHandler = (e)=>{
-  let updatedBufferDuration = e.target.value
-  updatedBufferDuration=parseInt(updatedBufferDuration)
-  setBufferDuration(updatedBufferDuration)
-}
-const dateDurationChangeHandler = (e)=>{
-  let updatedDateDuration= e.target.value
-  updatedDateDuration=parseInt(updatedDateDuration)
-  setDateDuration(updatedDateDuration)
-}
+  /* ----------EVENT CONDITION CHANGE------------- */
+  const bufferDurationChangeHandler = (e) => {
+    let updatedBufferDuration = e.target.value;
+    updatedBufferDuration = parseInt(updatedBufferDuration);
+    setBufferDuration(updatedBufferDuration);
+  };
+  const dateDurationChangeHandler = (e) => {
+    let updatedDateDuration = e.target.value;
+    updatedDateDuration = parseInt(updatedDateDuration);
+    setDateDuration(updatedDateDuration);
+  };
 
-const dateCapChangeHandler = (e)=>{
-  let updatedMinimumDateAmount= e.target.value
-  setDateCap(updatedMinimumDateAmount)
-}
-/* ----------EVENT CONDITION CHANGE------------- */
-/* --------------------HANDLERS------------- */
-//   /* ---------------LIFECYCLE-------------------------- */
-/* --------INIT-------- */
-useEffect(()=>{
-  async function startFetching() {
-    try{
-    setIsLoading(true)
-    const userResults = await fetchUsers();
-    const finishedUserResults = await fetchFinishedUsers(dateCap);
-    await userCountUpdateHandler()
-    await podCountUpdateHandler()
-
-    const matchResults = await fetchMatches();
-    const userDateCountAverageResults = await fetchUserDateCountAverage();
-    setIsLoading(false)
-    if (!isLoading) {
-      setUsers(userResults.data);
-      setTotalMatchCount(matchResults.data.length)
-      setFinishedUsersCount(finishedUserResults.data.length)
-      setUserDateCountAverage(userDateCountAverageResults.data[0].average_matches)
-    }
-  }
-  catch(err){
-    console.log("INITIAL LOAD FAILED:  ", err)
-  }
-}
-  startFetching();
-},[])
-
-
+  const dateMinChangeHandler = (e) => {
+    let updatedMinimumDateAmount = e.target.value;
+    setDateMin(updatedMinimumDateAmount);
+  };
+  const dateMaxChangeHandler = (e) => {
+    let updatedMaximumDateAmount = e.target.value;
+    setDateMax(updatedMaximumDateAmount);
+  };
+  /* ----------EVENT CONDITION CHANGE------------- */
+  /* --------------------HANDLERS------------- */
+  /* ---------------LIFECYCLE-------------------------- */
   /* --------INIT-------- */
 
-/* ---------------LIFECYCLE-------------------------- */
-const dateLength =   dateDuration+bufferDuration
+  async function fetchUserAndPodData() {
+    try {
+      fetchUsers().then((userResults) => setUsers(userResults.data));
+      fetchFinishedUsers(dateMin).then((finishedUserResults) =>
+        setFinishedUsersCount(finishedUserResults.data.length)
+      );
+      userCountUpdateHandler();
+      podCountUpdateHandler();
+      fetchUserDateCountAverage().then((userDateCountAverageResults) =>
+        setUserDateCountAverage(
+          userDateCountAverageResults.data[0].average_matches
+        )
+      );
+    } catch (err) {
+      console.log("INITIAL LOAD FAILED:  ", err);
+      throw err;
+    }
+  }
+
+  useEffect(() => {
+    fetchUserAndPodData();
+  }, []);
+  /* --------INIT-------- */
+  /* --------SESSION DURATION TRACKER-------- */
+  useEffect(() => {
+    let interval;
+    if (simIsRunning) {
+      interval = setInterval(() => {
+        setSessionDuration((seconds) => seconds + 1);
+      }, 1000);
+    } else if (simIsPaused) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [simIsRunning]);
+  /* --------SESSION DURATION TRACKER-------- */
+
+  const fetchAndSetMatches = async () => {
+    console.log("FETCH AND SET MATCHES FIRED")
+    const updatedMatchesInProgressResults = await fetchMatchesData(
+      dateDuration + bufferDuration
+    );
+    console.log("updatedCurrentResults:  ", updatedMatchesInProgressResults);
+    const updatedMatchesInProgress = await updatedMatchesInProgressResults.data;
+    console.log("updatedCurrent:  ", updatedMatchesInProgress);
+    await setMatchesInProgress(updatedMatchesInProgress);
+  };
+
+
+  const checkForSimCompletion = async ()=>{
+    const updatedSimStatus = await fetchSimStatus(dateMin, dateMax, dateDuration + bufferDuration)
+    console.log("updatedSimStatus:  ", updatedSimStatus.data.simStatus)
+    await setSimIsComplete(updatedSimStatus.data.simStatus)
+  }
+
+  /* sim loop */
+  useEffect(() => {
+    const progressSimulation = async ()=>{
+      // console.log("SIM IS PROGRESSING")
+      // await fetchUserAndPodData()
+      await fetchAndSetMatches()
+      await createMatch(dateMax)
+      await checkForSimCompletion()
+      // console.log("SIM IS PROGRESSED")
+    }
+    console.log("SESSION MOVING")
+    progressSimulation()
+    // Promise.all([
+    //   fetchUserAndPodData(),
+    //   createMatch(dateMax).then(fetchAndSetMatches()),
+    //   checkForSimCompletion(),
+    // ])
+    //   .then(fetchSimStatus(dateMin, dateMax, dateDuration + bufferDuration))
+    //   .then((result) => {
+    //     console.log("SIMSTATUS:  ", result)
+    //     console.log("SIMSTATUS:  ", result.data)
+    //     setSimIsComplete(result.data.simStatus)
+    //   }
+    //   );
+  }, [sessionDuration]);
+
+
+  const fetchAndSetSimResultsData = async ()=>{
+    const simulationResults = await fetchUserSimResults(dateMin, dateMax)
+    console.log("Sim Results:  ", simulationResults)
+    await setSimResultsData(simulationResults)
+}
+  useEffect(() => {
+    if(simIsComplete){
+      fetchAndSetSimResultsData()
+      simCompletionHandler()
+    }
+  }, [simIsComplete]);
+
+  /* ---------------LIFECYCLE-------------------------- */
+  const dateLength = dateDuration + bufferDuration;
   return (
     <div className="App">
       <div className="apphead-container">
-        <Header users={users} simIsComplete={simIsComplete} simIsPaused={simIsPaused} simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}  totalPodCount={totalPodCount} occupiedPodCount={occupiedPodCount} totalUsersCount={totalUsersCount} availableUsersCount={availableUsersCount} totalMatchCount={totalMatchCount} activeMatchCount={activeMatchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage}/>
+        <Header
+          users={users}
+          simIsComplete={simIsComplete}
+          simIsPaused={simIsPaused}
+          simIsRunning={simIsRunning}
+          dateMin={dateMin}
+          dateMax={dateMax}
+          dateMinChangeHandler={dateMinChangeHandler}
+          dateMaxChangeHandler={dateMaxChangeHandler}
+          bufferDuration={bufferDuration}
+          bufferDurationChangeHandler={bufferDurationChangeHandler}
+          dateDuration={dateDuration}
+          dateDurationChangeHandler={dateDurationChangeHandler}
+          totalPodCount={totalPodCount}
+          occupiedPodCount={occupiedPodCount}
+          totalUsersCount={totalUsersCount}
+          availableUsersCount={availableUsersCount}
+          totalMatchCount={totalMatchCount}
+          activeMatchCount={activeMatchCount}
+          finishedUsersCount={finishedUsersCount}
+          userDateCountAverage={userDateCountAverage}
+        />
       </div>
-      <Button onClick={simCompletionHandler}>
-        simCompletionHandler
-        </Button>
-    <Tabs
-      defaultActiveKey="matchmaker"
-      id="uncontrolled-tab-example"
-      className="mb-3"
-    >
-      {/* <Tab eventKey="dashboard" title="Dashboard">
+      <Button onClick={simCompletionHandler}>simCompletionHandler</Button>
+      <Tabs defaultActiveKey="matchmaker" id="tab-text">
+        {/* <Tab eventKey="dashboard" title="Dashboard">
         <Dashboard users={users} matchQueue={matchQueue} pods={pods} availablePods={availablePods} />
       </Tab> */}
-      <Tab eventKey="matchmaker" title="Matchmaker">
-        <Matchmaker
-          simulationRunHandler={simulationRunHandler}
-          sessionDuration={sessionDuration}
-          sessionDurationChangeHandler={sessionDurationChangeHandler}
-          simCompletionHandler={simCompletionHandler}
-          simResetHandler={simResetHandler}
-          simIsPaused={simIsPaused}
-          pauseSimulation= {simulationPauseHandler}
-          simIsComplete={simIsComplete}
-          simIsRunning={simIsRunning}
-          simIsStarting={simIsStarting}
-          simulationStartHandler={simulationStartHandler}
-          elligibleUsers={elligibleUsers}
-          dateDuration={dateLength}
-          dateCap={dateCap}
-          occupiedPodCount={occupiedPodCount}
-          totalPodCount={totalPodCount}
-          activeMatchCount={activeMatchCount}
-          totalMatchCount={totalMatchCount}
-          updateUserCount={userCountUpdateHandler}
-          updateMatchCount={matchCountUpdateHandler}
-          updatePodCount={podCountUpdateHandler}
-        />
-      </Tab>
-      <Tab eventKey="userlist" title="User List" >
-        <UserInfo users={users} podCount={totalPodCount} userDeleteHandler={userDeleteHandler} userUpdateHandler={userUpdateHandler} podCountUpdateHandler={podCountUpdateHandler} userCountUpdateHandler={userCountUpdateHandler}/>
-      </Tab>
-    </Tabs>
+        <Tab id="tab-text" eventKey="matchmaker" title="Matchmaker">
+          <Matchmaker
+            matchesInProgress={matchesInProgress}
+            simResultsData={simResultsData}
+            sessionDuration={sessionDuration}
+            simIsPaused={simIsPaused}
+            simIsComplete={simIsComplete}
+            simIsRunning={simIsRunning}
+            dateDuration={dateLength}
+            dateMin={dateMin}
+            dateMax={dateMax}
+            simulationPauseHandler={simulationPauseHandler}
+            simulationRunHandler={simulationRunHandler}
+            simResetHandler={simResetHandler}
+          />
+        </Tab>
+        <Tab id="tab-text" eventKey="userlist" title="User List">
+          <UserInfo
+            users={users}
+            podCount={totalPodCount}
+            userDeleteHandler={userDeleteHandler}
+            userUpdateHandler={userUpdateHandler}
+            podCountUpdateHandler={podCountUpdateHandler}
+            userCountUpdateHandler={userCountUpdateHandler}
+          />
+        </Tab>
+      </Tabs>
     </div>
   );
-}
+};
 
 export default App;

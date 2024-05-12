@@ -1,8 +1,13 @@
 .matchmaker-tab {
-    width: 90vw;
+
     height: auto;
     display: flex;
     flex-direction: column;
+    border-style: solid;
+    border-width: 2px;
+    border-color: white;
+    padding: 10px;
+    width: 100%;
 }
 
 .matches-container {

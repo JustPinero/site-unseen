@@ -3,13 +3,23 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: 96vw;
+    color: black;
 }
-.stats-container{
+
+.sim-results-totals_container{
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+}
 
+.stats-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 .completion-count_container{

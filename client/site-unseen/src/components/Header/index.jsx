@@ -11,8 +11,10 @@ const Header = ({
     simIsComplete,
     matchCount,
     finishedUsersCount,
-    dateCap,
-    dateCapChangeHandler,
+    dateMin,
+    dateMax,
+    dateMinChangeHandler,
+    dateMaxChangeHandler,
     users,
     totalUsersCount,
     availableUsersCount,
@@ -34,7 +36,7 @@ const Header = ({
                 </h5>
             </div>
             <div className="controller-container">
-                <SimSettings simIsRunning={simIsRunning} dateCap={dateCap} dateCapChangeHandler={dateCapChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}/>
+                <SimSettings simIsRunning={simIsRunning} dateMin={dateMin} dateMax={dateMax} dateMinChangeHandler={dateMinChangeHandler} dateMaxChangeHandler={dateMaxChangeHandler} bufferDuration={bufferDuration} bufferDurationChangeHandler={bufferDurationChangeHandler} dateDuration={dateDuration} dateDurationChangeHandler={dateDurationChangeHandler}/>
                 <InfoBox users={users} simIsComplete={simIsComplete} simIsPaused={simIsPaused} simIsRunning={simIsRunning} totalUsersCount={totalUsersCount} availableUsersCount={availableUsersCount} occupiedPodCount={occupiedPodCount} totalPodCount={totalPodCount} matchCount={matchCount} finishedUsersCount={finishedUsersCount} userDateCountAverage={userDateCountAverage} activeMatchCount={activeMatchCount} totalMatchCount={totalMatchCount}/>
             </div>
         </div>

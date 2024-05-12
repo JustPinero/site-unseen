@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button'
 import SimulationDurationTracker from "../../../components/SimulationDurationTracker";
 
 
-const MatchToolBox = ({sessionDuration, sessionDurationChangeHandler, simIsPaused, pauseSimulation, roundCount, simIsRunning, runSimulation, addMatch})=>{
+const MatchToolBox = ({sessionDuration, simulationPauseHandler, simIsRunning, runSimulation})=>{
 
     return(
         <div className="matchtools-container">
@@ -19,14 +19,14 @@ const MatchToolBox = ({sessionDuration, sessionDurationChangeHandler, simIsPause
                 {
                     simIsRunning ?
                     <>
-                <Button onClick={pauseSimulation }>
+                <Button onClick={simulationPauseHandler }>
                     PAUSE SIMULATION
                 </Button>
                 </>
                 : null
                 }
             </div>
-                <SimulationDurationTracker sessionDuration={sessionDuration} sessionDurationChangeHandler={sessionDurationChangeHandler} simIsRunning={simIsRunning} simIsPaused={simIsPaused} />
+                <SimulationDurationTracker sessionDuration={sessionDuration} />
             <div>
             </div>
         </div>

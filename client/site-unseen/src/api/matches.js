@@ -4,7 +4,9 @@ const PATH = `${BASEURL}/matches`;
 
 /* MATCHES GETS */
 const fetchMatchesData = async (dateDuration)=>{
+    console.log("fetchMatchesData fired")
     const payload = {maxDateDuration:dateDuration}
+    console.log("payload:  ", payload)
     return await axios.post(`${PATH}/data`, payload);
 };
 
@@ -26,17 +28,15 @@ const fetchMatchByID= async (id)=>{
 
 /* MATCHES GETS */
 const fetchMatchCount= async ()=>{
-    console.log(" I AM MATCHES AND I AM THE BROKEN ONE", `${PATH}/count`)
     return await axios.get(`${PATH}/count`);
 };
 
 
 /* MATCHES POSTS */
 const createMatch = async ( dateCount)=>{
+    console.log("CREATE MATCH FIRED")
     try{
-        console.log("dateCount:  ", dateCount, typeof dateCount)
     const payload = { dateCount}
-    console.log("payload:  ", payload)
     return await axios.post(`${PATH}/`, payload);
     }
     catch(error){
@@ -51,7 +51,6 @@ const completeMatch = async (id, matchData)=>{
 
 const completeMatches = async (matchesData)=>{
     const payload ={matches: matchesData}
-    console.log("completeMatch:  ", `${PATH}/complete`, "matchData:  ", matchesData)
     return await axios.post(`${PATH}/complete`, payload);
 };
 

@@ -18,7 +18,6 @@ const fetchPodsByID = async (id)=>{
 /* COUNTS */
 /* PODS COUNT */
 const fetchPodsCount = async ()=>{
-    console.log(" I AM PODS AND I AM THE BROKEN ONE")
     return await axios.get(`${PATH}/count`);
 };
 

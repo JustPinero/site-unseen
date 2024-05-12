@@ -8,12 +8,14 @@ import Button from 'react-bootstrap/Button';
 
 const SimSettings = ({ 
     simIsRunning,
-    dateCap,
-    dateCapChangeHandler, 
+    dateMin,
+    dateMax,
+    dateMinChangeHandler,
+    dateMaxChangeHandler,
     bufferDuration, 
     bufferDurationChangeHandler,
-     dateDuration,
-      dateDurationChangeHandler
+    dateDuration,
+    dateDurationChangeHandler
     })=>{
    
     return (
@@ -53,8 +55,8 @@ const SimSettings = ({
                     </Form.Label>
                     <Form.Control
                         id="minimumdate-form"
-                        value={dateCap}
-                        onChange={dateCapChangeHandler}
+                        value={dateMin}
+                        onChange={dateMinChangeHandler}
                         aria-label="Small"
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
@@ -67,13 +69,13 @@ const SimSettings = ({
                     </Form.Label>
                     <Form.Control
                         id="minimumdate-form"
-                        value={dateCap}
-                        onChange={dateCapChangeHandler}
+                        value={dateMax}
+                        onChange={dateMaxChangeHandler}
                         aria-label="Small"
                         aria-describedby="inputGroup-sizing-sm"
                         type="number"
                         disabled={simIsRunning}
-                    /> 
+                    />
                 </Form>
             </div>
             </div>

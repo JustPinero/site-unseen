@@ -10,6 +10,7 @@ const cors = require("cors");
 const matchesRouter = require('./routes/matches');
 const podsRouter = require('./routes/pods');
 const usersRouter = require('./routes/users');
+const simRouter = require('./routes/sim');
 
 //MIDDLEWARE
 app.use(express.static(path.join(__dirname, '../client/site-unseen/build')));
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use('/users', usersRouter);
 app.use('/pods', podsRouter);
 app.use('/matches', matchesRouter);
+app.use('/sim', simRouter);
 
 if( process.env.NODE_ENV === 'staging' || process.env.NODE_ENV === 'production'){
   app.get('*', (req, res)=>{

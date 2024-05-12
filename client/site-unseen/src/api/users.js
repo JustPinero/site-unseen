@@ -29,7 +29,6 @@ const fetchFinishedUsers = async (dateCount)=>{
 /* STAT COUNTS */
 //TOTAL
 const fetchUserCount = async ()=>{
-    console.log(" IAM RUNNING fetchUserCount")
     return await axios.get(`${PATH}/counts/all`);
 };
 //FINISHED
@@ -48,6 +47,16 @@ const fetchUsersByGender = async (gender)=>{
 };
 
 /* USER POSTS */
+/* REQUEST USER SIMRESULTS USING SIM SPECS */
+const fetchUserSimResults = async (dateMin, dateMax)=>{
+    const payload = {
+        dateMin: dateMin,
+        dateMax: dateMax
+    }
+    console.log("fetchUserSimResults :  ", payload)
+    return await axios.post(`${PATH}/simresults`, payload);
+};
+
 const createUser = async (newUser)=>{
     return await axios.post(`${PATH}/`, newUser);
 };
@@ -77,4 +86,4 @@ const deleteAllUsers =  async ()=>{
     return await axios.delete(`${PATH}/removeall`);
 };
 
-export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers,fetchUserCount, fetchFinishedUserCount, fetchUnfinishedUserCount, fetchUserDateCountAverage, fetchUsersByGender, createUser, generateUser, updateUser, deleteUser, deleteAllUsers}
+export {fetchUsers,fetchUserByID, fetchElligibleUsers, fetchFinishedUsers,fetchUserCount, fetchFinishedUserCount, fetchUnfinishedUserCount, fetchUserDateCountAverage, fetchUsersByGender, fetchUserSimResults, createUser, generateUser, updateUser, deleteUser, deleteAllUsers}
