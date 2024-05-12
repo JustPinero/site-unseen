@@ -12,7 +12,7 @@ const InfoBox = ({simIsComplete, simIsPaused, simIsRunning, totalUsersCount, ava
             <p className="infobox-text"> POD COUNT : {occupiedPodCount}/{totalPodCount} (occupied/total)</p>
             <p className="infobox-text"> CURRENT MATCH COUNT : {activeMatchCount}</p>
             <p className="infobox-text"> MATCH COUNT : {totalMatchCount}</p>
-            <p className="infobox-text"> AVERAGE DATE COUNT : {userDateCountAverage || 0}</p>
+            <p className="infobox-text"> AVERAGE DATE COUNT : {Math.round(userDateCountAverage * 100) / 100 || 0}</p>
         </div>
     )
 }

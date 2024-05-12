@@ -3,23 +3,24 @@ import "./styles.css"
 
 const SimulationResultsSection = ({sectionData})=>{
         const {title, data, finishedTotal, unfinishedTotal} = sectionData;
-        const undesiredKeys = ["sexual_pref", "gender"]
-        let updatedFormattedEntryData =[]
+        const undesiredKeys = ["sexual_pref", "gender"];
+        let updatedFormattedEntryData =[];
         if(sectionData){
             updatedFormattedEntryData = data.map((stat)=>{
             const statData = Object.keys(stat).map((key)=>{
-                console.log("KEY:  ", key)
-                return {
-                    label: key,
-                    data: stat[key]
+                if(undesiredKeys.indexOf(key)<0){
+                    return {
+                        label: key,
+                        data: stat[key]
+                    };
                 };
-            });
-            const sexuality =(stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === title)? "Homosexual" : "Heterosexual";
+            }).filter((entry)=>entry!==undefined);
+            const sexuality =stat.gender === "non-binary" ?  (stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === "female") ? "Seeking Female Matches" : "Seeking Male Matches"   : (stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === stat.gender) ? "Homosexual" : "Heterosexual";
                 const entryData = {
                     statTitle: sexuality,
                     statData:statData
                 }
-            return entryData
+            return entryData;
             })
         } 
         const formattedSectionTitle= title;
@@ -44,12 +45,15 @@ const SimulationResultsSection = ({sectionData})=>{
                     <div className="simresults-subsection-header">
                         <h5>{statTitle}</h5>
                     </div>
-                    {statData.length ?
-                        statData.map((entry)=>
-                   ( <SimulationResultsEntry entryData={entry}/>)
-                    )
-                    :null
+                    <div className="simresults-subsection_body">
+                    {
+                        statData.length ?
+                        statData.map((entry)=>{
+                            return ( <SimulationResultsEntry entryData={entry}/>)
+                        })
+                        :null
                     }
+                    </div>
                    </div>)
                 }):
                 null
