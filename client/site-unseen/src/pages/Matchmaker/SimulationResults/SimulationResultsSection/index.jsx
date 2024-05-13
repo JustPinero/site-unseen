@@ -3,10 +3,6 @@ import "./styles.css"
 
 const SimulationResultsSection = ({sectionData})=>{
         const {title, data, finishedTotal, unfinishedTotal, subdemographicFinishedCounts, subdemographicUnfinishedCounts} = sectionData;
-        console.log("title:  ", title)
-        console.log("data:  ", data)
-        console.log("subdemographicFinishedCounts:  ", subdemographicFinishedCounts)
-        console.log("subdemographicUnfinishedCounts:  ", subdemographicUnfinishedCounts)
         const undesiredKeys = ["sexual_pref", "gender"];
         let updatedFormattedEntryData =[];
         if(sectionData){
@@ -35,7 +31,6 @@ const SimulationResultsSection = ({sectionData})=>{
             }
             const formattedSubdemographicFinishedUserCount = fetchAndFormatSexualityDemographicCountData(subdemographicFinishedCounts, "Users who finished:  ")
             const formattedSubdemographicUnfinishedUserCount = fetchAndFormatSexualityDemographicCountData(subdemographicUnfinishedCounts, "Users who did not finished:  ")
-            console.log("STAT DATA:  ", [...statData, formattedSubdemographicFinishedUserCount, formattedSubdemographicUnfinishedUserCount ])
             const formattedStatData = [...statData, formattedSubdemographicFinishedUserCount, formattedSubdemographicUnfinishedUserCount ].filter(stat=>(stat!==undefined))
             const sexuality =stat.gender === "non-binary" ?  (stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === "female") ? "Seeking Female Matches" : "Seeking Male Matches"   : (stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === stat.gender) ? "Homosexual" : "Heterosexual";
                 const entryData = {
