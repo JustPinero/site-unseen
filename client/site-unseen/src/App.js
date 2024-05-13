@@ -1,6 +1,7 @@
 /* REACT */
 import { useState, useEffect } from "react";
-
+/* SOCKET IO */
+// import { socket } from './socket';
 /* STYLES */
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -40,8 +41,10 @@ const DATEDURATION = 1;
 const DEFAULTDATECAP = 3;
 
 const App = () => {
-  // console.log("SOCKET:  ",socket )
   /*--------LOCAL STATE---------- */
+  /* SOCKET */
+  // const [isConnected, setIsConnected] = useState(socket.connected);
+  // const [fooEvents, setFooEvents] = useState([]);
   /*LOADING */
   const [isLoading, setIsLoading] = useState(false);
   /* SIMULATION */
@@ -293,6 +296,28 @@ const App = () => {
 
   useEffect(() => {
     fetchUserAndPodData();
+    // function onConnect() {
+    //   setIsConnected(true);
+    // }
+
+    // function onDisconnect() {
+    //   setIsConnected(false);
+    // }
+
+    // function onFooEvent(value) {
+    //   setFooEvents(previous => [...previous, value]);
+    // }
+
+    // socket.on('connect', onConnect);
+    // socket.on('disconnect', onDisconnect);
+    // socket.on('foo', onFooEvent);
+
+    // return () => {
+    //   socket.off('connect', onConnect);
+    //   socket.off('disconnect', onDisconnect);
+    //   socket.off('foo', onFooEvent);
+    // };
+
   }, []);
   /* --------INIT-------- */
   /* --------SESSION DURATION TRACKER-------- */
@@ -371,14 +396,10 @@ const App = () => {
 
   // const handleSendMessage = (e) => {
   //   e.preventDefault();
-  //   console.log(
-  //     "spocketID", 
-  //   socket
-  //   )
   //     socket.emit('message', {
   //       text: "flurby wurby derby",
+  //       id: `${socket.id}${Math.random()}`,
   //       socketID: socket.id,
-  //       data:"JINGLE BELLS"
   //     });
   // };
     /* ---------------SOCKET STUFF-------------------------- */

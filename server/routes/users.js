@@ -35,7 +35,7 @@ router.get('/gender/:gender', async(req,res)=>{
 });
 
 /* GET user by id */
-router.get('/:id', async(req,res)=>{
+router.get('user/:id', async(req,res)=>{
 	try {
     const {id} = req.params
 		const user = await db.query(
@@ -48,7 +48,7 @@ router.get('/:id', async(req,res)=>{
 });
 
 /* GET user dates by id */
-router.get('/:id/dates', async(req,res)=>{
+router.get('user/:id/dates', async(req,res)=>{
 	try {
     const {id} = req.params
 		const user = await db.query(
@@ -319,7 +319,9 @@ router.get('/unfinished/:datecount/count', async(req,res)=>{
 router.post('/simresults', async(req, res)=>{
   try{
   const {dateMax, dateMin} =req.body;
-  /* --------------------FINISHED USER TOTALS----------------------- */
+//   /* --------------------FINISHED USER TOTALS----------------------- */
+  console.log("USER SIM RESULTS STARTS")
+  console.log("finishedTotalResults works")
   const finishedTotalResults = await db.query(
     `
     SELECT COUNT(*) AS user_count
@@ -345,6 +347,7 @@ router.post('/simresults', async(req, res)=>{
     ) AS subquery;
 `, [dateMin]
 );
+// console.log("finishedMaleResults works")
 const finishedFemaleResults = await db.query(
   `
   SELECT COUNT(*) AS user_count
@@ -358,6 +361,7 @@ const finishedFemaleResults = await db.query(
   ) AS subquery;
 `, [dateMin]
 );
+// console.log("finishedFemaleResults works")
 const finishedNbResults = await db.query(
   `
   SELECT COUNT(*) AS user_count
@@ -371,7 +375,8 @@ const finishedNbResults = await db.query(
   ) AS subquery;
 `, [dateMin]
 );
-/* --------------------UNFINISHED USER TOTALS----------------------- */
+// console.log("finishedNbResults works")
+// /* --------------------UNFINISHED USER TOTALS----------------------- */
   const unfinishedTotalResults = await db.query(
     `
     SELECT COUNT(*) AS user_count
@@ -384,6 +389,7 @@ const finishedNbResults = await db.query(
     ) AS subquery;
 `, [dateMin]
 );
+// console.log("unfinishedTotalResults works")
   const unfinishedMaleResults = await db.query(
     `
     SELECT COUNT(*) AS user_count
@@ -397,6 +403,7 @@ const finishedNbResults = await db.query(
     ) AS subquery;
 `, [dateMin]
 );
+// console.log("unfinishedMaleResults works")
 const unfinishedFemaleResults = await db.query(
   `
   SELECT COUNT(*) AS user_count
@@ -410,6 +417,7 @@ const unfinishedFemaleResults = await db.query(
   ) AS subquery;
 `, [dateMin]
 );
+// console.log("unfinishedFemaleResults works")
 const unfinishedNbResults = await db.query(
   `
   SELECT COUNT(*) AS user_count
@@ -423,9 +431,9 @@ const unfinishedNbResults = await db.query(
   ) AS subquery;
 `, [dateMin]
 );
-
-/* --------------------SIM DETAILS----------------------- */
-//MALE
+// console.log("unfinishedNbResults works")
+// /* --------------------SIM DETAILS----------------------- */
+// //MALE
 const maleDetailsResults = await db.query(
   `
 SELECT
@@ -486,8 +494,39 @@ GROUP BY
     max_min_avg_match_counts.avg_match_count;
 `
 );
-
-//FEMALE USERS
+// console.log("maleDetailsResults works")
+// //SUB DEMOGRAPHIC FINISHED COUNT
+const maleSubDemographicTotalFinishedUsers = await db.query(
+  `
+  SELECT sexual_pref, COUNT(*) AS user_count
+  FROM (
+      SELECT u.id, u.sexual_pref
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      WHERE u.gender = 'male'
+      GROUP BY u.id, u.sexual_pref
+      HAVING COUNT(m.id) >= $1
+  ) AS subquery
+  GROUP BY sexual_pref;
+  `, [dateMin]);
+//   console.log("maleSubDemographicTotalFinishedUsers works")
+// //SUB DEMOGRAPHIC UNFINISHED COUNT
+  const maleSubDemographicTotalUnfinishedUsers = await db.query(
+    `
+    SELECT sexual_pref, COUNT(*) AS user_count
+    FROM (
+        SELECT u.id, u.sexual_pref
+        FROM users u
+        LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+        WHERE u.gender = 'male'
+        GROUP BY u.id, u.sexual_pref
+        HAVING COUNT(m.id) < $1
+    ) AS subquery
+    GROUP BY sexual_pref;
+    `, [dateMin]);
+//     console.log("maleSubDemographicTotalUnfinishedUsers works")
+// //FEMALE USERS
+// console.log("femaleDetailsResults starting")
 const femaleDetailsResults = await db.query(
   `
 SELECT
@@ -546,12 +585,39 @@ GROUP BY
     max_min_avg_match_counts.max_match_count,
     max_min_avg_match_counts.min_match_count,
     max_min_avg_match_counts.avg_match_count;
-
-
 `
 );
+// console.log("femaleDetailsResults works")
+const femaleSubDemographicTotalFinishedUsers = await db.query(
+`
+SELECT sexual_pref, COUNT(*) AS user_count
+FROM (
+    SELECT u.id, u.sexual_pref
+    FROM users u
+    LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+    WHERE u.gender = 'female'
+    GROUP BY u.id, u.sexual_pref
+    HAVING COUNT(m.id) >= $1
+) AS subquery
+GROUP BY sexual_pref;
+`, [dateMin])
+console.log("femaleSubDemographicTotalFinishedUsers works")
+const femaleSubDemographicTotalUnfinishedUsers = await db.query(
+  `
+  SELECT sexual_pref, COUNT(*) AS user_count
+  FROM (
+      SELECT u.id, u.sexual_pref
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      WHERE u.gender = 'female'
+      GROUP BY u.id, u.sexual_pref
+      HAVING COUNT(m.id) < $1
+  ) AS subquery
+  GROUP BY sexual_pref;
+  `, [dateMin]);
+//   console.log("femaleSubDemographicTotalUnfinishedUsers works")
 
-//NON-BINARY USERS
+// //NON-BINARY USERS
 const nonbinaryDetailsResults = await db.query(
   `
 SELECT
@@ -614,34 +680,111 @@ GROUP BY
 
 `
 );
-//FINISHED
+// console.log("nonbinaryDetailsResults works")
+// //SUB DEMOGRAPHIC FINISHED COUNT
+const nbSubDemographicTotalFinishedUsers = await db.query(
+  `
+  SELECT sexual_pref, COUNT(*) AS user_count
+  FROM (
+      SELECT u.id, u.sexual_pref
+      FROM users u
+      LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+      WHERE u.gender = 'non-binary'
+      GROUP BY u.id, u.sexual_pref
+      HAVING COUNT(m.id) >= $1
+  ) AS subquery
+  GROUP BY sexual_pref;
+  `, [dateMin]);
+//   console.log("nbSubDemographicTotalFinishedUsers works")
+// //SUB DEMOGRAPHIC UNFINISHED COUNT
+  const nbSubDemographicTotalUnfinishedUsers = await db.query(
+    `
+    SELECT sexual_pref, COUNT(*) AS user_count
+    FROM (
+        SELECT u.id, u.sexual_pref
+        FROM users u
+        LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
+        WHERE u.gender = 'non-binary'
+        GROUP BY u.id, u.sexual_pref
+        HAVING COUNT(m.id) < $1
+    ) AS subquery
+    GROUP BY sexual_pref;
+    `, [dateMin]);
+//     console.log("nbSubDemographicTotalUnfinishedUsers works")
+
+
+// //FINISHED
+// //_____MALE_____
+// //MALE COUNT
 const finishedMaleData = finishedMaleResults.rows;
+// //SUBDEMOGRAPHICS
+const maleSubdemographicFinishedUserData = maleSubDemographicTotalFinishedUsers.rows;
+// //_____FEMALE_____
+// //FEMALE COUNT
 const finishedFemaleData = finishedFemaleResults.rows;
+// //SUBDEMOGRAPHICS
+const femaleSubdemographicFinishedUserData = femaleSubDemographicTotalFinishedUsers.rows;
+// //_____NONBINARY_____
+// //NB COUNT
 const finishedNbData = finishedNbResults.rows;
+// //SUBDEMOGRAPHICS
+const nbSubdemographicFinishedUserData = nbSubDemographicTotalFinishedUsers.rows;
+// //_____ALL_____
 const finishedTotalData = finishedTotalResults.rows
-//UNFINISHED
+// //UNFINISHED
+// //_____MALE_____
 const unfinishedMaleData = unfinishedMaleResults.rows;
+// //SUBDEMOGRAPHICS
+const maleSubdemographicUnfinishedUserData =maleSubDemographicTotalUnfinishedUsers.rows
+// //_____FEMALE_____
 const unfinishedFemaleData = unfinishedFemaleResults.rows;
+// //SUBDEMOGRAPHICS
+const femaleSubdemographicUnfinishedUserData =femaleSubDemographicTotalUnfinishedUsers.rows
+// //_____NONBINARY_____
 const unfinishedNbData = unfinishedNbResults.rows;
+// //SUBDEMOGRAPHICS
+const nbSubdemographicUnfinishedUserData =nbSubDemographicTotalUnfinishedUsers.rows
+// //_____ALL_____
 const unfinishedTotalData = unfinishedTotalResults.rows
-//DETAILS
+// //DETAILS
+// //MALE
 const maleDetailsData = maleDetailsResults.rows
+// //FEMALE
 const femaleDetailsData = femaleDetailsResults.rows
+// //NON BINARY
 const nonBinaryDetailsData = nonbinaryDetailsResults.rows
 
-/*--------------PAYLOAD---------------*/
+// /*--------------PAYLOAD---------------*/
 
 const data ={
   finished:{
-    male:finishedMaleData,
-    female: finishedFemaleData,
-    nb: finishedNbData,
+    male:{
+      total: finishedMaleData,
+      subDemographicCounts: maleSubdemographicFinishedUserData
+    },
+    female: {
+      total: finishedFemaleData,
+      subDemographicCounts: femaleSubdemographicFinishedUserData
+    },
+    nb: {
+      total:finishedNbData,
+      subDemographicCounts:nbSubdemographicFinishedUserData
+    },
     total:finishedTotalData
   },
   unfinished:{
-    male:unfinishedMaleData,
-    female: unfinishedFemaleData,
-    nb: unfinishedNbData,
+    male:{
+      total: unfinishedMaleData,
+      subDemographicCounts: maleSubdemographicUnfinishedUserData
+    },
+    female: {
+      total: unfinishedFemaleData,
+      subDemographicCounts: femaleSubdemographicUnfinishedUserData
+    },
+    nb: {
+      total: unfinishedNbData,
+      subDemographicCounts: nbSubdemographicUnfinishedUserData
+    },
     total:unfinishedTotalData
   },
   details:{

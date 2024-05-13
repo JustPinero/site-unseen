@@ -440,7 +440,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.delete("/", async (req, res) => {
+router.delete("/reset", async (req, res) => {
   try {
     await db.query(`DELETE FROM matches `);
     await db.query(`UPDATE pods SET occupied=FALSE, occupant_id = NULL;`);

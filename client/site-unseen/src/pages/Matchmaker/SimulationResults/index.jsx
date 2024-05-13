@@ -7,16 +7,22 @@ const SimulationResults = ({simResultsData})=>{
         const simDetailsResults =  simResultsData.data.details;
         //MALE DATA
         const maleData = simDetailsResults.male;
-        const maleFinishedTotalCount = parseInt(simFinishedTotalsResults.male[0].user_count);
-        const maleUnfinishedTotalCount = parseInt(simUnfinishedTotalsResults.male[0].user_count);
+        const maleSubdemographicFinishedCounts = simResultsData.data.finished.male.subDemographicCounts
+        const maleSubdemographicUnfinishedCounts = simResultsData.data.unfinished.male.subDemographicCounts
+        const maleFinishedTotalCount = parseInt(simFinishedTotalsResults.male.total[0].user_count);
+        const maleUnfinishedTotalCount = parseInt(simUnfinishedTotalsResults.male.total[0].user_count);
         //FEMALE DATA
         const femaleData = simDetailsResults.female
-        const femaleFinishedTotalCount = parseInt(simFinishedTotalsResults.female[0].user_count);
-        const femaleUnfinishedTotalCount = parseInt(simUnfinishedTotalsResults.female[0].user_count);
+        const femaleSubdemographicFinishedCounts = simResultsData.data.finished.female.subDemographicCounts
+        const femaleSubdemographicUnfinishedCounts = simResultsData.data.unfinished.female.subDemographicCounts
+        const femaleFinishedTotalCount = parseInt(simFinishedTotalsResults.female.total[0].user_count);
+        const femaleUnfinishedTotalCount = parseInt(simUnfinishedTotalsResults.female.total[0].user_count);
         //NB DATA
         const nbData = simDetailsResults.nb
-        const nbFinishedTotalCount = parseInt(simFinishedTotalsResults.nb[0].user_count);
-        const nbUnfinishedTotalCount = parseInt(simUnfinishedTotalsResults.nb[0].user_count);
+        const nbSubdemographicFinishedCounts = simResultsData.data.finished.nb.subDemographicCounts
+        const nbSubdemographicUnfinishedCounts = simResultsData.data.unfinished.nb.subDemographicCounts
+        const nbFinishedTotalCount = parseInt(simFinishedTotalsResults.nb.total[0].user_count);
+        const nbUnfinishedTotalCount = parseInt(simUnfinishedTotalsResults.nb.total[0].user_count);
     return(
         <div className="sim-results-container" >
             <h1>
@@ -29,9 +35,9 @@ const SimulationResults = ({simResultsData})=>{
                 <h5>TOTAL OF USERS THAT DID NOT FINISH:  {maleUnfinishedTotalCount+ femaleUnfinishedTotalCount+ nbUnfinishedTotalCount}</h5>
             </div>
             <div className="stats-container">
-                {maleData && <SimulationResultsSection sectionData={{title:"Male Users", finishedTotal:maleFinishedTotalCount, unfinishedTotal:maleUnfinishedTotalCount, data:maleData}} />}
-                 { femaleData && <SimulationResultsSection sectionData={{title:"Female Users", finishedTotal:femaleFinishedTotalCount, unfinishedTotal:femaleUnfinishedTotalCount, data:femaleData}}/>}
-                { nbData && <SimulationResultsSection sectionData={{title:"Non-Binary Users", finishedTotal:nbFinishedTotalCount, unfinishedTotal:nbUnfinishedTotalCount, data:nbData}}/>}
+                {maleData && <SimulationResultsSection sectionData={{title:"Male Users", finishedTotal:maleFinishedTotalCount, unfinishedTotal:maleUnfinishedTotalCount, data:maleData, subdemographicFinishedCounts: maleSubdemographicFinishedCounts, subdemographicUnfinishedCounts: maleSubdemographicUnfinishedCounts}} />}
+                 { femaleData && <SimulationResultsSection sectionData={{title:"Female Users", finishedTotal:femaleFinishedTotalCount, unfinishedTotal:femaleUnfinishedTotalCount, data:femaleData, subdemographicFinishedCounts: femaleSubdemographicFinishedCounts, subdemographicUnfinishedCounts:femaleSubdemographicUnfinishedCounts}}/>}
+                { nbData && <SimulationResultsSection sectionData={{title:"Non-Binary Users", finishedTotal:nbFinishedTotalCount, unfinishedTotal:nbUnfinishedTotalCount, data:nbData, subdemographicFinishedCounts: nbSubdemographicFinishedCounts, subdemographicUnfinishedCounts: nbSubdemographicUnfinishedCounts}}/>}
             </div>
             </>
                 }

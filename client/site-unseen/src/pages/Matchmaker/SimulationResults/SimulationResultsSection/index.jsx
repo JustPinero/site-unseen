@@ -2,12 +2,17 @@ import SimulationResultsEntry from './SimResultsEntry';
 import "./styles.css"
 
 const SimulationResultsSection = ({sectionData})=>{
-        const {title, data, finishedTotal, unfinishedTotal} = sectionData;
+        const {title, data, finishedTotal, unfinishedTotal, subdemographicFinishedCounts, subdemographicUnfinishedCounts} = sectionData;
+        console.log("title:  ", title)
+        console.log("data:  ", data)
+        console.log("subdemographicFinishedCounts:  ", subdemographicFinishedCounts)
+        console.log("subdemographicUnfinishedCounts:  ", subdemographicUnfinishedCounts)
         const undesiredKeys = ["sexual_pref", "gender"];
         let updatedFormattedEntryData =[];
         if(sectionData){
             updatedFormattedEntryData = data.map((stat)=>{
-            const statData = Object.keys(stat).map((key)=>{
+                console.log("STAT:  ", stat)
+            let statData = Object.keys(stat).map((key)=>{
                 if(undesiredKeys.indexOf(key)<0){
                     return {
                         label: key,
@@ -15,10 +20,27 @@ const SimulationResultsSection = ({sectionData})=>{
                     };
                 };
             }).filter((entry)=>entry!==undefined);
+            const fetchAndFormatSexualityDemographicCountData = (demographicDataArr, label)=>{
+                for(let i=0 ; i< demographicDataArr.length; i++){
+                    const currentSubdemographicCountData = demographicDataArr[i];
+                    console.log("currentSubdemographicCountData:  ", currentSubdemographicCountData.sexual_pref)
+                    console.log("stat.sexual_pref:  ", stat.sexual_pref)
+                    if(currentSubdemographicCountData.sexual_pref === stat.sexual_pref){
+                        return {
+                            label: label,
+                            data: currentSubdemographicCountData.user_count ? currentSubdemographicCountData.user_count : 0
+                        }
+                    }
+                }
+            }
+            const formattedSubdemographicFinishedUserCount = fetchAndFormatSexualityDemographicCountData(subdemographicFinishedCounts, "Users who finished:  ")
+            const formattedSubdemographicUnfinishedUserCount = fetchAndFormatSexualityDemographicCountData(subdemographicUnfinishedCounts, "Users who did not finished:  ")
+            console.log("STAT DATA:  ", [...statData, formattedSubdemographicFinishedUserCount, formattedSubdemographicUnfinishedUserCount ])
+            const formattedStatData = [...statData, formattedSubdemographicFinishedUserCount, formattedSubdemographicUnfinishedUserCount ].filter(stat=>(stat!==undefined))
             const sexuality =stat.gender === "non-binary" ?  (stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === "female") ? "Seeking Female Matches" : "Seeking Male Matches"   : (stat.sexual_pref === "bisexual") ? "Bisexual" : (stat.sexual_pref === stat.gender) ? "Homosexual" : "Heterosexual";
                 const entryData = {
                     statTitle: sexuality,
-                    statData:statData
+                    statData: formattedStatData
                 }
             return entryData;
             })

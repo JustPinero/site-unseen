@@ -68,7 +68,7 @@ const deleteMatch =  async (id)=>{
 
 /* MATCHES DELETE */
 const deleteMatches =  async ()=>{
-    return await axios.delete(`${PATH}`);
+    return await axios.delete(`${PATH}/reset`);
 };
 
 

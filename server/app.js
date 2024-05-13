@@ -4,13 +4,19 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const app = express();
-const http = require('http').Server(app);
+// const {createServer} = require('http')
+// const { Server } = require("socket.io");
+// const httpServer = createServer(app);
 const cors = require("cors");
-// const socketIO = require('socket.io')(http, {
-//   cors: {
-//       origin: "http://localhost:3000"
-//   }
-// });
+// const io = new Server(httpServer, {  cors: {
+//   origin: "http://localhost:3000"
+// } });
+// // const socketIO = new require('socket.io')(http, {
+// //   cors: {
+// //       origin: "http://localhost:3000"
+// //   }
+// // });
+// io.listen(4000);
 
 //ROUTERS
 const matchesRouter = require('./routes/matches');
@@ -35,13 +41,14 @@ app.use('/sim', simRouter);
 
 if( process.env.NODE_ENV === 'staging' || process.env.NODE_ENV === 'production'){
   //SOCKET CONNECTION
-  // socketIO.on('connection', (socket) => {
+  // io.on('connection', (socket) => {
   //   console.log("New Client Connected!");
-  //   console.log(`⚡: ${socket.id} user just connected!`);
+  //   socket.emit('message', 'This is a test message from the server');
+  // //   console.log(`⚡: ${socket.id} user just connected!`);
   //   socket.on("message", data => {
   //     console.log(data);
 
-  //     // let interval = setInterval(()=> getSelPos(socket), 2000);
+  // //     // let interval = setInterval(()=> getSelPos(socket), 2000);
   // });
   // // const getSelPos = async(socket) =>{
   // //   console.log(" IAM WORKING")
