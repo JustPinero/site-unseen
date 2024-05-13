@@ -1,3 +1,2 @@
-const BASEURL = 'http://localhost:5001'
-
+const BASEURL = `${loc.protocol}//${loc.hostname}${loc.hostname==='localhost' ? ':5001' : '' }`
 export {BASEURL}
