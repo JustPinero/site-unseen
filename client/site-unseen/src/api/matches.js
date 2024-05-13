@@ -63,7 +63,7 @@ const updateMatch =  async (id, matchUpdate)=>{
 
 /* MATCHES DELETE */
 const deleteMatch =  async (id)=>{
-    return await axios.delete(`${PATH}/${id}`);
+    return await axios.delete(`${PATH}/remove/${id}`);
 };
 
 /* MATCHES DELETE */

@@ -938,14 +938,14 @@ router.delete('remove/:id', async(req,res)=>{
 /* DELETE All USERS */
 router.delete('/removeall', async(req,res)=>{
 	try {
+    await db.query(`UPDATE pods SET occupied=FALSE, occupant_id = NULL;`);
 		await db.query(
 		`DELETE FROM users `
 	);
 	res.status(200);
-  res.json(data)
 	} catch (error) {
 		console.log("ERROR:  ", error.message)
-    throw err
+    throw error
 	}
 });
 

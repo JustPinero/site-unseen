@@ -174,9 +174,15 @@ router.post("/", async (req, res) => {
       );
       const sortedUsers = sortedUsersResults.rows;
       if (!sortedUsers.length) {
+        console.log("sorted Users:  ", sortedUsers)
         return res.status(200);
       }
       //SELECT MOST VIABLE CANDIDATE
+      const sortedUserIDsAndMatchNums = sortedUsers.map(matchData=> ({
+        id: matchData.id,
+        matchNum: matchData.num_matches
+      }))
+      console.log("sortedUserIDsAndMatchNums:  ", sortedUserIDsAndMatchNums)
       const user1 = sortedUsers[0];
       const userID = user1.id;
       const isUserAvailable = user1.available;
@@ -429,7 +435,7 @@ router.put("/:id", async (req, res) => {
 
 /* DELETE */
 /* DELETE match by id */
-router.delete("/:id", async (req, res) => {
+router.delete("/remove/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await db.query(`DELETE FROM matches WHERE id = $1`, [id]);
@@ -442,7 +448,7 @@ router.delete("/:id", async (req, res) => {
 
 router.delete("/reset", async (req, res) => {
   try {
-    await db.query(`DELETE FROM matches `);
+    await db.query(`DELETE FROM matches;`);
     await db.query(`UPDATE pods SET occupied=FALSE, occupant_id = NULL;`);
     await db.query(`UPDATE users SET available=TRUE, status = 'available';`);
     res.status(200);

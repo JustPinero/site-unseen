@@ -356,9 +356,9 @@ const App = () => {
   useEffect(() => {
     const progressSimulation = async ()=>{
       // console.log("SIM IS PROGRESSING")
-      await fetchUserAndPodData()
       await fetchAndSetMatches()
       await createMatch(dateMax)
+      await fetchUserAndPodData()
       await checkForSimCompletion()
       // console.log("SIM IS PROGRESSED")
     }

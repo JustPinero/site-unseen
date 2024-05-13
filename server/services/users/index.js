@@ -10,7 +10,7 @@ const getEligibleUsers = async (maximumDateThreshHold) => {
     LEFT JOIN matches m ON u.id = m.user1_id OR u.id = m.user2_id
     WHERE u.available = TRUE
     GROUP BY u.id, u.username
-    HAVING COUNT(m.id) < $1
+    HAVING COUNT(m.id) <= $1
     ORDER BY num_matches ASC;
     ;`,
     [maximumDateThreshHold]
