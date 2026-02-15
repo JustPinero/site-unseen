@@ -142,12 +142,13 @@ export default function SimulationListPage() {
       {loading ? (
         <div className="loading">Loading simulations...</div>
       ) : filtered.length === 0 ? (
-        <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ color: "var(--gray-400)" }}>
-            {search ? "No simulations match your search" : "No simulations found"}
+        <div className="empty-state">
+          <div className="empty-state-heart">{"\uD83D\uDC94"}</div>
+          <p>
+            {search ? "No simulations match your search" : "No simulations yet — create your first one!"}
           </p>
-          <Link to="/create" className="btn btn-primary" style={{ marginTop: "1rem" }}>
-            Create One
+          <Link to="/create" className="btn btn-primary">
+            Create Simulation
           </Link>
         </div>
       ) : (

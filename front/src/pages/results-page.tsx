@@ -7,9 +7,9 @@ import {
   PieChart, Pie, Cell,
 } from "recharts";
 
-const PINK_PALETTE = [
-  "#db2777", "#ec4899", "#f472b6", "#f9a8d4", "#fbcfe8",
-  "#be185d", "#9d174d", "#831843", "#fda4af", "#fb7185",
+const VALENTINE_PALETTE = [
+  "#E91E63", "#C62828", "#F06292", "#EF5350", "#F8BBD0",
+  "#D81B60", "#C2185B", "#F48FB1", "#FF8A80", "#FF5252",
 ];
 
 interface DemographicStats {
@@ -70,7 +70,11 @@ export default function ResultsPage() {
   }, [id]);
 
   if (loading) {
-    return <div className="container"><div className="loading">Loading results...</div></div>;
+    return (
+      <div className="container">
+        <div className="loading">Loading results...</div>
+      </div>
+    );
   }
 
   if (error) {
@@ -190,7 +194,7 @@ export default function ResultsPage() {
                 attendees: v,
               }))}
             dataKey="attendees"
-            color={PINK_PALETTE[1]}
+            color={VALENTINE_PALETTE[1]}
           />
         </ChartCard>
 
@@ -202,7 +206,7 @@ export default function ResultsPage() {
               count: v,
             }))}
             dataKey="count"
-            color={PINK_PALETTE[2]}
+            color={VALENTINE_PALETTE[2]}
           />
         </ChartCard>
 
@@ -214,7 +218,7 @@ export default function ResultsPage() {
               dates: b.totalDates,
             }))}
             dataKey="dates"
-            color={PINK_PALETTE[3]}
+            color={VALENTINE_PALETTE[3]}
           />
           <ChartSummary entries={data.byAgeBracket.map((b) => [
             b.bracket,
@@ -243,7 +247,8 @@ export default function ResultsPage() {
       </div>
 
       {/* Footer nav */}
-      <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem", marginBottom: "3rem" }}>
+      <div className="divider-arrow">{"\u{1F3F9}"}</div>
+      <div style={{ display: "flex", gap: "0.75rem", marginBottom: "3rem" }}>
         <Link to="/simulations" className="btn btn-secondary">All Simulations</Link>
         <Link to="/create" className="btn btn-primary">New Simulation</Link>
       </div>
@@ -286,7 +291,7 @@ function ChartSummary({ entries }: { entries: [string, string][] }) {
 function BarChartSimple({
   data,
   dataKey,
-  color = PINK_PALETTE[0],
+  color = VALENTINE_PALETTE[0],
 }: {
   data: Array<Record<string, string | number>>;
   dataKey: string;
@@ -295,10 +300,10 @@ function BarChartSimple({
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -15 }}>
-        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9ca3af" }} />
-        <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} allowDecimals={false} />
+        <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#757575" }} />
+        <YAxis tick={{ fontSize: 11, fill: "#757575" }} allowDecimals={false} />
         <Tooltip
-          contentStyle={{ borderRadius: 8, border: "1px solid #fbcfe8", fontSize: 13 }}
+          contentStyle={{ borderRadius: 8, border: "1px solid #F8BBD0", fontSize: 13 }}
         />
         <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
       </BarChart>
@@ -330,11 +335,11 @@ function PieChartSimple({
           fontSize={11}
         >
           {data.map((_, i) => (
-            <Cell key={i} fill={PINK_PALETTE[i % PINK_PALETTE.length]} />
+            <Cell key={i} fill={VALENTINE_PALETTE[i % VALENTINE_PALETTE.length]} />
           ))}
         </Pie>
         <Tooltip
-          contentStyle={{ borderRadius: 8, border: "1px solid #fbcfe8", fontSize: 13 }}
+          contentStyle={{ borderRadius: 8, border: "1px solid #F8BBD0", fontSize: 13 }}
         />
       </PieChart>
     </ResponsiveContainer>

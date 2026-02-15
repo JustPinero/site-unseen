@@ -10,6 +10,7 @@ function Nav() {
     <nav className="nav">
       <div className="container">
         <Link to="/" className="nav-brand">
+          <span className="nav-brand-heart">{"\u2764\uFE0F"}</span>
           Site Unseen
         </Link>
         <ul className="nav-links">

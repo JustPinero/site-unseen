@@ -33,8 +33,9 @@ export default function SimulationViewPage() {
       {sim.phase === "waiting" && (
         <div style={{ marginTop: "3rem" }}>
           <div className="card" style={{ textAlign: "center", padding: "3rem", maxWidth: 500, margin: "0 auto" }}>
-            <h2 style={{ color: "var(--pink-600)", marginBottom: "0.5rem" }}>Ready to Go</h2>
-            <p style={{ marginBottom: "1.5rem", color: "var(--gray-500)" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>{"\uD83D\uDC98"}</div>
+            <h2 style={{ fontFamily: "var(--font-display)", color: "var(--primary)", marginBottom: "0.5rem" }}>Ready to Go</h2>
+            <p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)" }}>
               Attendees are generated. Start the simulation to watch dates unfold in real time.
             </p>
             <button className="btn btn-primary" onClick={sim.start}>

@@ -171,7 +171,7 @@ export default function CreateSimulationPage() {
           <p className="form-hint">4–100 attendees</p>
         </div>
 
-        <div className="card" style={{ marginBottom: "1.25rem", background: "var(--pink-50)" }}>
+        <div className="card" style={{ marginBottom: "1.25rem", background: "var(--rose-50)" }}>
           <p style={{ fontSize: "0.9rem", color: "var(--gray-600)" }}>
             <strong>Summary:</strong> {attendeeCount} attendees, {maxRounds} rounds max,{" "}
             {mode === SimulationMode.DETAILED
