@@ -1,9 +1,8 @@
 import type { Namespace, Socket } from "socket.io";
-import type { SimulationConfig, SimulationResult } from "@site-unseen/shared";
+import type { Attendee, SimulationConfig, SimulationResult } from "@site-unseen/shared";
 import { SimulationMode, SimulationStatus } from "@site-unseen/shared";
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { SimulationRunner } from "../engine/simulation-runner.js";
-import { generateAttendees } from "../engine/attendee-generator.js";
 import { aggregateResults } from "../engine/results-aggregator.js";
 
 const prisma = new PrismaClient();
@@ -91,15 +90,20 @@ export function registerSimulationHandlers(nsp: Namespace): void {
           attendeeCount: sim.attendeeCount,
         };
 
-        const attendees = generateAttendees({
-          simulationId,
-          count: config.attendeeCount,
+        // Load attendees created by POST /api/v1/simulations
+        const dbAttendees = await prisma.attendee.findMany({
+          where: { simulationId },
         });
+        const attendees: Attendee[] = dbAttendees.map((a) => ({
+          ...a,
+          gender: a.gender as Attendee["gender"],
+          sexuality: a.sexuality as Attendee["sexuality"],
+        }));
 
-        // Save attendees to DB
-        await prisma.attendee.createMany({
-          data: attendees,
-        });
+        if (attendees.length === 0) {
+          socket.emit("simulation:error", { message: "No attendees found for this simulation" });
+          return;
+        }
 
         // Update simulation status
         await prisma.simulation.update({

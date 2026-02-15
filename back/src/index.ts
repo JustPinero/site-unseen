@@ -4,6 +4,8 @@ import cors from "cors";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import healthRouter from "./routes/health.js";
+import simulationsRouter from "./routes/simulations.js";
+import { errorHandler } from "./middleware/error-handler.js";
 import { registerSimulationHandlers } from "./socket/simulation-handler.js";
 
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
@@ -24,6 +26,10 @@ app.use(express.json());
 
 // Routes
 app.use("/api/v1", healthRouter);
+app.use("/api/v1", simulationsRouter);
+
+// Error handling
+app.use(errorHandler);
 
 // Default namespace — ping/pong for connection testing
 io.on("connection", (socket) => {
