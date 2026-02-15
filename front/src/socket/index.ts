@@ -13,3 +13,11 @@ export const simulationSocket: Socket = io(`${SERVER_URL}/simulation`, {
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
 });
+
+export const lobbySocket: Socket = io(`${SERVER_URL}/lobby`, {
+  autoConnect: false,
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+});

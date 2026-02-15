@@ -1,9 +1,10 @@
 import type { Namespace, Socket } from "socket.io";
-import type { Attendee, SimulationConfig, SimulationResult } from "@site-unseen/shared";
+import type { Attendee, Simulation, SimulationConfig, SimulationResult } from "@site-unseen/shared";
 import { SimulationMode, SimulationStatus } from "@site-unseen/shared";
 import { PrismaClient, type Prisma } from "@prisma/client";
 import { SimulationRunner } from "../engine/simulation-runner.js";
 import { aggregateResults } from "../engine/results-aggregator.js";
+import { broadcastSimulationUpdate, broadcastViewerCount } from "./lobby-handler.js";
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,38 @@ function roomName(simulationId: string): string {
   return `sim:${simulationId}`;
 }
 
+async function emitViewerCount(nsp: Namespace, simulationId: string): Promise<void> {
+  const room = roomName(simulationId);
+  const sockets = await nsp.in(room).fetchSockets();
+  broadcastViewerCount(simulationId, sockets.length);
+}
+
+function toSimulation(row: {
+  id: string;
+  name: string;
+  status: string;
+  mode: string;
+  eventLengthMinutes: number;
+  dateLengthMinutes: number;
+  breakLengthMinutes: number;
+  attendeeCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}): Simulation {
+  return {
+    id: row.id,
+    name: row.name,
+    status: row.status as SimulationStatus,
+    mode: row.mode as SimulationMode,
+    eventLengthMinutes: row.eventLengthMinutes,
+    dateLengthMinutes: row.dateLengthMinutes,
+    breakLengthMinutes: row.breakLengthMinutes,
+    attendeeCount: row.attendeeCount,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
 export function registerSimulationHandlers(nsp: Namespace): void {
   nsp.on("connection", (socket: Socket) => {
     console.log(`[simulation] Viewer connected: ${socket.id}`);
@@ -29,6 +62,9 @@ export function registerSimulationHandlers(nsp: Namespace): void {
 
       await socket.join(room);
       console.log(`[simulation] ${socket.id} joined ${room}`);
+
+      // Broadcast updated viewer count to lobby
+      await emitViewerCount(nsp, simulationId);
 
       // Send snapshot if simulation is active
       const active = activeSimulations.get(simulationId);
@@ -56,6 +92,9 @@ export function registerSimulationHandlers(nsp: Namespace): void {
       const room = roomName(data.simulationId);
       await socket.leave(room);
       console.log(`[simulation] ${socket.id} left ${room}`);
+
+      // Broadcast updated viewer count to lobby
+      await emitViewerCount(nsp, data.simulationId);
     });
 
     socket.on("simulation:start", async (data: { simulationId: string }) => {
@@ -106,10 +145,13 @@ export function registerSimulationHandlers(nsp: Namespace): void {
         }
 
         // Update simulation status
-        await prisma.simulation.update({
+        const updatedSim = await prisma.simulation.update({
           where: { id: simulationId },
           data: { status: SimulationStatus.RUNNING },
         });
+
+        // Broadcast to lobby that this simulation is now running
+        broadcastSimulationUpdate(toSimulation(updatedSim));
 
         const runner = new SimulationRunner(simulationId, config, attendees);
         const room = roomName(simulationId);
@@ -147,6 +189,19 @@ export function registerSimulationHandlers(nsp: Namespace): void {
       }
     });
 
+    socket.on("disconnecting", () => {
+      // Broadcast updated viewer counts for all rooms this socket was in
+      for (const room of socket.rooms) {
+        if (room.startsWith("sim:")) {
+          const simulationId = room.slice(4);
+          // After disconnect the count will be one less
+          nsp.in(room).fetchSockets().then((sockets) => {
+            broadcastViewerCount(simulationId, Math.max(0, sockets.length - 1));
+          });
+        }
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`[simulation] Viewer disconnected: ${socket.id}`);
     });
@@ -179,10 +234,13 @@ async function completeSimulation(
     });
 
     // Update simulation status
-    await prisma.simulation.update({
+    const completedSim = await prisma.simulation.update({
       where: { id: simulationId },
       data: { status: SimulationStatus.COMPLETED },
     });
+
+    // Broadcast to lobby that this simulation completed
+    broadcastSimulationUpdate(toSimulation(completedSim));
   } catch (err) {
     console.error(`[simulation] Error saving results for ${simulationId}:`, err);
   }

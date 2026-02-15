@@ -800,6 +800,154 @@ a:hover {
   to { transform: rotate(360deg); }
 }
 
+/* ============================================
+   Lobby / Simulation List
+   ============================================ */
+
+.lobby-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.lobby-tabs {
+  display: flex;
+  gap: 0;
+  border: 2px solid var(--pink-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.lobby-tab {
+  padding: 0.45rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  background: white;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lobby-tab:not(:last-child) {
+  border-right: 1px solid var(--pink-200);
+}
+
+.lobby-tab:hover {
+  background: var(--pink-50);
+}
+
+.lobby-tab-active {
+  background: var(--pink-600);
+  color: white;
+}
+
+.lobby-tab-active:hover {
+  background: var(--pink-700);
+}
+
+.lobby-tab-count {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.lobby-tab-active .lobby-tab-count {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.lobby-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lobby-search {
+  width: 220px;
+}
+
+.lobby-sort {
+  width: auto;
+}
+
+/* Lobby Cards */
+.lobby-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.lobby-card-live {
+  border-color: var(--pink-300);
+  box-shadow: 0 0 0 1px var(--pink-200), 0 4px 12px rgba(236, 72, 153, 0.12);
+}
+
+.lobby-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.lobby-card-name {
+  font-size: 1.05rem;
+  color: var(--gray-800);
+}
+
+.lobby-badge-live {
+  animation: pulse 1.5s infinite;
+}
+
+.lobby-card-details {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.lobby-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-100);
+}
+
+.lobby-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lobby-viewers {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pink-600);
+}
+
+.lobby-viewers svg {
+  opacity: 0.8;
+}
+
+.lobby-card-date {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.lobby-card-action .btn {
+  pointer-events: none;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .hero h1 {
@@ -844,5 +992,18 @@ a:hover {
 
   .results-overview {
     flex-direction: column;
+  }
+
+  .lobby-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lobby-controls {
+    flex-direction: column;
+  }
+
+  .lobby-search {
+    width: 100%;
   }
 }

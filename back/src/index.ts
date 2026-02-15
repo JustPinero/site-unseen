@@ -7,6 +7,7 @@ import healthRouter from "./routes/health.js";
 import simulationsRouter from "./routes/simulations.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { registerSimulationHandlers } from "./socket/simulation-handler.js";
+import { registerLobbyHandlers } from "./socket/lobby-handler.js";
 
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
 
@@ -47,6 +48,10 @@ io.on("connection", (socket) => {
 // /simulation namespace
 const simulationNs = io.of("/simulation");
 registerSimulationHandlers(simulationNs);
+
+// /lobby namespace
+const lobbyNs = io.of("/lobby");
+registerLobbyHandlers(lobbyNs);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
