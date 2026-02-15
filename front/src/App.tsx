@@ -5,6 +5,7 @@ import CreateSimulationPage from "./pages/create-simulation-page";
 import SimulationListPage from "./pages/simulation-list-page";
 import SimulationViewPage from "./pages/simulation-view-page";
 import ResultsPage from "./pages/results-page";
+import NotFoundPage from "./pages/not-found-page";
 
 function Nav() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/simulations" element={<SimulationListPage />} />
           <Route path="/simulations/:id" element={<SimulationViewPage />} />
           <Route path="/simulations/:id/results" element={<ResultsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </ErrorBoundary>
     </BrowserRouter>

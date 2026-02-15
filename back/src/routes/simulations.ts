@@ -1,5 +1,6 @@
 import { Router } from "express";
 import type { Prisma } from "@prisma/client";
+import rateLimit from "express-rate-limit";
 import {
   simulationConfigSchema,
   SimulationMode,
@@ -12,11 +13,22 @@ import { generateAttendees } from "../engine/attendee-generator.js";
 import { SimulationRunner } from "../engine/simulation-runner.js";
 import { aggregateResults } from "../engine/results-aggregator.js";
 import prisma from "../lib/prisma.js";
+
 const router = Router();
+
+// Creation rate limit: 10 requests per minute per IP
+const createLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: { code: "RATE_LIMITED", message: "Too many simulations created, please try again later" } },
+});
 
 // POST /api/v1/simulations — Create a new simulation
 router.post(
   "/simulations",
+  createLimiter,
   validate(simulationConfigSchema),
   async (req, res, next) => {
     try {
