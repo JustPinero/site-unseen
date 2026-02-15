@@ -30,7 +30,6 @@ export function useLobby(callbacks: UseLobbyCallbacks): void {
 
   useEffect(() => {
     lobbySocket.connect();
-    lobbySocket.emit("lobby:subscribe");
 
     lobbySocket.on("connect", () => {
       lobbySocket.emit("lobby:subscribe");

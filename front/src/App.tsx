@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import ErrorBoundary from "./components/error-boundary";
 import HomePage from "./pages/home-page";
 import CreateSimulationPage from "./pages/create-simulation-page";
 import SimulationListPage from "./pages/simulation-list-page";
@@ -25,14 +26,16 @@ function Nav() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Nav />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/create" element={<CreateSimulationPage />} />
-        <Route path="/simulations" element={<SimulationListPage />} />
-        <Route path="/simulations/:id" element={<SimulationViewPage />} />
-        <Route path="/simulations/:id/results" element={<ResultsPage />} />
-      </Routes>
+      <ErrorBoundary>
+        <Nav />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/create" element={<CreateSimulationPage />} />
+          <Route path="/simulations" element={<SimulationListPage />} />
+          <Route path="/simulations/:id" element={<SimulationViewPage />} />
+          <Route path="/simulations/:id/results" element={<ResultsPage />} />
+        </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

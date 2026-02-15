@@ -1,12 +1,11 @@
 import type { Namespace, Socket } from "socket.io";
 import type { Attendee, Simulation, SimulationConfig, SimulationResult } from "@site-unseen/shared";
 import { SimulationMode, SimulationStatus } from "@site-unseen/shared";
-import { PrismaClient, type Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { SimulationRunner } from "../engine/simulation-runner.js";
 import { aggregateResults } from "../engine/results-aggregator.js";
 import { broadcastSimulationUpdate, broadcastViewerCount } from "./lobby-handler.js";
-
-const prisma = new PrismaClient();
+import prisma from "../lib/prisma.js";
 
 interface ActiveSimulation {
   runner: SimulationRunner;
@@ -197,7 +196,7 @@ export function registerSimulationHandlers(nsp: Namespace): void {
           // After disconnect the count will be one less
           nsp.in(room).fetchSockets().then((sockets) => {
             broadcastViewerCount(simulationId, Math.max(0, sockets.length - 1));
-          });
+          }).catch(console.error);
         }
       }
     });
@@ -247,6 +246,12 @@ async function completeSimulation(
 
   nsp.to(room).emit("simulation:completed", result);
   console.log(`[simulation] ${simulationId} completed — ${dates.length} dates, ${runner.getCurrentRound()} rounds`);
+
+  // Clean up activeSimulations entry after 5 minutes to prevent memory leak
+  setTimeout(() => {
+    activeSimulations.delete(simulationId);
+    console.log(`[simulation] Cleaned up active entry for ${simulationId}`);
+  }, 5 * 60 * 1000);
 
   return result;
 }

@@ -1,18 +1,13 @@
 import "dotenv/config";
-import express from "express";
-import cors from "cors";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import healthRouter from "./routes/health.js";
-import simulationsRouter from "./routes/simulations.js";
-import { errorHandler } from "./middleware/error-handler.js";
+import app from "./app.js";
 import { registerSimulationHandlers } from "./socket/simulation-handler.js";
 import { registerLobbyHandlers } from "./socket/lobby-handler.js";
 
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
 
-const app = express();
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
@@ -21,17 +16,6 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST"],
   },
 });
-
-// Middleware
-app.use(cors({ origin: FRONTEND_URL }));
-app.use(express.json());
-
-// Routes
-app.use("/api/v1", healthRouter);
-app.use("/api/v1", simulationsRouter);
-
-// Error handling
-app.use(errorHandler);
 
 // Default namespace — ping/pong for connection testing
 io.on("connection", (socket) => {

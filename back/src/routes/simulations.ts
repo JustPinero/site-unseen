@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PrismaClient, type Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import {
   simulationConfigSchema,
   SimulationMode,
@@ -11,8 +11,7 @@ import { AppError } from "../middleware/error-handler.js";
 import { generateAttendees } from "../engine/attendee-generator.js";
 import { SimulationRunner } from "../engine/simulation-runner.js";
 import { aggregateResults } from "../engine/results-aggregator.js";
-
-const prisma = new PrismaClient();
+import prisma from "../lib/prisma.js";
 const router = Router();
 
 // POST /api/v1/simulations — Create a new simulation
@@ -101,10 +100,18 @@ router.get("/simulations", async (req, res, next) => {
 
     const where: Prisma.SimulationWhereInput = {};
     if (req.query.status) {
-      where.status = req.query.status as SimulationStatus;
+      const status = req.query.status as string;
+      if (!Object.values(SimulationStatus).includes(status as SimulationStatus)) {
+        throw new AppError("VALIDATION_ERROR", `Invalid status: ${status}`);
+      }
+      where.status = status as SimulationStatus;
     }
     if (req.query.mode) {
-      where.mode = req.query.mode as SimulationMode;
+      const mode = req.query.mode as string;
+      if (!Object.values(SimulationMode).includes(mode as SimulationMode)) {
+        throw new AppError("VALIDATION_ERROR", `Invalid mode: ${mode}`);
+      }
+      where.mode = mode as SimulationMode;
     }
 
     const [simulations, total] = await Promise.all([
