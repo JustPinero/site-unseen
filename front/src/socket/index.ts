@@ -8,4 +8,8 @@ export const socket: Socket = io(SERVER_URL, {
 
 export const simulationSocket: Socket = io(`${SERVER_URL}/simulation`, {
   autoConnect: false,
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
 });

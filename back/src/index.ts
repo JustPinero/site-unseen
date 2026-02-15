@@ -4,6 +4,7 @@ import cors from "cors";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import healthRouter from "./routes/health.js";
+import { registerSimulationHandlers } from "./socket/simulation-handler.js";
 
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
 
@@ -37,15 +38,9 @@ io.on("connection", (socket) => {
   });
 });
 
-// /simulation namespace — stub for Request #004
+// /simulation namespace
 const simulationNs = io.of("/simulation");
-simulationNs.on("connection", (socket) => {
-  console.log(`[simulation] Viewer connected: ${socket.id}`);
-
-  socket.on("disconnect", () => {
-    console.log(`[simulation] Viewer disconnected: ${socket.id}`);
-  });
-});
+registerSimulationHandlers(simulationNs);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

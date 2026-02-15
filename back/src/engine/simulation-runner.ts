@@ -114,6 +114,14 @@ export class SimulationRunner {
     return this.state.currentRound;
   }
 
+  getLastTick(): SimulationTick {
+    return this.toTick();
+  }
+
+  getAttendees(): Attendee[] {
+    return this.attendees;
+  }
+
   private startNewRound(): void {
     this.state.currentRound++;
 
