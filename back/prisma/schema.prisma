@@ -7,4 +7,91 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Models will be added in Request #002
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Sexuality {
+  HETEROSEXUAL
+  HOMOSEXUAL
+  BISEXUAL
+}
+
+enum SimulationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+}
+
+enum SimulationMode {
+  DETAILED
+  QUICK
+}
+
+model Simulation {
+  id                 String           @id @default(uuid())
+  name               String
+  status             SimulationStatus @default(PENDING)
+  mode               SimulationMode
+  eventLengthMinutes Int
+  dateLengthMinutes  Int
+  breakLengthMinutes Int              @default(1)
+  attendeeCount      Int
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  attendees      Attendee[]
+  simulatedDates SimulatedDate[]
+  result         SimulationResult?
+
+  @@map("simulations")
+}
+
+model Attendee {
+  id           String    @id @default(uuid())
+  simulationId String
+  name         String
+  gender       Gender
+  sexuality    Sexuality
+  age          Int
+  ethnicity    String
+  interests    String[]
+
+  simulation Simulation    @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+  datesAsA   SimulatedDate[] @relation("AttendeeA")
+  datesAsB   SimulatedDate[] @relation("AttendeeB")
+
+  @@map("attendees")
+}
+
+model SimulatedDate {
+  id                 String  @id @default(uuid())
+  simulationId       String
+  roundNumber        Int
+  attendeeAId        String
+  attendeeBId        String
+  durationMinutes    Int
+  endedEarly         Boolean @default(false)
+  compatibilityScore Int
+
+  simulation Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+  attendeeA  Attendee   @relation("AttendeeA", fields: [attendeeAId], references: [id], onDelete: Cascade)
+  attendeeB  Attendee   @relation("AttendeeB", fields: [attendeeBId], references: [id], onDelete: Cascade)
+
+  @@map("simulated_dates")
+}
+
+model SimulationResult {
+  id                      String @id @default(uuid())
+  simulationId            String @unique
+  totalRounds             Int
+  totalDatesCompleted     Int
+  totalEarlyExits         Int
+  averageDatesPerAttendee Float
+  resultData              Json
+
+  simulation Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+
+  @@map("simulation_results")
+}
