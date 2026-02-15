@@ -346,6 +346,379 @@ a:hover {
   flex-wrap: wrap;
 }
 
+/* ============================================
+   Simulation View
+   ============================================ */
+
+/* Header */
+.sim-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.25rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.sim-header-left {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.sim-clock,
+.sim-round {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sim-clock-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-400);
+}
+
+.sim-clock-time {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--pink-600);
+}
+
+.sim-phase {
+  display: inline-block;
+  padding: 0.25rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sim-phase-matching {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sim-phase-dating {
+  background: var(--pink-100);
+  color: var(--pink-700);
+  animation: pulse 2s infinite;
+}
+
+.sim-phase-break {
+  background: var(--gray-100);
+  color: var(--gray-500);
+}
+
+.sim-connection {
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sim-connection::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.sim-connection-on {
+  color: var(--green-500);
+}
+
+.sim-connection-on::before {
+  background: var(--green-500);
+  box-shadow: 0 0 4px var(--green-500);
+}
+
+.sim-connection-off {
+  color: var(--red-500);
+  animation: pulse 1.5s infinite;
+}
+
+.sim-connection-off::before {
+  background: var(--red-500);
+}
+
+/* Layout */
+.sim-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+}
+
+.sim-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sim-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.sim-section-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-400);
+  margin-bottom: 0.75rem;
+}
+
+/* Active Dates */
+.sim-dates {
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.sim-dates-empty {
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--gray-400);
+}
+
+.sim-dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sim-date-row {
+  padding: 0.65rem 0.75rem;
+  background: var(--pink-50);
+  border-radius: var(--radius);
+  transition: background 0.3s;
+}
+
+.sim-date-early {
+  background: #fef2f2;
+}
+
+.sim-date-people {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.sim-date-person {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.sim-date-gender {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.sim-date-name {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.sim-date-age {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+}
+
+.sim-date-heart {
+  font-size: 0.9rem;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.sim-date-heart-broken {
+  animation: none;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.sim-date-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sim-date-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--pink-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sim-date-progress-fill {
+  height: 100%;
+  background: var(--pink-400);
+  border-radius: 3px;
+  transition: width 1s linear;
+}
+
+.sim-date-progress-early {
+  background: var(--red-500);
+}
+
+.sim-date-time {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  white-space: nowrap;
+  min-width: 45px;
+}
+
+.sim-date-early-badge {
+  display: inline-block;
+  margin-left: 0.3rem;
+  padding: 0 0.35rem;
+  background: #fecaca;
+  color: var(--red-600);
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+/* Waiting List */
+.sim-waiting {
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.sim-waiting-count {
+  font-size: 0.75rem;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  margin-left: 0.3rem;
+}
+
+.sim-waiting-empty {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.sim-waiting-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sim-waiting-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--gray-500);
+}
+
+.sim-waiting-gender {
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+.sim-waiting-name {
+  flex: 1;
+}
+
+.sim-waiting-age {
+  font-size: 0.75rem;
+  color: var(--gray-300);
+}
+
+/* Stats Bar */
+.sim-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 0.65rem 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sim-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1rem;
+}
+
+.sim-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--pink-600);
+}
+
+.sim-stat-label {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+}
+
+.sim-stat-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--gray-200);
+}
+
+/* Connection Overlay */
+.sim-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.sim-overlay-content {
+  background: white;
+  border-radius: var(--radius);
+  padding: 2rem 3rem;
+  text-align: center;
+  color: var(--gray-600);
+  font-weight: 600;
+}
+
+.sim-overlay-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--pink-200);
+  border-top-color: var(--pink-500);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .hero h1 {
@@ -359,5 +732,28 @@ a:hover {
   .nav .container {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .sim-layout {
+    flex-direction: column;
+  }
+
+  .sim-sidebar {
+    width: 100%;
+  }
+
+  .sim-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .sim-stats {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sim-stat-divider {
+    display: none;
   }
 }

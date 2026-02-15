@@ -1,102 +1,64 @@
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSimulation } from "../hooks/use-simulation";
+import EventHeader from "../components/event-header";
+import ActiveDatesTable from "../components/active-dates-table";
+import WaitingList from "../components/waiting-list";
+import StatsBar from "../components/stats-bar";
+import ConnectionOverlay from "../components/connection-overlay";
 
 export default function SimulationViewPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const sim = useSimulation(id ?? null);
 
-  if (sim.phase === "completed") {
-    navigate(`/simulations/${id}/results`, { replace: true });
-  }
+  useEffect(() => {
+    if (sim.phase === "completed") {
+      navigate(`/simulations/${id}/results`, { replace: true });
+    }
+  }, [sim.phase, id, navigate]);
+
+  const showOverlay = sim.phase === "running" && !sim.connected;
 
   return (
     <div className="container">
-      <div className="page-header">
-        <h1>Simulation View</h1>
-        <p>
-          {sim.phase === "connecting" && "Connecting..."}
-          {sim.phase === "waiting" && "Waiting to start"}
-          {sim.phase === "running" && "Simulation in progress"}
-          {sim.phase === "error" && "Error occurred"}
-          {sim.phase === "idle" && "Initializing..."}
-        </p>
-      </div>
+      <ConnectionOverlay visible={showOverlay} />
 
       {sim.error && <div className="error-message">{sim.error}</div>}
 
+      {(sim.phase === "idle" || sim.phase === "connecting") && (
+        <div className="loading">Connecting to simulation...</div>
+      )}
+
       {sim.phase === "waiting" && (
-        <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ marginBottom: "1rem", color: "var(--gray-500)" }}>
-            Ready to start the simulation
-          </p>
-          <button className="btn btn-primary" onClick={sim.start}>
-            Start Simulation
-          </button>
+        <div style={{ marginTop: "3rem" }}>
+          <div className="card" style={{ textAlign: "center", padding: "3rem", maxWidth: 500, margin: "0 auto" }}>
+            <h2 style={{ color: "var(--pink-600)", marginBottom: "0.5rem" }}>Ready to Go</h2>
+            <p style={{ marginBottom: "1.5rem", color: "var(--gray-500)" }}>
+              Attendees are generated. Start the simulation to watch dates unfold in real time.
+            </p>
+            <button className="btn btn-primary" onClick={sim.start}>
+              Start Simulation
+            </button>
+          </div>
         </div>
       )}
 
       {sim.phase === "running" && sim.tick && (
-        <div>
-          <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-            <div className="card" style={{ flex: 1, minWidth: 140, textAlign: "center" }}>
-              <div style={{ fontSize: "0.8rem", color: "var(--gray-400)" }}>Event Clock</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--pink-600)" }}>
-                {sim.tick.eventClock}m
-              </div>
+        <>
+          <EventHeader tick={sim.tick} connected={sim.connected} />
+
+          <div className="sim-layout">
+            <div className="sim-main">
+              <ActiveDatesTable pairs={sim.tick.activePairs} />
             </div>
-            <div className="card" style={{ flex: 1, minWidth: 140, textAlign: "center" }}>
-              <div style={{ fontSize: "0.8rem", color: "var(--gray-400)" }}>Round</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--pink-600)" }}>
-                {sim.tick.currentRound}
-              </div>
-            </div>
-            <div className="card" style={{ flex: 1, minWidth: 140, textAlign: "center" }}>
-              <div style={{ fontSize: "0.8rem", color: "var(--gray-400)" }}>Phase</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--pink-600)" }}>
-                {sim.tick.roundPhase}
-              </div>
-            </div>
-            <div className="card" style={{ flex: 1, minWidth: 140, textAlign: "center" }}>
-              <div style={{ fontSize: "0.8rem", color: "var(--gray-400)" }}>Dates Done</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--pink-600)" }}>
-                {sim.tick.completedDates}
-              </div>
-            </div>
+            <aside className="sim-sidebar">
+              <WaitingList attendees={sim.tick.waitingAttendees} />
+            </aside>
           </div>
 
-          <p style={{ color: "var(--gray-400)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>
-            Full real-time view coming in Request #007
-          </p>
-
-          {sim.tick.activePairs.length > 0 && (
-            <div className="card">
-              <h3 style={{ marginBottom: "0.75rem", color: "var(--gray-700)" }}>Active Dates</h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                {sim.tick.activePairs.map((pair, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "0.4rem 0",
-                      borderBottom: "1px solid var(--gray-100)",
-                      fontSize: "0.9rem",
-                    }}
-                  >
-                    <span>
-                      {pair.attendeeA.name} + {pair.attendeeB.name}
-                    </span>
-                    <span style={{ color: "var(--gray-400)" }}>
-                      {pair.dateMinutesElapsed}/{pair.dateLengthMinutes}min
-                      {pair.endedEarly && " (left early)"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+          <StatsBar tick={sim.tick} />
+        </>
       )}
     </div>
   );
