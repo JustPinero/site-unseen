@@ -1,12 +1,16 @@
 {
   "name": "site-unseen",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "back",
+    "front"
+  ],
   "scripts": {
-    "start": "cd server && npm i && npm run start",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "dev": "npm run dev --workspace=back & npm run dev --workspace=front",
+    "dev:back": "npm run dev --workspace=back",
+    "dev:front": "npm run dev --workspace=front",
+    "build": "npm run build --workspace=shared && npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
 }
