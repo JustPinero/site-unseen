@@ -10,7 +10,7 @@
     "dev": "npm run dev --workspace=back & npm run dev --workspace=front",
     "dev:back": "npm run dev --workspace=back",
     "dev:front": "npm run dev --workspace=front",
-    "build": "npm run build --workspace=shared && npm run build --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "start": "cd back && npx tsx src/index.ts",
     "postinstall": "cd back && npx prisma generate"
