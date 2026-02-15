@@ -1,6 +1,6 @@
 import type { Simulation, SimulationConfig, SimulationResult, SimulatedDate } from "@site-unseen/shared";
 
-const API_BASE = "http://localhost:3001/api/v1";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1";
 
 interface ApiError {
   error: { code: string; message: string };
