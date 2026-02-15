@@ -347,6 +347,87 @@ a:hover {
 }
 
 /* ============================================
+   Results Page
+   ============================================ */
+
+.results-header {
+  margin: 2rem 0 1.5rem;
+}
+
+.results-title {
+  font-size: 1.75rem;
+  color: var(--gray-900);
+}
+
+.results-subtitle {
+  color: var(--gray-500);
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.results-overview {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.results-stat-card {
+  flex: 1;
+  min-width: 130px;
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+
+.results-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--pink-600);
+}
+
+.results-stat-label {
+  font-size: 0.8rem;
+  color: var(--gray-400);
+  margin-top: 0.15rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.results-chart-card {
+  background: white;
+  border: 1px solid var(--pink-100);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.results-chart-title {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+  margin-bottom: 0.75rem;
+}
+
+.results-chart-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+/* ============================================
    Simulation View
    ============================================ */
 
@@ -755,5 +836,13 @@ a:hover {
 
   .sim-stat-divider {
     display: none;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-overview {
+    flex-direction: column;
   }
 }
